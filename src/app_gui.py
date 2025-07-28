@@ -144,7 +144,7 @@ class ReviewScraperApp:
         
         for code, filename in flag_files.items():
             try:
-                flag_path = os.path.join("img", filename)
+                flag_path = os.path.join("assets", "flags", filename)
                 if os.path.exists(flag_path):
                     # Carrega a imagem sem redimensionar (já está 24x24px)
                     flag_img = tk.PhotoImage(file=flag_path)
@@ -310,13 +310,13 @@ class ReviewScraperApp:
         """Configura o ícone da aplicação"""
         try:
             # Primeiro tenta usar o arquivo .ico (melhor para Windows)
-            ico_path = os.path.join("img", "google-play.ico")
+            ico_path = os.path.join("assets", "icons", "google-play.ico")
             if os.path.exists(ico_path):
                 self.root.iconbitmap(ico_path)
                 return
             
             # Fallback para PNG se .ico não existir
-            png_path = os.path.join("img", "google-play.png")
+            png_path = os.path.join("assets", "icons", "google-play.png")
             if os.path.exists(png_path):
                 try:
                     from PIL import Image, ImageTk
@@ -354,7 +354,7 @@ class ReviewScraperApp:
             hwnd = self.root.winfo_id()
             
             # Carrega o ícone do arquivo .ico
-            ico_path = os.path.join("img", "google-play.ico")
+            ico_path = os.path.join("assets", "icons", "google-play.ico")
             if os.path.exists(ico_path):
                 ico_path = os.path.abspath(ico_path)
                 
@@ -402,7 +402,7 @@ class ReviewScraperApp:
             hwnd = self.root.winfo_id()
             
             # Segunda tentativa de aplicar o ícone
-            ico_path = os.path.join("img", "google-play.ico")
+            ico_path = os.path.join("assets", "icons", "google-play.ico")
             if os.path.exists(ico_path):
                 ico_path = os.path.abspath(ico_path)
                 
@@ -1014,7 +1014,7 @@ class ReviewScraperApp:
         
         # Configura o ícone da janela
         try:
-            ico_path = os.path.join("img", "google-play.ico")
+            ico_path = os.path.join("assets", "icons", "google-play.ico")
             if os.path.exists(ico_path):
                 about_window.iconbitmap(ico_path)
         except:

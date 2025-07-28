@@ -13,7 +13,7 @@
 
 ---
 
-![Google Play Reviews Scraper](img/google-play.png)
+![Google Play Reviews Scraper](../assets/icons/google-play.png)
 
 **Outil professionnel pour extraire et analyser les avis d'applications du Google Play Store**
 
@@ -77,10 +77,10 @@ python review_scraper.py --url "https://play.google.com/store/apps/details?id=co
 
 ## 💻 **Interface Graphique Moderne**
 
-![Google Play Reviews Scraper Screenshot](img/google-play-reviews-scraper.png)
+![Google Play Reviews Scraper Screenshot](../assets/screenshots/google-play-reviews-scraper.png)
 
 ### 🎬 **Application en Action**
-![Google Play Reviews Scraper Demo](img/google-play-reviews-scraper.gif)
+![Google Play Reviews Scraper Demo](../assets/screenshots/google-play-reviews-scraper.gif)
 
 ### ✨ Fonctionnalités de l'Interface :
 - 🎨 **Design Material Design** moderne et intuitif
@@ -108,7 +108,7 @@ python review_scraper.py --url "https://play.google.com/store/apps/details?id=co
 ## 🛠️ **Interface en Ligne de Commande**
 
 ### 🎬 **Démonstration du Terminal**
-![Google Play Reviews Scraper Terminal Demo](img/google-play-reviews-scraper-terminal.gif)
+![Google Play Reviews Scraper Terminal Demo](../assets/screenshots/google-play-reviews-scraper-terminal.gif)
 
 ### 🍎🐧 **Pour les Utilisateurs Mac/Linux (Obligatoire)**
 
