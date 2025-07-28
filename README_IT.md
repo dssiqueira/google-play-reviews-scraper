@@ -77,7 +77,10 @@ python review_scraper.py --url "https://play.google.com/store/apps/details?id=co
 
 ## 💻 **Interfaccia Grafica Moderna**
 
-![Interface](https://via.placeholder.com/800x500/1976D2/FFFFFF?text=Interfaccia+Multi-lingua)
+![Google Play Reviews Scraper Screenshot](img/google-play-reviews-scraper.png)
+
+### 🎬 **Applicazione in Azione**
+![Google Play Reviews Scraper Demo](img/google-play-reviews-scraper.gif)
 
 ### ✨ Caratteristiche dell'Interfaccia:
 - 🎨 **Design Material Design** moderno e intuitivo
@@ -103,6 +106,9 @@ python review_scraper.py --url "https://play.google.com/store/apps/details?id=co
 ---
 
 ## 🛠️ **Interfaccia a Riga di Comando**
+
+### 🎬 **Dimostrazione del Terminal**
+![Google Play Reviews Scraper Terminal Demo](img/google-play-reviews-scraper-terminal.gif)
 
 ### 🍎🐧 **Per Utenti Mac/Linux (Obbligatorio)**
 

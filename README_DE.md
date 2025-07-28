@@ -77,7 +77,10 @@ python review_scraper.py --url "https://play.google.com/store/apps/details?id=co
 
 ## 💻 **Moderne Grafische Benutzeroberfläche**
 
-![Interface](https://via.placeholder.com/800x500/1976D2/FFFFFF?text=Mehrsprachige+Benutzeroberfläche)
+![Google Play Reviews Scraper Screenshot](img/google-play-reviews-scraper.png)
+
+### 🎬 **Anwendung in Aktion**
+![Google Play Reviews Scraper Demo](img/google-play-reviews-scraper.gif)
 
 ### ✨ Interface-Funktionen:
 - 🎨 **Modernes Material Design** intuitive Benutzeroberfläche
@@ -126,6 +129,9 @@ Klicken Sie auf "Sammlung Starten" und warten Sie. Der Prozess ist automatisch!
 ---
 
 ## 🛠️ **Kommandozeilenschnittstelle**
+
+### 🎬 **Terminal-Demonstration**
+![Google Play Reviews Scraper Terminal Demo](img/google-play-reviews-scraper-terminal.gif)
 
 ### 🍎🐧 **Für Mac/Linux-Benutzer (Erforderlich)**
 
