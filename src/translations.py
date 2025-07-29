@@ -33,6 +33,23 @@ TRANSLATIONS = {
         'folder_button': 'Pasta',
         'close_button': 'Fechar',
         
+        # Modal de tempo economizado
+        'time_saved_title': 'Tempo Economizado!',
+        'collection_completed': 'Coleta concluída com sucesso!',
+        'reviews_processed': '{} reviews processadas automaticamente.',
+        'reviews_label': 'Reviews',
+        'time_saved_label': 'Tempo Economizado',
+        'manual_comparison': 'vs. coleta manual (30s por review)',
+        'accumulated_totals': 'Totais Acumulados',
+        'total_summary': '{} reviews • {} economizados • {} sessões',
+        
+        # Modal "Sobre" - Estatísticas
+        'usage_statistics': 'Estatísticas de Uso',
+        'total_time_saved': 'Tempo Total Economizado',
+        'reviews_collected': 'Reviews Coletadas',
+        'usage_sessions': 'Sessões de Uso',
+        'no_stats_message': 'Nenhuma coleta realizada ainda.\nUse a ferramenta para ver suas estatísticas aqui!',
+        
         # Status
         'ready_status': 'Pronto para iniciar',
         'starting_status': 'Iniciando coleta...',
@@ -131,6 +148,23 @@ Funcionalidades:
         'json_button': 'JSON',
         'folder_button': 'Folder',
         'close_button': 'Close',
+        
+        # Time saved modal
+        'time_saved_title': 'Time Saved!',
+        'collection_completed': 'Collection completed successfully!',
+        'reviews_processed': '{} reviews processed automatically.',
+        'reviews_label': 'Reviews',
+        'time_saved_label': 'Time Saved',
+        'manual_comparison': 'vs. manual collection (30s per review)',
+        'accumulated_totals': 'Accumulated Totals',
+        'total_summary': '{} reviews • {} saved • {} sessions',
+        
+        # "About" modal - Statistics
+        'usage_statistics': 'Usage Statistics',
+        'total_time_saved': 'Total Time Saved',
+        'reviews_collected': 'Reviews Collected',
+        'usage_sessions': 'Usage Sessions',
+        'no_stats_message': 'No collections performed yet.\nUse the tool to see your statistics here!',
         
         # Status
         'ready_status': 'Ready to start',
@@ -231,6 +265,23 @@ Features:
         'folder_button': 'Carpeta',
         'close_button': 'Cerrar',
         
+        # Modal de tiempo ahorrado
+        'time_saved_title': '¡Tiempo Ahorrado!',
+        'collection_completed': '¡Recopilación completada con éxito!',
+        'reviews_processed': '{} reseñas procesadas automáticamente.',
+        'reviews_label': 'Reseñas',
+        'time_saved_label': 'Tiempo Ahorrado',
+        'manual_comparison': 'vs. recopilación manual (30s por reseña)',
+        'accumulated_totals': 'Totales Acumulados',
+        'total_summary': '{} reseñas • {} ahorrados • {} sesiones',
+        
+        # Modal "Acerca de" - Estadísticas
+        'usage_statistics': 'Estadísticas de Uso',
+        'total_time_saved': 'Tiempo Total Ahorrado',
+        'reviews_collected': 'Reseñas Recopiladas',
+        'usage_sessions': 'Sesiones de Uso',
+        'no_stats_message': 'Aún no se han realizado recopilaciones.\n¡Usa la herramienta para ver tus estadísticas aquí!',
+        
         # Estado
         'ready_status': 'Listo para comenzar',
         'starting_status': 'Iniciando recopilación...',
@@ -329,6 +380,23 @@ Características:
         'json_button': 'JSON',
         'folder_button': 'Dossier',
         'close_button': 'Fermer',
+        
+        # Modal de temps économisé
+        'time_saved_title': 'Temps Économisé !',
+        'collection_completed': 'Collection terminée avec succès !',
+        'reviews_processed': '{} avis traités automatiquement.',
+        'reviews_label': 'Avis',
+        'time_saved_label': 'Temps Économisé',
+        'manual_comparison': 'vs. collecte manuelle (30s par avis)',
+        'accumulated_totals': 'Totaux Accumulés',
+        'total_summary': '{} avis • {} économisés • {} sessions',
+        
+        # Modal "À propos" - Statistiques
+        'usage_statistics': 'Statistiques d\'Utilisation',
+        'total_time_saved': 'Temps Total Économisé',
+        'reviews_collected': 'Avis collectés',
+        'usage_sessions': 'Sessions d\'utilisation',
+        'no_stats_message': 'Aucune collecte effectuée pour le moment.\nUtilisez l\'outil pour voir vos statistiques ici !',
         
         # État
         'ready_status': 'Prêt à commencer',
@@ -429,6 +497,23 @@ Fonctionnalités:
         'folder_button': 'Ordner',
         'close_button': 'Schließen',
         
+        # Modal für gesparte Zeit
+        'time_saved_title': 'Zeit Gespart!',
+        'collection_completed': 'Sammlung erfolgreich abgeschlossen!',
+        'reviews_processed': '{} Bewertungen automatisch verarbeitet.',
+        'reviews_label': 'Bewertungen',
+        'time_saved_label': 'Zeit Gespart',
+        'manual_comparison': 'vs. manuelle Sammlung (30s pro Bewertung)',
+        'accumulated_totals': 'Gesamtsummen',
+        'total_summary': '{} Bewertungen • {} gespart • {} Sitzungen',
+        
+        # "Über" Modal - Statistiken
+        'usage_statistics': 'Statistiken',
+        'total_time_saved': 'Zeit Gespart',
+        'reviews_collected': 'Reviews',
+        'usage_sessions': 'Sessions',
+        'no_stats_message': 'Noch keine Sammlungen durchgeführt.\nVerwenden Sie das Tool, um Ihre Statistiken hier zu sehen!',
+        
         # Status
         'ready_status': 'Bereit zum Starten',
         'starting_status': 'Sammlung wird gestartet...',
@@ -527,6 +612,23 @@ Funktionen:
         'json_button': 'JSON',
         'folder_button': 'Cartella',
         'close_button': 'Chiudi',
+        
+        # Modal tempo risparmiato
+        'time_saved_title': 'Tempo Risparmiato!',
+        'collection_completed': 'Raccolta completata con successo!',
+        'reviews_processed': '{} recensioni elaborate automaticamente.',
+        'reviews_label': 'Recensioni',
+        'time_saved_label': 'Tempo Risparmiato',
+        'manual_comparison': 'vs. raccolta manuale (30s per recensione)',
+        'accumulated_totals': 'Totali Accumulati',
+        'total_summary': '{} recensioni • {} risparmiati • {} sessioni',
+        
+        # Modal "Informazioni" - Statistiche
+        'usage_statistics': 'Statistiche di Utilizzo',
+        'total_time_saved': 'Tempo Totale Risparmiato',
+        'reviews_collected': 'Recensioni raccolte',
+        'usage_sessions': 'Sessioni di utilizzo',
+        'no_stats_message': 'Nessuna raccolta eseguita ancora.\nUsa lo strumento per vedere le tue statistiche qui!',
         
         # Stato
         'ready_status': 'Pronto per iniziare',

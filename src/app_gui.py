@@ -5,6 +5,7 @@ import os
 import time
 from review_scraper import GooglePlayReviewScraper
 from translations import translator
+from time_stats import time_stats
 
 class ReviewScraperApp:
     def __init__(self, root):
@@ -917,6 +918,9 @@ class ReviewScraperApp:
                     self.log(f"\nColeta finalizada com sucesso!")
                     self.log(f"Arquivos salvos em: {output_dir}")
                     
+                    # Mostra modal de tempo economizado
+                    self.root.after(500, lambda: self.show_time_saved_modal(len(reviews_data)))
+                    
                     self.root.after(0, lambda: self.status_label.config(
                         text=f"Concluído: {len(reviews_data)} reviews coletadas"))
                     
@@ -993,8 +997,8 @@ class ReviewScraperApp:
     def show_about(self):
         """Mostra a janela Sobre"""
         # Calcula posição central antes de criar a janela
-        window_width = 500
-        window_height = 400
+        window_width = 650  # Máximo para alemão
+        window_height = 570  # Reduzido após remover primeiro uso
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
         
@@ -1032,7 +1036,7 @@ class ReviewScraperApp:
         # Descrição do projeto centralizada
         tk.Label(main_frame, text=translator.get('about_description'), font=('Segoe UI', 10),
                 fg=self.colors['on_background'], bg=self.colors['background'],
-                justify=tk.CENTER, wraplength=440).pack(pady=(0, 20))
+                justify=tk.CENTER, wraplength=590).pack(pady=(0, 20))
         
         # Ferramenta externa centralizada
         tk.Label(main_frame, text=translator.get('about_external_tool'),
@@ -1048,6 +1052,93 @@ class ReviewScraperApp:
                                bg=self.colors['background'], cursor='hand2')
         external_link.pack()
         external_link.bind("<Button-1>", lambda e: self.open_url("https://review-stats-pro.lovable.app/"))
+        
+        # Seção de estatísticas de tempo economizado
+        stats_summary = time_stats.get_stats_summary()
+        
+        # Separador antes das estatísticas
+        separator1 = tk.Frame(main_frame, height=1, bg=self.colors['divider'])
+        separator1.pack(fill=tk.X, pady=(20, 15))
+        
+        # Título das estatísticas
+        tk.Label(main_frame, text=f"📊 {translator.get('usage_statistics')}",
+                font=('Segoe UI', 12, 'bold'), fg=self.colors['primary'],
+                bg=self.colors['background']).pack(pady=(0, 10))
+        
+        if stats_summary['total_reviews'] > 0:
+            # Card com estatísticas
+            stats_frame = tk.Frame(main_frame, bg=self.colors['surface'], relief='solid', bd=1)
+            stats_frame.pack(fill=tk.X, pady=(0, 15))
+            
+            # Estatísticas principais
+            stats_content = tk.Frame(stats_frame, bg=self.colors['surface'])
+            stats_content.pack(fill=tk.X, padx=20, pady=(20, 25))
+            
+            # Destaques principais em duas colunas
+            highlights_frame = tk.Frame(stats_content, bg=self.colors['surface'])
+            highlights_frame.pack(fill=tk.X, pady=(0, 15))
+            
+            # Coluna 1: Total de Reviews
+            reviews_highlight = tk.Frame(highlights_frame, bg=self.colors['surface'])
+            reviews_highlight.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 10))
+            
+            tk.Label(reviews_highlight, text=f"📈 {translator.get('reviews_collected')}",
+                    font=('Segoe UI', 10, 'bold'), fg=self.colors['primary'],
+                    bg=self.colors['surface']).pack()
+            
+            tk.Label(reviews_highlight, text=f"{stats_summary['total_reviews']:,}",
+                    font=('Segoe UI', 16, 'bold'), fg=self.colors['info'],
+                    bg=self.colors['surface']).pack()
+            
+            # Coluna 2: Tempo Economizado
+            time_highlight = tk.Frame(highlights_frame, bg=self.colors['surface'])
+            time_highlight.pack(side=tk.RIGHT, fill=tk.X, expand=True, padx=(10, 0))
+            
+            tk.Label(time_highlight, text=f"⏱️ {translator.get('total_time_saved')}",
+                    font=('Segoe UI', 10, 'bold'), fg=self.colors['primary'],
+                    bg=self.colors['surface']).pack()
+            
+            tk.Label(time_highlight, text=stats_summary['total_time_saved_formatted'],
+                    font=('Segoe UI', 16, 'bold'), fg=self.colors['secondary'],
+                    bg=self.colors['surface']).pack()
+            
+            # Separador sutil
+            separator_stats = tk.Frame(stats_content, height=1, bg=self.colors['divider'])
+            separator_stats.pack(fill=tk.X, pady=(5, 10))
+            
+            # Outras estatísticas - layout especial para alemão
+            other_stats = tk.Frame(stats_content, bg=self.colors['surface'])
+            other_stats.pack(fill=tk.X, pady=(5, 0))
+            
+            # Layout específico para alemão
+            if translator.current_language == 'de':
+                # Para alemão: layout mais compacto e limpo
+                stats_compact = tk.Frame(other_stats, bg=self.colors['surface'])
+                stats_compact.pack(fill=tk.X, pady=(0, 5))
+                
+                # Apenas Sessions
+                sessions_text = f"🔄 {translator.get('usage_sessions')}: {stats_summary['total_sessions']:,}"
+                tk.Label(stats_compact, text=sessions_text,
+                        font=('Segoe UI', 9), fg=self.colors['on_surface'],
+                        bg=self.colors['surface'], anchor='w').pack(fill=tk.X)
+            else:
+                # Para outros idiomas: layout limpo
+                # Apenas sessões de uso
+                sessions_frame = tk.Frame(other_stats, bg=self.colors['surface'])
+                sessions_frame.pack(fill=tk.X)
+                
+                sessions_text = f"🔄 {translator.get('usage_sessions')}: {stats_summary['total_sessions']:,}"
+                tk.Label(sessions_frame, text=sessions_text,
+                        font=('Segoe UI', 9), fg=self.colors['on_surface'],
+                        bg=self.colors['surface'], anchor='w', wraplength=580).pack(fill=tk.X)
+        else:
+            # Mensagem quando não há estatísticas
+            no_stats_frame = tk.Frame(main_frame, bg=self.colors['surface'], relief='solid', bd=1)
+            no_stats_frame.pack(fill=tk.X, pady=(0, 15))
+            
+            tk.Label(no_stats_frame, text=translator.get('no_stats_message'),
+                    font=('Segoe UI', 10), fg=self.colors['on_surface'],
+                    bg=self.colors['surface'], justify=tk.CENTER).pack(pady=20)
         
         # Separador
         separator = tk.Frame(main_frame, height=1, bg=self.colors['divider'])
@@ -1090,6 +1181,139 @@ class ReviewScraperApp:
         """Abre URL no navegador padrão"""
         import webbrowser
         webbrowser.open(url)
+    
+    def show_time_saved_modal(self, reviews_count):
+        """Mostra modal com tempo economizado"""
+        if reviews_count <= 0:
+            return
+        
+        # Salva a sessão e obtém tempo economizado
+        time_saved_seconds = time_stats.add_session(reviews_count)
+        
+        # Obtém estatísticas totais
+        stats_summary = time_stats.get_stats_summary()
+        
+        time_saved_formatted = time_stats.format_time(time_saved_seconds)
+        manual_time_formatted = time_stats.format_time(reviews_count * 30)  # Mesmo valor, mas para contexto
+        
+        # Calcula posição central
+        window_width = 500
+        window_height = 350
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        
+        x = (screen_width // 2) - (window_width // 2)
+        y = (screen_height // 2) - (window_height // 2)
+        
+        # Cria a janela modal
+        modal = tk.Toplevel(self.root)
+        modal.title(translator.get('time_saved_title'))
+        modal.geometry(f"{window_width}x{window_height}+{x}+{y}")
+        modal.resizable(False, False)
+        modal.configure(bg=self.colors['background'])
+        
+        # Configura propriedades da janela
+        modal.transient(self.root)
+        modal.grab_set()
+        
+        # Configura o ícone da janela
+        try:
+            ico_path = os.path.join("assets", "icons", "google-play.ico")
+            if os.path.exists(ico_path):
+                modal.iconbitmap(ico_path)
+        except:
+            pass
+        
+        # Container principal
+        main_frame = tk.Frame(modal, bg=self.colors['background'])
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=30, pady=30)
+        
+        # Ícone e título
+        title_frame = tk.Frame(main_frame, bg=self.colors['background'])
+        title_frame.pack(pady=(0, 20))
+        
+        tk.Label(title_frame, text="🎉", font=('Segoe UI', 24),
+                bg=self.colors['background']).pack(side=tk.LEFT, padx=(0, 10))
+        
+        tk.Label(title_frame, text=translator.get('time_saved_title'), font=('Segoe UI', 18, 'bold'),
+                fg=self.colors['primary'], bg=self.colors['background']).pack(side=tk.LEFT)
+        
+        # Mensagem principal mais concisa
+        message_text = f"{translator.get('collection_completed')}\n{translator.get('reviews_processed').format(reviews_count)}"
+        
+        tk.Label(main_frame, text=message_text, font=('Segoe UI', 12),
+                fg=self.colors['on_background'], bg=self.colors['background'],
+                wraplength=440, justify=tk.CENTER).pack(pady=(0, 20))
+        
+        # Card com destaque - layout em duas colunas
+        highlight_frame = tk.Frame(main_frame, bg=self.colors['surface'], relief='solid', bd=1)
+        highlight_frame.pack(fill=tk.X, pady=(0, 20))
+        
+        highlight_content = tk.Frame(highlight_frame, bg=self.colors['surface'])
+        highlight_content.pack(fill=tk.X, padx=20, pady=15)
+        
+        # Coluna 1: Reviews processadas
+        reviews_col = tk.Frame(highlight_content, bg=self.colors['surface'])
+        reviews_col.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        
+        tk.Label(reviews_col, text=f"📈 {translator.get('reviews_label')}", font=('Segoe UI', 10, 'bold'),
+                fg=self.colors['primary'], bg=self.colors['surface']).pack()
+        
+        tk.Label(reviews_col, text=f"{reviews_count:,}", font=('Segoe UI', 18, 'bold'),
+                fg=self.colors['info'], bg=self.colors['surface']).pack()
+        
+        # Coluna 2: Tempo economizado
+        time_col = tk.Frame(highlight_content, bg=self.colors['surface'])
+        time_col.pack(side=tk.RIGHT, fill=tk.X, expand=True)
+        
+        tk.Label(time_col, text=f"⏱️ {translator.get('time_saved_label')}", font=('Segoe UI', 10, 'bold'),
+                fg=self.colors['primary'], bg=self.colors['surface']).pack()
+        
+        tk.Label(time_col, text=time_saved_formatted, font=('Segoe UI', 18, 'bold'),
+                fg=self.colors['secondary'], bg=self.colors['surface']).pack()
+        
+        # Explicação sutil
+        explanation = tk.Label(highlight_frame, text=translator.get('manual_comparison'),
+                              font=('Segoe UI', 8), fg=self.colors['disabled'],
+                              bg=self.colors['surface'])
+        explanation.pack(pady=(0, 10))
+        
+        # Estatísticas totais (mais compactas)
+        if stats_summary['total_sessions'] > 1:  # Só mostra se não é a primeira sessão
+            total_frame = tk.Frame(main_frame, bg=self.colors['background'])
+            total_frame.pack(fill=tk.X, pady=(0, 15))
+            
+            tk.Label(total_frame, text=f"📊 {translator.get('accumulated_totals')}", font=('Segoe UI', 10, 'bold'),
+                    fg=self.colors['primary'], bg=self.colors['background']).pack(pady=(0, 5))
+            
+            total_text = translator.get('total_summary').format(
+                f"{stats_summary['total_reviews']:,}",
+                stats_summary['total_time_saved_formatted'],
+                f"{stats_summary['total_sessions']:,}"
+            )
+            
+            tk.Label(total_frame, text=total_text, font=('Segoe UI', 9),
+                    fg=self.colors['on_surface'], bg=self.colors['background'],
+                    justify=tk.CENTER).pack()
+        
+        # Botão fechar
+        close_btn = tk.Button(main_frame, text=translator.get('close_button'), command=modal.destroy,
+                            bg=self.colors['primary'], fg='white', font=('Segoe UI', 11, 'bold'),
+                            relief='flat', bd=0, cursor='hand2', width=12, height=2)
+        close_btn.pack(pady=(10, 0))
+        
+        # Hover effect para o botão
+        def on_enter(e):
+            close_btn.config(bg=self.darken_color(self.colors['primary']))
+        def on_leave(e):
+            close_btn.config(bg=self.colors['primary'])
+        close_btn.bind("<Enter>", on_enter)
+        close_btn.bind("<Leave>", on_leave)
+        
+        # Foco no botão para permitir fechar com Enter
+        close_btn.focus_set()
+        modal.bind('<Return>', lambda e: modal.destroy())
+        modal.bind('<Escape>', lambda e: modal.destroy())
     
     def log(self, message):
         """Adiciona mensagem ao log"""
