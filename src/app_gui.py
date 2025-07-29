@@ -40,7 +40,6 @@ class ReviewScraperApp:
         self.setup_styles()
         
         # Variáveis
-        self.url_var = tk.StringVar()
         self.country_var = tk.StringVar(value="br")
         self.lang_var = tk.StringVar(value="pt")
         self.output_dir_var = tk.StringVar(value=os.getcwd())
@@ -53,8 +52,7 @@ class ReviewScraperApp:
         
         self.create_interface()
         
-        # Bind eventos
-        self.url_var.trace('w', self.on_url_change)
+        # Bind eventos (removido - agora usa on_urls_change)
 
     def create_language_selector(self, parent):
         """Cria seletor de idioma customizado com bandeiras PNG"""
@@ -557,25 +555,69 @@ class ReviewScraperApp:
         self.subtitle_label.pack(pady=(5, 0))
         
     def create_url_section(self, parent):
-        """Cria a seção de URL"""
+        """Cria a seção de URLs com lista visual"""
         section, self.url_section_title = self.create_card(parent, translator.get('url_section'))
         
-        # URL entry
-        url_frame = tk.Frame(section, bg=self.colors['surface'])
-        url_frame.pack(fill=tk.X, pady=(0, 10))
+        # Campo de entrada de URL única
+        url_input_frame = tk.Frame(section, bg=self.colors['surface'])
+        url_input_frame.pack(fill=tk.X, pady=(0, 10))
         
-        self.url_entry = tk.Entry(url_frame, textvariable=self.url_var,
-                                 font=('Segoe UI', 11), bg=self.colors['surface'],
-                                 fg=self.colors['on_surface'], relief='solid', bd=1)
+        self.url_entry = tk.Entry(url_input_frame, font=('Segoe UI', 11),
+                                 bg=self.colors['surface'], fg=self.colors['on_surface'],
+                                 relief='solid', bd=1)
         self.url_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, ipady=8, ipadx=10)
         
-        self.paste_btn = self.create_button(url_frame, translator.get('paste_button'), self.paste_url, self.colors['info'])
-        self.paste_btn.pack(side=tk.RIGHT, padx=(10, 0))
+        # Botões de ação
+        url_buttons = tk.Frame(url_input_frame, bg=self.colors['surface'])
+        url_buttons.pack(side=tk.RIGHT, padx=(10, 0))
         
-        # App ID
-        self.app_id_label = tk.Label(section, text="", font=('Segoe UI', 10),
-                                   fg=self.colors['primary'], bg=self.colors['surface'])
-        self.app_id_label.pack(anchor=tk.W)
+        self.paste_btn = self.create_button(url_buttons, translator.get('paste_button'), self.paste_url, self.colors['info'])
+        self.paste_btn.pack(side=tk.LEFT, padx=(0, 5))
+        
+        self.add_btn = self.create_button(url_buttons, "Adicionar", self.add_url, self.colors['primary'])
+        self.add_btn.pack(side=tk.LEFT)
+        
+        # Lista visual de URLs adicionadas
+        list_frame = tk.Frame(section, bg=self.colors['surface'])
+        list_frame.pack(fill=tk.X, pady=(10, 0))
+        
+        # Título da lista
+        list_title = tk.Label(list_frame, text="Apps na fila:", font=('Segoe UI', 10, 'bold'),
+                             fg=self.colors['primary'], bg=self.colors['surface'])
+        list_title.pack(anchor=tk.W, pady=(0, 5))
+        
+        # Container da lista com scrollbar
+        list_container = tk.Frame(list_frame, bg=self.colors['surface'], relief='solid', bd=1)
+        list_container.pack(fill=tk.X, pady=(0, 10))
+        
+        # Canvas para scroll
+        self.list_canvas = tk.Canvas(list_container, height=120, bg=self.colors['background'],
+                                    highlightthickness=0)
+        self.list_scrollbar = tk.Scrollbar(list_container, orient="vertical", command=self.list_canvas.yview)
+        self.list_canvas.configure(yscrollcommand=self.list_scrollbar.set)
+        
+        # Frame scrollável
+        self.list_scrollable_frame = tk.Frame(self.list_canvas, bg=self.colors['background'])
+        self.list_canvas.create_window((0, 0), window=self.list_scrollable_frame, anchor="nw")
+        
+        self.list_canvas.pack(side="left", fill="both", expand=True)
+        self.list_scrollbar.pack(side="right", fill="y")
+        
+        # Bind para scroll
+        self.list_scrollable_frame.bind("<Configure>", 
+                                       lambda e: self.list_canvas.configure(scrollregion=self.list_canvas.bbox("all")))
+        
+        # Botão para limpar toda a lista
+        self.clear_all_btn = self.create_button(list_frame, "Limpar Todos", self.clear_all_urls, self.colors['error'])
+        self.clear_all_btn.pack(anchor=tk.W)
+        
+        # Lista para armazenar URLs
+        self.urls_list = []
+        
+        # Status
+        self.urls_status_label = tk.Label(section, text="Nenhum app adicionado", font=('Segoe UI', 10),
+                                         fg=self.colors['disabled'], bg=self.colors['surface'])
+        self.urls_status_label.pack(anchor=tk.W, pady=(5, 0))
         
         self.setup_placeholder()
         
@@ -665,11 +707,11 @@ class ReviewScraperApp:
         results = tk.Frame(section, bg=self.colors['surface'])
         results.pack()
         
-        self.open_csv_btn = self.create_button(results, "CSV", lambda: self.open_file(self.csv_path),
+        self.open_csv_btn = self.create_button(results, "CSV", self.open_csv_files,
                                              self.colors['secondary'], state=tk.DISABLED)
         self.open_csv_btn.pack(side=tk.LEFT, padx=(0, 5))
         
-        self.open_json_btn = self.create_button(results, "JSON", lambda: self.open_file(self.json_path),
+        self.open_json_btn = self.create_button(results, "JSON", self.open_json_files,
                                               self.colors['info'], state=tk.DISABLED)
         self.open_json_btn.pack(side=tk.LEFT, padx=(0, 5))
         
@@ -767,40 +809,151 @@ class ReviewScraperApp:
         return color_map.get(color, color)
 
     def setup_placeholder(self):
-        """Configura placeholder para URL"""
-        placeholder = translator.get('url_placeholder')
+        """Configura placeholder para URL única"""
+        placeholder = "Cole a URL do app do Google Play Store..."
         
         def on_focus_in(e):
-            if self.url_var.get() == placeholder:
-                self.url_var.set("")
+            if self.url_entry.get() == placeholder:
+                self.url_entry.delete(0, tk.END)
                 self.url_entry.config(fg=self.colors['on_surface'])
         
         def on_focus_out(e):
-            if not self.url_var.get():
-                self.url_var.set(placeholder)
+            if not self.url_entry.get():
+                self.url_entry.insert(0, placeholder)
                 self.url_entry.config(fg=self.colors['disabled'])
         
-        self.url_var.set(placeholder)
+        self.url_entry.insert(0, placeholder)
         self.url_entry.config(fg=self.colors['disabled'])
         self.url_entry.bind('<FocusIn>', on_focus_in)
         self.url_entry.bind('<FocusOut>', on_focus_out)
-
-    def on_url_change(self, *args):
-        """Chamado quando URL muda"""
-        url = self.url_var.get()
-        placeholder_text = "Cole a URL do app do Google Play Store..."
         
-        if url and url != placeholder_text:
-            try:
-                app_id = self.scraper.extract_app_id_from_url(url) if self.scraper else ""
-                self.app_id_label.config(text=f"App ID: {app_id}")
-                self.status_var.set(f"App ID extraído: {app_id}")
-            except:
-                self.app_id_label.config(text="")
-                self.status_var.set("URL inválida")
+        # Bind Enter para adicionar URL
+        self.url_entry.bind('<Return>', lambda e: self.add_url())
+
+    def paste_url(self):
+        """Cola URL da área de transferência"""
+        try:
+            clipboard_content = self.root.clipboard_get()
+            placeholder = "Cole a URL do app do Google Play Store..."
+            
+            if self.url_entry.get() == placeholder:
+                self.url_entry.delete(0, tk.END)
+                self.url_entry.config(fg=self.colors['on_surface'])
+            
+            self.url_entry.delete(0, tk.END)
+            self.url_entry.insert(0, clipboard_content.strip())
+            self.url_entry.config(fg=self.colors['on_surface'])
+            self.log(translator.get('url_pasted'))
+        except tk.TclError:
+            messagebox.showerror(translator.get('error_title'), translator.get('error_clipboard'))
+    
+    def add_url(self):
+        """Adiciona URL à lista"""
+        url = self.url_entry.get().strip()
+        placeholder = "Cole a URL do app do Google Play Store..."
+        
+        if not url or url == placeholder:
+            messagebox.showwarning("Aviso", "Por favor, insira uma URL")
+            return
+        
+        if 'play.google.com/store/apps/details' not in url:
+            messagebox.showerror("Erro", "URL deve ser do Google Play Store")
+            return
+        
+        try:
+            # Extrai app_id
+            app_id = self.scraper.extract_app_id_from_url(url)
+            
+            # Verifica se já existe
+            for existing in self.urls_list:
+                if existing['app_id'] == app_id:
+                    messagebox.showwarning("Aviso", f"App {app_id} já está na lista")
+                    return
+            
+            # Adiciona à lista
+            self.urls_list.append({'url': url, 'app_id': app_id})
+            
+            # Limpa campo de entrada
+            self.url_entry.delete(0, tk.END)
+            self.setup_placeholder()
+            
+            # Atualiza lista visual
+            self.update_urls_list()
+            self.log(f"App adicionado: {app_id}")
+            
+        except Exception as e:
+            messagebox.showerror("Erro", f"URL inválida: {str(e)}")
+    
+    def remove_url(self, app_id):
+        """Remove URL da lista"""
+        self.urls_list = [item for item in self.urls_list if item['app_id'] != app_id]
+        self.update_urls_list()
+        self.log(f"App removido: {app_id}")
+    
+    def clear_all_urls(self):
+        """Limpa toda a lista"""
+        if not self.urls_list:
+            return
+        
+        if messagebox.askyesno("Confirmar", "Deseja remover todos os apps da lista?"):
+            self.urls_list = []
+            self.update_urls_list()
+            self.log("Lista de apps limpa")
+    
+    def update_urls_list(self):
+        """Atualiza a lista visual de URLs"""
+        # Limpa lista atual
+        for widget in self.list_scrollable_frame.winfo_children():
+            widget.destroy()
+        
+        if not self.urls_list:
+            # Mostra mensagem vazia
+            empty_label = tk.Label(self.list_scrollable_frame, text="Nenhum app adicionado ainda",
+                                  font=('Segoe UI', 10), fg=self.colors['disabled'],
+                                  bg=self.colors['background'])
+            empty_label.pack(pady=20)
+            self.urls_status_label.config(text="Nenhum app adicionado", fg=self.colors['disabled'])
         else:
-            self.app_id_label.config(text="")
-            self.status_var.set("Pronto")
+            # Mostra lista de apps
+            for i, url_data in enumerate(self.urls_list):
+                app_id = url_data['app_id']
+                
+                # Frame do item
+                item_frame = tk.Frame(self.list_scrollable_frame, bg=self.colors['surface'],
+                                     relief='solid', bd=1)
+                item_frame.pack(fill=tk.X, padx=5, pady=2)
+                
+                # Número e App ID
+                info_label = tk.Label(item_frame, text=f"{i+1}. {app_id}",
+                                     font=('Segoe UI', 10), fg=self.colors['on_surface'],
+                                     bg=self.colors['surface'])
+                info_label.pack(side=tk.LEFT, padx=10, pady=5)
+                
+                # Botão remover
+                remove_btn = tk.Button(item_frame, text="✕", font=('Segoe UI', 10, 'bold'),
+                                      bg=self.colors['error'], fg='white', relief='flat',
+                                      bd=0, width=3, cursor='hand2',
+                                      command=lambda aid=app_id: self.remove_url(aid))
+                remove_btn.pack(side=tk.RIGHT, padx=5, pady=2)
+                
+                # Hover effect
+                def on_enter(e, btn=remove_btn):
+                    btn.config(bg=self.darken_color(self.colors['error']))
+                def on_leave(e, btn=remove_btn):
+                    btn.config(bg=self.colors['error'])
+                remove_btn.bind("<Enter>", on_enter)
+                remove_btn.bind("<Leave>", on_leave)
+            
+            # Atualiza status
+            count = len(self.urls_list)
+            if count == 1:
+                self.urls_status_label.config(text="1 app na fila", fg=self.colors['primary'])
+            else:
+                self.urls_status_label.config(text=f"{count} apps na fila", fg=self.colors['primary'])
+        
+        # Atualiza scroll region
+        self.list_scrollable_frame.update_idletasks()
+        self.list_canvas.configure(scrollregion=self.list_canvas.bbox("all"))
 
     def update_progress(self, value):
         """Atualiza barra de progresso"""
@@ -812,14 +965,7 @@ class ReviewScraperApp:
             progress_width = (value / 100) * canvas_width
             self.progress_canvas.coords(self.progress_bar_id, 0, 0, progress_width, 20)
     
-    def paste_url(self):
-        """Cola URL da área de transferência"""
-        try:
-            clipboard_content = self.root.clipboard_get()
-            self.url_var.set(clipboard_content)
-            self.log("URL colada da área de transferência")
-        except:
-            messagebox.showwarning("Aviso", "Não foi possível colar da área de transferência")
+
     
     def choose_folder(self):
         """Escolhe pasta de destino"""
@@ -843,15 +989,10 @@ class ReviewScraperApp:
                     subprocess.call(['xdg-open', folder])
     
     def start_scraping(self):
-        """Inicia o scraping"""
-        url = self.url_var.get().strip()
-        
-        if not url:
-            messagebox.showerror("Erro", "Por favor, insira uma URL")
-            return
-        
-        if "play.google.com" not in url:
-            messagebox.showerror("Erro", "URL deve ser do Google Play Store")
+        """Inicia o scraping (suporta múltiplas URLs)"""
+        # Verifica se há URLs na lista
+        if not self.urls_list:
+            messagebox.showerror("Erro", "Por favor, adicione pelo menos um app à lista")
             return
         
         # Atualiza interface
@@ -863,7 +1004,12 @@ class ReviewScraperApp:
         self.open_folder_btn.config(state=tk.DISABLED, bg=self.colors['disabled'], fg='white')
         self.progress_var.set(0)
         self.update_progress(0)
-        self.status_label.config(text="Iniciando coleta...")
+        
+        if len(self.urls_list) == 1:
+            self.status_label.config(text="Iniciando coleta...")
+        else:
+            self.status_label.config(text=f"Iniciando coleta em lote ({len(self.urls_list)} apps)...")
+        
         self.status_var.set("Executando...")
         
         # Limpa log
@@ -880,59 +1026,74 @@ class ReviewScraperApp:
         thread.start()
     
     def scraping_worker(self):
-        """Worker thread para scraping"""
+        """Worker thread para scraping em lote"""
+        total_reviews = 0
+        processed_apps = 0
+        
         try:
-            url = self.url_var.get()
-            self.log(f"Processando URL: {url}")
+            total_apps = len(self.urls_list)
+            output_dir = self.output_dir_var.get()
             
-            # Extrai app_id
-            app_id = self.scraper.extract_app_id_from_url(url)
-            self.log(f"App ID extraído: {app_id}")
-            
-            # Coleta reviews
-            self.log("Iniciando coleta de reviews...")
-            reviews_data, app_info = self.scraper.extract_all_reviews(app_id)
-            
-            if reviews_data and self.is_running:
-                # Salva arquivos
-                output_dir = self.output_dir_var.get()
+            for i, url_data in enumerate(self.urls_list, 1):
+                if not self.is_running:
+                    break
                 
-                # Muda para o diretório de saída
-                original_dir = os.getcwd()
-                os.chdir(output_dir)
+                url = url_data['url']
+                app_id = url_data['app_id']
+                
+                # Atualiza status
+                self.root.after(0, lambda i=i, total=total_apps, app=app_id: self.status_label.config(
+                    text=f"App {i}/{total}: {app}"
+                ))
+                
+                self.log(f"[{i}/{total_apps}] Processando: {app_id}")
                 
                 try:
-                    self.scraper.save_reviews(reviews_data, app_info)
+                    # Extrai reviews
+                    reviews_data, app_info = self.scraper.extract_all_reviews(app_id)
                     
-                    # Encontra os arquivos criados
-                    app_name = self.scraper.clean_filename(app_info.get('title', 'app'))
-                    self.csv_path = os.path.join(output_dir, f"{app_name}_reviews.csv")
-                    self.json_path = os.path.join(output_dir, f"{app_name}_reviews.json")
-                    
-                    # Mostra estatísticas
-                    self.show_statistics(reviews_data)
-                    
-                    # Habilita botões
-                    self.root.after(0, self.enable_result_buttons)
-                    
-                    self.log(f"\nColeta finalizada com sucesso!")
-                    self.log(f"Arquivos salvos em: {output_dir}")
-                    
-                    # Mostra modal de tempo economizado
-                    self.root.after(500, lambda: self.show_time_saved_modal(len(reviews_data)))
-                    
-                    self.root.after(0, lambda: self.status_label.config(
-                        text=f"Concluído: {len(reviews_data)} reviews coletadas"))
-                    
-                finally:
-                    os.chdir(original_dir)
-            else:
-                self.log("Nenhuma review foi coletada")
+                    if reviews_data:
+                        # Muda para diretório de saída
+                        original_dir = os.getcwd()
+                        os.chdir(output_dir)
+                        
+                        try:
+                            self.scraper.save_reviews(reviews_data, app_info)
+                            total_reviews += len(reviews_data)
+                            processed_apps += 1
+                            
+                            self.log(f"✅ {len(reviews_data)} reviews coletadas")
+                        finally:
+                            os.chdir(original_dir)
+                    else:
+                        self.log("⚠️ Nenhuma review encontrada")
                 
+                except Exception as e:
+                    self.log(f"❌ Erro: {e}")
+                
+                # Atualiza progresso
+                progress = (i / total_apps) * 100
+                self.root.after(0, lambda p=progress: self.update_progress(p))
+            
+            # Finaliza processamento
+            if self.is_running and total_reviews > 0:
+                # Habilita botões de resultado
+                self.root.after(0, self.enable_result_buttons)
+                
+                # Mostra modal de tempo economizado
+                self.root.after(500, lambda: self.show_time_saved_modal(total_reviews))
+                
+                # Atualiza status final
+                if processed_apps == 1:
+                    final_status = f"Concluído: {total_reviews} reviews coletadas"
+                else:
+                    final_status = f"Concluído: {total_reviews} reviews de {processed_apps} apps"
+                
+                self.root.after(0, lambda: self.status_label.config(text=final_status))
+                self.log(f"🎉 {final_status}")
+            
         except Exception as e:
-            self.log(f"Erro: {e}")
-            self.root.after(0, lambda: self.status_label.config(text=f"Erro: {str(e)}"))
-        
+            self.log(f"❌ Erro geral: {e}")
         finally:
             self.root.after(0, self.reset_ui)
     
@@ -951,10 +1112,9 @@ class ReviewScraperApp:
     
     def enable_result_buttons(self):
         """Habilita botões de resultado"""
-        if self.csv_path and os.path.exists(self.csv_path):
-            self.open_csv_btn.config(state=tk.NORMAL, bg=self.colors['secondary'], fg='white')
-        if self.json_path and os.path.exists(self.json_path):
-            self.open_json_btn.config(state=tk.NORMAL, bg=self.colors['info'], fg='white')
+        # Para múltiplos apps, apenas habilita o botão de pasta
+        self.open_csv_btn.config(state=tk.NORMAL, bg=self.colors['secondary'], fg='white')
+        self.open_json_btn.config(state=tk.NORMAL, bg=self.colors['info'], fg='white')
         self.open_folder_btn.config(state=tk.NORMAL, bg=self.colors['warning'], fg='white')
     
     def show_statistics(self, reviews_data):
@@ -988,6 +1148,34 @@ class ReviewScraperApp:
                     subprocess.call(['xdg-open', filepath])
         else:
             messagebox.showerror("Erro", "Arquivo não encontrado")
+    
+    def open_csv_files(self):
+        """Abre pasta com arquivos CSV"""
+        output_dir = self.output_dir_var.get()
+        try:
+            # Procura por arquivos CSV na pasta de saída
+            csv_files = [f for f in os.listdir(output_dir) if f.endswith('.csv')]
+            if csv_files:
+                # Abre o primeiro arquivo CSV encontrado
+                self.open_file(os.path.join(output_dir, csv_files[-1]))  # Último criado
+            else:
+                messagebox.showinfo("Info", "Nenhum arquivo CSV encontrado")
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao abrir arquivo CSV: {e}")
+    
+    def open_json_files(self):
+        """Abre pasta com arquivos JSON"""
+        output_dir = self.output_dir_var.get()
+        try:
+            # Procura por arquivos JSON na pasta de saída
+            json_files = [f for f in os.listdir(output_dir) if f.endswith('.json')]
+            if json_files:
+                # Abre o primeiro arquivo JSON encontrado
+                self.open_file(os.path.join(output_dir, json_files[-1]))  # Último criado
+            else:
+                messagebox.showinfo("Info", "Nenhum arquivo JSON encontrado")
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao abrir arquivo JSON: {e}")
     
     def clear_log(self):
         """Limpa o log"""
