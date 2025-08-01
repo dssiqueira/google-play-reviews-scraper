@@ -1,3 +1,14 @@
+"""Google Play Reviews Scraper
+==============================
+
+This module provides :class:`GooglePlayReviewScraper`, a utility class to
+collect, analyze and save user reviews from the Google Play Store. It can be
+executed directly as a command-line script or imported in other projects.
+"""
+
+from dataclasses import asdict, dataclass
+from typing import Dict
+
 from google_play_scraper import app, reviews, Sort
 import pandas as pd
 import json
@@ -6,10 +17,44 @@ import argparse
 import re
 from urllib.parse import parse_qs, urlparse
 
+
+@dataclass
+class Review:
+    """Simplified representation of a Play Store review."""
+
+    review_id: str
+    user_name: str
+    content: str
+    score: int
+    thumbs_up_count: int
+    at: str
+    reply_content: str
+    reply_at: str
+    app_version: str
+
+    @classmethod
+    def from_raw(cls, raw: Dict[str, object]) -> "Review":
+        """Create a Review from the dictionary returned by google_play_scraper."""
+        return cls(
+            review_id=raw.get("reviewId", ""),
+            user_name=raw.get("userName", "N/A"),
+            content=raw.get("content", "N/A"),
+            score=raw.get("score", 0),
+            thumbs_up_count=raw.get("thumbsUpCount", 0),
+            at=raw.get("at", ""),
+            reply_content=raw.get("replyContent", ""),
+            reply_at=raw.get("repliedAt", ""),
+            app_version=raw.get("appVersion", ""),
+        )
+
+    def to_dict(self) -> Dict[str, object]:
+        """Return a JSON serializable representation of this review."""
+        return asdict(self)
+
 class GooglePlayReviewScraper:
-    """Scraper otimizado para coletar reviews do Google Play Store"""
+    """High-level interface for extracting reviews from Google Play."""
     
-    def __init__(self, country='br', lang='pt'):
+    def __init__(self, country: str = "br", lang: str = "pt") -> None:
         self.country = country
         self.lang = lang
     
@@ -36,20 +81,25 @@ class GooglePlayReviewScraper:
     def validate_app_id(self, app_id):
         """Valida se o app_id está no formato correto"""
         return bool(re.match(r'^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+$', app_id))
+
+    def get_app_info(self, app_id: str) -> Dict[str, str]:
+        """Retorna informações básicas do aplicativo."""
+        try:
+            info = app(app_id, lang=self.lang, country=self.country)
+            print(f"App: {info.get('title', 'N/A')}")
+            print(f"Total de reviews: {info.get('reviews', 0)}")
+            return info
+        except Exception as exc:
+            print(f"Erro ao obter informações: {exc}")
+            return {'appId': app_id, 'title': 'App desconhecido', 'error': str(exc)}
     
     def extract_all_reviews(self, app_id):
         """Extrai TODOS os reviews de um app do Google Play Store"""
         
         print(f"Coletando informações do app: {app_id}")
-        
+
         # Informações básicas do app
-        try:
-            app_info = app(app_id, lang=self.lang, country=self.country)
-            print(f"App: {app_info.get('title', 'N/A')}")
-            print(f"Total de reviews: {app_info.get('reviews', 0)}")
-        except Exception as e:
-            print(f"Erro ao obter informações: {e}")
-            app_info = {'appId': app_id, 'title': 'App desconhecido', 'error': str(e)}
+        app_info = self.get_app_info(app_id)
         
         print("Iniciando coleta de reviews...")
         
@@ -74,21 +124,7 @@ class GooglePlayReviewScraper:
                 if not result:
                     break
                 
-                # Processa reviews de forma mais eficiente
-                batch_reviews = [
-                    {
-                        'review_id': r.get('reviewId', ''),
-                        'user_name': r.get('userName', 'N/A'),
-                        'content': r.get('content', 'N/A'),
-                        'score': r.get('score', 0),
-                        'thumbs_up_count': r.get('thumbsUpCount', 0),
-                        'at': r.get('at', ''),
-                        'reply_content': r.get('replyContent', ''),
-                        'reply_at': r.get('repliedAt', ''),
-                        'app_version': r.get('appVersion', '')
-                    }
-                    for r in result
-                ]
+                batch_reviews = [Review.from_raw(r) for r in result]
                 
                 all_reviews.extend(batch_reviews)
                 print(f"Total: {len(all_reviews)} reviews")
@@ -117,8 +153,11 @@ class GooglePlayReviewScraper:
         elif filename_prefix is None:
             filename_prefix = "google_play_reviews"
         
+        # Normaliza objetos Review para dicionários simples
+        rows = [r.to_dict() if isinstance(r, Review) else r for r in reviews_data]
+
         # Salva CSV
-        pd.DataFrame(reviews_data).to_csv(f'{filename_prefix}.csv', index=False, encoding='utf-8')
+        pd.DataFrame(rows).to_csv(f"{filename_prefix}.csv", index=False, encoding="utf-8")
         
         # Salva JSON
         json_data = {
@@ -129,7 +168,7 @@ class GooglePlayReviewScraper:
                 'language': self.lang
             },
             'app_info': app_info or {},
-            'reviews': reviews_data
+            'reviews': rows
         }
         
         with open(f'{filename_prefix}.json', 'w', encoding='utf-8') as f:
@@ -155,7 +194,10 @@ class GooglePlayReviewScraper:
         print(f"\nEstatísticas:")
         print(f"Total: {len(reviews_data)} reviews")
         
-        scores = [r['score'] for r in reviews_data if r['score']]
+        def get_score(obj: object) -> int:
+            return obj.score if isinstance(obj, Review) else obj.get("score", 0)
+
+        scores = [get_score(r) for r in reviews_data if get_score(r)]
         if scores:
             print(f"Rating médio: {sum(scores)/len(scores):.2f}")
             for rating in range(1, 6):
@@ -167,10 +209,15 @@ class GooglePlayReviewScraper:
         print(f"\nPrimeiras {count} reviews:")
         
         for i, review in enumerate(reviews_data[:count], 1):
-            print(f"\n{i}. {review['user_name']} ({review['score']}★)")
-            print(f"   {review['content'][:80]}...")
-            if review['reply_content']:
-                print(f"   Resposta: {review['reply_content'][:60]}...")
+            if isinstance(review, Review):
+                data = review.to_dict()
+            else:
+                data = review
+
+            print(f"\n{i}. {data['user_name']} ({data['score']}★)")
+            print(f"   {data['content'][:80]}...")
+            if data.get('reply_content'):
+                print(f"   Resposta: {data['reply_content'][:60]}...")
 
 def main():
     """Função principal"""

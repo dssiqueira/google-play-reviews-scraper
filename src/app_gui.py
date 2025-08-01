@@ -1,3 +1,5 @@
+"""Graphical user interface for the Google Play Reviews Scraper."""
+
 import tkinter as tk
 from tkinter import messagebox, filedialog
 import threading
@@ -8,6 +10,7 @@ from translations import translator
 from time_stats import time_stats
 
 class ReviewScraperApp:
+    """Main application window that manages the scraping workflow."""
     def __init__(self, root):
         self.root = root
         self.root.title("Google Play Reviews Scraper")
@@ -71,10 +74,20 @@ class ReviewScraperApp:
         self.is_running = False
         self.csv_path = None
         self.json_path = None
-        
+
         self.create_interface()
-        
+
         # Bind eventos (removido - agora usa on_urls_change)
+
+    def center_window(self, window, width=None, height=None):
+        """Centraliza uma janela definindo opcionalmente o tamanho."""
+        window.update_idletasks()
+        w = width or window.winfo_width()
+        h = height or window.winfo_height()
+        x = (window.winfo_screenwidth() // 2) - (w // 2)
+        y = (window.winfo_screenheight() // 2) - (h // 2)
+        geom = f"{w}x{h}+{x}+{y}" if width and height else f"+{x}+{y}"
+        window.geometry(geom)
 
     def create_language_selector(self, parent):
         """Cria seletor de idioma customizado com bandeiras PNG"""
@@ -1480,19 +1493,10 @@ class ReviewScraperApp:
 
     def show_about(self):
         """Mostra a janela Sobre"""
-        # Calcula posição central antes de criar a janela
-        window_width = 650  # Máximo para alemão
-        window_height = 570  # Reduzido após remover primeiro uso
-        screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
-        
-        x = (screen_width // 2) - (window_width // 2)
-        y = (screen_height // 2) - (window_height // 2)
-        
         # Cria a janela já na posição correta
         about_window = tk.Toplevel(self.root)
         about_window.title(translator.get('about_title'))
-        about_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+        self.center_window(about_window, 650, 570)  # Máximo para alemão
         about_window.resizable(False, False)
         about_window.configure(bg=self.colors['background'])
         
@@ -1683,16 +1687,11 @@ class ReviewScraperApp:
         # Calcula posição central
         window_width = 500
         window_height = 350
-        screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
-        
-        x = (screen_width // 2) - (window_width // 2)
-        y = (screen_height // 2) - (window_height // 2)
-        
+
         # Cria a janela modal
         modal = tk.Toplevel(self.root)
         modal.title(translator.get('time_saved_title'))
-        modal.geometry(f"{window_width}x{window_height}+{x}+{y}")
+        self.center_window(modal, window_width, window_height)
         modal.resizable(False, False)
         modal.configure(bg=self.colors['background'])
         
@@ -1812,10 +1811,7 @@ def main():
     app = ReviewScraperApp(root)
     
     # Centraliza janela
-    root.update_idletasks()
-    x = (root.winfo_screenwidth() // 2) - (root.winfo_width() // 2)
-    y = (root.winfo_screenheight() // 2) - (root.winfo_height() // 2)
-    root.geometry(f"+{x}+{y}")
+    app.center_window(root)
     
     root.mainloop()
 
