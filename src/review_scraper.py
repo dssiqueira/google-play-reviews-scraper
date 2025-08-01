@@ -1,3 +1,11 @@
+"""Google Play Reviews Scraper
+==============================
+
+This module provides :class:`GooglePlayReviewScraper`, a utility class to
+collect, analyze and save user reviews from the Google Play Store. It can be
+executed directly as a command-line script or imported in other projects.
+"""
+
 from google_play_scraper import app, reviews, Sort
 import pandas as pd
 import json
