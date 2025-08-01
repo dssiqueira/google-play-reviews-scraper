@@ -21,19 +21,41 @@ class ReviewScraperApp:
         # Força o ícone na barra de tarefas do Windows
         self.setup_taskbar_icon()
         
-        # Cores Material Design otimizadas
+        # Tema claro com cores contrastantes e vibrantes
         self.colors = {
-            'primary': '#1976D2',
-            'secondary': '#2E7D32',
-            'error': '#C62828',
-            'warning': '#E65100',
-            'info': '#0277BD',
-            'surface': '#FFFFFF',
-            'background': '#FAFAFA',
-            'on_surface': '#212121',
-            'on_background': '#424242',
-            'disabled': '#757575',
-            'divider': '#E0E0E0'
+            # Cores principais mais vibrantes e contrastantes
+            'primary': '#4F46E5',        # Azul índigo mais intenso
+            'secondary': '#7C3AED',      # Roxo violeta mais vibrante
+            'accent': '#EC4899',         # Rosa magenta vibrante
+            'error': '#DC2626',          # Vermelho mais intenso
+            'warning': '#D97706',        # Laranja mais contrastante
+            'info': '#0891B2',           # Ciano mais escuro
+            'success': '#059669',        # Verde mais intenso
+            
+            # Cores específicas para botões contrastantes
+            'btn_blue': '#2563EB',       # Azul royal vibrante
+            'btn_purple': '#9333EA',     # Roxo vibrante
+            'btn_pink': '#DB2777',       # Rosa pink intenso
+            'btn_red': '#DC2626',        # Vermelho intenso
+            'btn_orange': '#EA580C',     # Laranja vibrante
+            'btn_cyan': '#0891B2',       # Ciano intenso
+            'btn_green': '#16A34A',      # Verde vibrante
+            'btn_indigo': '#4338CA',     # Índigo profundo
+            
+            # Cores de interface
+            'background': '#F8FAFC',     # Slate 50 (fundo principal)
+            'surface': '#FFFFFF',        # Branco (cards)
+            'surface_light': '#F1F5F9',  # Slate 100 (hover suave)
+            'surface_dark': '#E2E8F0',   # Slate 200 (bordas)
+            'on_surface': '#1E293B',     # Slate 800 (texto escuro)
+            'on_background': '#334155',  # Slate 700 (texto médio)
+            'disabled': '#94A3B8',       # Slate 400 (desabilitado)
+            'divider': '#E2E8F0',        # Slate 200 (divisores)
+            'input_bg': '#F8FAFC',       # Slate 50 (inputs)
+            'input_border': '#D1D5DB',   # Gray 300 (bordas inputs)
+            'hover': '#F1F5F9',          # Slate 100 (hover)
+            'border': '#E5E7EB',         # Gray 200 (bordas suaves)
+            'shadow': '#0000001A'        # Sombra sutil (10% opacidade)
         }
         
         # Configurar estilo
@@ -426,8 +448,8 @@ class ReviewScraperApp:
         self.create_header(self.scrollable_frame)
         self.create_url_section(self.scrollable_frame)
         self.create_config_section(self.scrollable_frame)
-        self.create_action_section(self.scrollable_frame)
         self.create_progress_section(self.scrollable_frame)
+        self.create_main_action_button(self.scrollable_frame)
         self.create_log_section(self.scrollable_frame)
         self.create_status_bar()
 
@@ -510,242 +532,415 @@ class ReviewScraperApp:
         self.root.focus_set()
 
     def create_header(self, parent):
-        """Cria o cabeçalho"""
+        """Cria o cabeçalho moderno com ícone do Google Play"""
         header = tk.Frame(parent, bg=self.colors['background'])
-        header.pack(fill=tk.X, pady=(0, 20))
+        header.pack(fill=tk.X, pady=(0, 30))
         
-        # Container para título e botão info
-        title_container = tk.Frame(header, bg=self.colors['background'])
-        title_container.pack(fill=tk.X)
+        # Container principal do header
+        header_container = tk.Frame(header, bg=self.colors['background'])
+        header_container.pack(fill=tk.X)
         
-        # Título centralizado
-        title_frame = tk.Frame(title_container, bg=self.colors['background'])
-        title_frame.pack(expand=True)
+        # Container para ícone e título (lado esquerdo)
+        title_container = tk.Frame(header_container, bg=self.colors['background'])
+        title_container.pack(side=tk.LEFT, fill=tk.X, expand=True)
         
-        self.title_label = tk.Label(title_frame, text=translator.get('window_title'),
-                font=('Segoe UI', 20, 'bold'), fg=self.colors['on_background'],
+        # Ícone do Google Play (se disponível)
+        try:
+            icon_path = os.path.join("assets", "icons", "google-play.png")
+            if os.path.exists(icon_path):
+                icon_img = tk.PhotoImage(file=icon_path)
+                # Redimensiona para 48x48
+                icon_img = icon_img.subsample(2, 2)  # Ajuste conforme necessário
+                icon_label = tk.Label(title_container, image=icon_img, bg=self.colors['background'])
+                icon_label.image = icon_img  # Mantém referência
+                icon_label.pack(side=tk.LEFT, padx=(0, 15))
+        except:
+            pass
+        
+        # Container para textos do título
+        text_container = tk.Frame(title_container, bg=self.colors['background'])
+        text_container.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        
+        # Título principal
+        self.title_label = tk.Label(text_container, text="Google Play Reviews Scraper",
+                font=('Segoe UI', 24, 'bold'), fg=self.colors['on_background'],
                 bg=self.colors['background'])
-        self.title_label.pack()
+        self.title_label.pack(anchor=tk.W)
+        
+        # Subtítulo
+        self.subtitle_label = tk.Label(text_container, text="Coleta reviews de apps do Google Play Store",
+                font=('Segoe UI', 12), fg=self.colors['disabled'],
+                bg=self.colors['background'])
+        self.subtitle_label.pack(anchor=tk.W, pady=(2, 0))
         
         # Container para controles do canto superior direito
-        controls_frame = tk.Frame(title_container, bg=self.colors['background'])
-        controls_frame.pack(side=tk.RIGHT, anchor=tk.NE, padx=(0, 5), pady=(5, 0))
+        controls_frame = tk.Frame(header_container, bg=self.colors['background'])
+        controls_frame.pack(side=tk.RIGHT, anchor=tk.NE, padx=(10, 0))
         
-        # Seletor de idioma customizado com bandeiras
-        self.create_language_selector(controls_frame)
+        # Botão de configurações (ícone de engrenagem)
+        settings_btn = tk.Button(controls_frame, text="⚙", font=('Segoe UI', 16),
+                               bg=self.colors['surface'], fg=self.colors['disabled'], 
+                               relief='flat', bd=0, width=3, height=1, cursor='hand2',
+                               command=self.show_about)
+        settings_btn.pack()
         
-        # Botão de informação (menor e mais discreto)
-        info_btn = tk.Button(controls_frame, text="ℹ", font=('Segoe UI', 10),
-                           bg=self.colors['background'], fg=self.colors['disabled'], 
-                           relief='flat', bd=0, width=2, height=1, cursor='hand2', 
-                           command=self.show_about)
-        info_btn.pack(side=tk.LEFT)
-        
-        # Hover effect para o botão info (mais sutil)
+        # Hover effect para o botão de configurações
         def on_enter(e):
-            info_btn.config(fg=self.colors['info'], bg=self.colors['divider'])
+            settings_btn.config(fg=self.colors['on_surface'], bg=self.colors['surface_light'])
         def on_leave(e):
-            info_btn.config(fg=self.colors['disabled'], bg=self.colors['background'])
-        info_btn.bind("<Enter>", on_enter)
-        info_btn.bind("<Leave>", on_leave)
-        
-        self.subtitle_label = tk.Label(header, text=translator.get('window_subtitle'),
-                font=('Segoe UI', 12), fg=self.colors['primary'],
-                bg=self.colors['background'])
-        self.subtitle_label.pack(pady=(5, 0))
+            settings_btn.config(fg=self.colors['disabled'], bg=self.colors['surface'])
+        settings_btn.bind("<Enter>", on_enter)
+        settings_btn.bind("<Leave>", on_leave)
         
     def create_url_section(self, parent):
-        """Cria a seção de URLs com lista visual"""
-        section, self.url_section_title = self.create_card(parent, translator.get('url_section'))
+        """Cria a seção de URLs com design moderno"""
+        # Card principal com sombra simulada
+        shadow_frame = tk.Frame(parent, bg=self.colors['border'], relief='flat', bd=0)
+        shadow_frame.pack(fill=tk.X, pady=(0, 20), padx=20)
         
-        # Campo de entrada de URL única
-        url_input_frame = tk.Frame(section, bg=self.colors['surface'])
-        url_input_frame.pack(fill=tk.X, pady=(0, 10))
+        card = tk.Frame(shadow_frame, bg=self.colors['surface'], relief='flat', bd=0)
+        card.pack(fill=tk.X, padx=1, pady=1)
         
-        self.url_entry = tk.Entry(url_input_frame, font=('Segoe UI', 11),
+        # Padding interno
+        section = tk.Frame(card, bg=self.colors['surface'])
+        section.pack(fill=tk.X, padx=20, pady=20)
+        
+        # Título da seção
+        self.url_section_title = tk.Label(section, text="Adicionar Apps",
+                                         font=('Segoe UI', 16, 'bold'), 
+                                         fg=self.colors['on_surface'],
+                                         bg=self.colors['surface'])
+        self.url_section_title.pack(anchor=tk.W, pady=(0, 15))
+        
+        # Campo de entrada com design moderno
+        input_container = tk.Frame(section, bg=self.colors['surface'])
+        input_container.pack(fill=tk.X, pady=(0, 15))
+        
+        # Entry com bordas arredondadas e tema claro
+        entry_frame = tk.Frame(input_container, bg=self.colors['input_border'], relief='flat', bd=0)
+        entry_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 10))
+        
+        entry_inner = tk.Frame(entry_frame, bg=self.colors['surface'], relief='flat', bd=0)
+        entry_inner.pack(fill=tk.X, padx=1, pady=1)
+        
+        self.url_entry = tk.Entry(entry_inner, font=('Segoe UI', 12),
                                  bg=self.colors['surface'], fg=self.colors['on_surface'],
-                                 relief='solid', bd=1)
-        self.url_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, ipady=8, ipadx=10)
+                                 relief='flat', bd=0, insertbackground=self.colors['primary'])
+        self.url_entry.pack(fill=tk.X, padx=15, pady=10)
         
-        # Botões de ação
-        url_buttons = tk.Frame(url_input_frame, bg=self.colors['surface'])
-        url_buttons.pack(side=tk.RIGHT, padx=(10, 0))
+        # Container para botões
+        buttons_container = tk.Frame(input_container, bg=self.colors['surface'])
+        buttons_container.pack(side=tk.RIGHT, padx=(10, 0))
         
-        self.paste_btn = self.create_button(url_buttons, translator.get('paste_button'), self.paste_url, self.colors['info'])
-        self.paste_btn.pack(side=tk.LEFT, padx=(0, 5))
+        # Botão Colar arredondado com cor contrastante
+        paste_btn_container = self.create_rounded_button(buttons_container, "Colar", 
+                                                        self.paste_url, self.colors['btn_pink'], 
+                                                        width=70, height=35)
+        paste_btn_container.pack(side=tk.LEFT, padx=(0, 8))
         
-        self.add_btn = self.create_button(url_buttons, "Adicionar", self.add_url, self.colors['primary'])
-        self.add_btn.pack(side=tk.LEFT)
+        # Botão Adicionar arredondado com cor contrastante
+        add_btn_container = self.create_rounded_button(buttons_container, "Adicionar", 
+                                                      self.add_url, self.colors['btn_blue'], 
+                                                      width=90, height=35)
+        add_btn_container.pack(side=tk.LEFT)
         
-        # Lista visual de URLs adicionadas
-        list_frame = tk.Frame(section, bg=self.colors['surface'])
-        list_frame.pack(fill=tk.X, pady=(10, 0))
+        # Seção Apps na fila
+        queue_section = tk.Frame(section, bg=self.colors['surface'])
+        queue_section.pack(fill=tk.X, pady=(15, 0))
         
-        # Título da lista
-        list_title = tk.Label(list_frame, text="Apps na fila:", font=('Segoe UI', 10, 'bold'),
-                             fg=self.colors['primary'], bg=self.colors['surface'])
-        list_title.pack(anchor=tk.W, pady=(0, 5))
+        # Título Apps na fila
+        queue_title = tk.Label(queue_section, text="Apps na fila",
+                              font=('Segoe UI', 14, 'bold'),
+                              fg=self.colors['on_surface'],
+                              bg=self.colors['surface'])
+        queue_title.pack(anchor=tk.W, pady=(0, 10))
         
-        # Container da lista com scrollbar
-        list_container = tk.Frame(list_frame, bg=self.colors['surface'], relief='solid', bd=1)
-        list_container.pack(fill=tk.X, pady=(0, 10))
+        # Container da lista com bordas arredondadas para tema claro
+        list_outer = tk.Frame(queue_section, bg=self.colors['input_border'], relief='flat', bd=0)
+        list_outer.pack(fill=tk.X, pady=(0, 15))
+        
+        list_container = tk.Frame(list_outer, bg=self.colors['input_bg'], 
+                                 relief='flat', bd=0, height=120)
+        list_container.pack(fill=tk.X, padx=1, pady=1)
+        list_container.pack_propagate(False)
         
         # Canvas para scroll
-        self.list_canvas = tk.Canvas(list_container, height=120, bg=self.colors['background'],
-                                    highlightthickness=0)
-        self.list_scrollbar = tk.Scrollbar(list_container, orient="vertical", command=self.list_canvas.yview)
+        self.list_canvas = tk.Canvas(list_container, bg=self.colors['background'],
+                                    highlightthickness=0, bd=0)
+        self.list_scrollbar = tk.Scrollbar(list_container, orient="vertical", 
+                                          command=self.list_canvas.yview,
+                                          bg=self.colors['surface'])
         self.list_canvas.configure(yscrollcommand=self.list_scrollbar.set)
         
         # Frame scrollável
         self.list_scrollable_frame = tk.Frame(self.list_canvas, bg=self.colors['background'])
         self.list_canvas.create_window((0, 0), window=self.list_scrollable_frame, anchor="nw")
         
-        self.list_canvas.pack(side="left", fill="both", expand=True)
+        self.list_canvas.pack(side="left", fill="both", expand=True, padx=10, pady=10)
         self.list_scrollbar.pack(side="right", fill="y")
         
         # Bind para scroll
         self.list_scrollable_frame.bind("<Configure>", 
                                        lambda e: self.list_canvas.configure(scrollregion=self.list_canvas.bbox("all")))
         
-        # Botão para limpar toda a lista
-        self.clear_all_btn = self.create_button(list_frame, "Limpar Todos", self.clear_all_urls, self.colors['error'])
-        self.clear_all_btn.pack(anchor=tk.W)
+        # Botão Limpar Todos arredondado com cor contrastante
+        clear_btn_container = self.create_rounded_button(queue_section, "Limpar Todos", 
+                                                        self.clear_all_urls, self.colors['btn_red'], 
+                                                        width=120, height=32)
+        clear_btn_container.pack(anchor=tk.W, pady=(5, 0))
+        
+        # Status da lista
+        self.urls_status_label = tk.Label(queue_section, text="Nenhum app adicionado",
+                                         font=('Segoe UI', 10), fg=self.colors['disabled'],
+                                         bg=self.colors['surface'])
+        self.urls_status_label.pack(anchor=tk.W, pady=(8, 0))
         
         # Lista para armazenar URLs
         self.urls_list = []
         
-        # Status
-        self.urls_status_label = tk.Label(section, text="Nenhum app adicionado", font=('Segoe UI', 10),
-                                         fg=self.colors['disabled'], bg=self.colors['surface'])
-        self.urls_status_label.pack(anchor=tk.W, pady=(5, 0))
-        
         self.setup_placeholder()
         
     def create_config_section(self, parent):
-        """Cria a seção de configurações"""
-        section, self.config_section_title = self.create_card(parent, translator.get('config_section'))
+        """Cria a seção de configurações com design moderno"""
+        # Card principal com sombra simulada
+        shadow_frame = tk.Frame(parent, bg=self.colors['border'], relief='flat', bd=0)
+        shadow_frame.pack(fill=tk.X, pady=(0, 20), padx=20)
         
-        # Linha 1: País e Idioma
-        row1 = tk.Frame(section, bg=self.colors['surface'])
-        row1.pack(fill=tk.X, pady=(0, 10))
+        card = tk.Frame(shadow_frame, bg=self.colors['surface'], relief='flat', bd=0)
+        card.pack(fill=tk.X, padx=1, pady=1)
         
-        self.country_label = tk.Label(row1, text=translator.get('country_label'), font=('Segoe UI', 10),
-                fg=self.colors['on_surface'], bg=self.colors['surface'])
-        self.country_label.pack(side=tk.LEFT)
+        # Padding interno
+        section = tk.Frame(card, bg=self.colors['surface'])
+        section.pack(fill=tk.X, padx=20, pady=20)
+        
+        # Título da seção
+        self.config_section_title = tk.Label(section, text="Configurações",
+                                            font=('Segoe UI', 16, 'bold'),
+                                            fg=self.colors['on_surface'],
+                                            bg=self.colors['surface'])
+        self.config_section_title.pack(anchor=tk.W, pady=(0, 15))
+        
+        # Container para País e Idioma
+        config_row = tk.Frame(section, bg=self.colors['surface'])
+        config_row.pack(fill=tk.X, pady=(0, 15))
+        
+        # País
+        country_container = tk.Frame(config_row, bg=self.colors['surface'])
+        country_container.pack(side=tk.LEFT, padx=(0, 30))
+        
+        self.country_label = tk.Label(country_container, text="País:",
+                                     font=('Segoe UI', 12, 'bold'),
+                                     fg=self.colors['on_surface'],
+                                     bg=self.colors['surface'])
+        self.country_label.pack(anchor=tk.W)
         
         from tkinter import ttk
-        ttk.Combobox(row1, textvariable=self.country_var,
-                    values=["br", "us", "uk", "ca", "au", "de", "fr", "es", "it"],
-                    width=8, state="readonly").pack(side=tk.LEFT, padx=(5, 20))
+        # Estilo customizado para combobox
+        style = ttk.Style()
+        style.theme_use('clam')
+        style.configure('Custom.TCombobox',
+                       fieldbackground=self.colors['input_bg'],
+                       background=self.colors['input_bg'],
+                       foreground=self.colors['on_surface'],
+                       borderwidth=0,
+                       relief='flat')
         
-        self.language_label = tk.Label(row1, text=translator.get('language_label'), font=('Segoe UI', 10),
-                fg=self.colors['on_surface'], bg=self.colors['surface'])
-        self.language_label.pack(side=tk.LEFT)
+        country_combo = ttk.Combobox(country_container, textvariable=self.country_var,
+                                   values=["br", "us", "uk", "ca", "au", "de", "fr", "es", "it"],
+                                   width=6, state="readonly", style='Custom.TCombobox')
+        country_combo.pack(pady=(5, 0))
         
-        ttk.Combobox(row1, textvariable=self.lang_var,
-                    values=["pt", "en", "es", "fr", "de", "it"],
-                    width=8, state="readonly").pack(side=tk.LEFT, padx=(5, 0))
+        # Idioma
+        lang_container = tk.Frame(config_row, bg=self.colors['surface'])
+        lang_container.pack(side=tk.LEFT)
         
-        # Linha 2: Pasta
-        row2 = tk.Frame(section, bg=self.colors['surface'])
-        row2.pack(fill=tk.X)
+        self.language_label = tk.Label(lang_container, text="Idioma:",
+                                      font=('Segoe UI', 12, 'bold'),
+                                      fg=self.colors['on_surface'],
+                                      bg=self.colors['surface'])
+        self.language_label.pack(anchor=tk.W)
         
-        self.folder_text_label = tk.Label(row2, text=translator.get('folder_label'), font=('Segoe UI', 10),
-                fg=self.colors['on_surface'], bg=self.colors['surface'])
-        self.folder_text_label.pack(side=tk.LEFT)
+        lang_combo = ttk.Combobox(lang_container, textvariable=self.lang_var,
+                                values=["pt", "en", "es", "fr", "de", "it"],
+                                width=6, state="readonly", style='Custom.TCombobox')
+        lang_combo.pack(pady=(5, 0))
         
-        self.folder_label = tk.Label(row2, text=self.output_dir_var.get(),
-                                   font=('Segoe UI', 9), fg=self.colors['primary'],
-                                   bg=self.colors['surface'], cursor='hand2')
-        self.folder_label.pack(side=tk.LEFT, padx=(5, 10), fill=tk.X, expand=True)
+        # Pasta de destino
+        folder_container = tk.Frame(section, bg=self.colors['surface'])
+        folder_container.pack(fill=tk.X)
+        
+        # Label da pasta
+        folder_label_text = tk.Label(folder_container, text="Pasta de destino:",
+                                    font=('Segoe UI', 12, 'bold'),
+                                    fg=self.colors['on_surface'],
+                                    bg=self.colors['surface'])
+        folder_label_text.pack(anchor=tk.W, pady=(0, 5))
+        
+        # Container para caminho e botão
+        folder_row = tk.Frame(folder_container, bg=self.colors['surface'])
+        folder_row.pack(fill=tk.X)
+        
+        # Caminho da pasta (clicável)
+        self.folder_label = tk.Label(folder_row, text=self.output_dir_var.get(),
+                                   font=('Segoe UI', 10), fg=self.colors['info'],
+                                   bg=self.colors['surface'], cursor='hand2',
+                                   anchor='w', justify='left')
+        self.folder_label.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 10))
         self.folder_label.bind("<Button-1>", lambda e: self.open_folder())
         
-        self.choose_btn = self.create_button(row2, translator.get('choose_button'), self.choose_folder, self.colors['warning'])
-        self.choose_btn.pack(side=tk.RIGHT)
-        
-    def create_action_section(self, parent):
-        """Cria a seção de ações"""
-        actions = tk.Frame(parent, bg=self.colors['background'])
-        actions.pack(fill=tk.X, pady=15)
-        
-        buttons = tk.Frame(actions, bg=self.colors['background'])
-        buttons.pack()
-        
-        self.start_btn = self.create_button(buttons, translator.get('start_button'), self.start_scraping, 
-                                          self.colors['primary'], primary=True)
-        self.start_btn.pack(side=tk.LEFT, padx=(0, 10))
-        
-        self.stop_btn = self.create_button(buttons, translator.get('stop_button'), self.stop_scraping, 
-                                         self.colors['error'], state=tk.DISABLED)
-        self.stop_btn.pack(side=tk.LEFT, padx=(0, 10))
-        
-        self.clear_btn = self.create_button(buttons, translator.get('clear_button'), self.clear_log, self.colors['disabled'])
-        self.clear_btn.pack(side=tk.LEFT)
+        # Botão Escolher arredondado com cor contrastante
+        choose_btn_container = self.create_rounded_button(folder_row, "Escolher", 
+                                                         self.choose_folder, self.colors['btn_cyan'], 
+                                                         width=100, height=32)
+        choose_btn_container.pack(side=tk.RIGHT)
         
     def create_progress_section(self, parent):
-        """Cria a seção de progresso"""
-        section, self.progress_section_title = self.create_card(parent, translator.get('progress_section'))
+        """Cria a seção de progresso com design moderno"""
+        # Card principal com sombra simulada
+        shadow_frame = tk.Frame(parent, bg=self.colors['border'], relief='flat', bd=0)
+        shadow_frame.pack(fill=tk.X, pady=(0, 20), padx=20)
         
-        # Barra de progresso simples
+        card = tk.Frame(shadow_frame, bg=self.colors['surface'], relief='flat', bd=0)
+        card.pack(fill=tk.X, padx=1, pady=1)
+        
+        # Padding interno
+        section = tk.Frame(card, bg=self.colors['surface'])
+        section.pack(fill=tk.X, padx=20, pady=20)
+        
+        # Título da seção
+        self.progress_section_title = tk.Label(section, text="Progresso",
+                                             font=('Segoe UI', 16, 'bold'),
+                                             fg=self.colors['on_surface'],
+                                             bg=self.colors['surface'])
+        self.progress_section_title.pack(anchor=tk.W, pady=(0, 15))
+        
+        # Status atual
+        self.status_label = tk.Label(section, text="Pronto para iniciar",
+                                   font=('Segoe UI', 12),
+                                   fg=self.colors['disabled'],
+                                   bg=self.colors['surface'])
+        self.status_label.pack(anchor=tk.W, pady=(0, 10))
+        
+        # Container para botões de resultado
+        self.result_buttons_frame = tk.Frame(section, bg=self.colors['surface'])
+        self.result_buttons_frame.pack(fill=tk.X, pady=(10, 0))
+        
+        # Botões de resultado arredondados com cores contrastantes
+        self.csv_btn_container = self.create_rounded_button(self.result_buttons_frame, "CSV", 
+                                                           self.open_csv_files, self.colors['btn_green'], 
+                                                           width=80, height=35)
+        self.csv_btn_container.pack(side=tk.LEFT, padx=(0, 10))
+        
+        self.json_btn_container = self.create_rounded_button(self.result_buttons_frame, "JSON", 
+                                                            self.open_json_files, self.colors['btn_blue'], 
+                                                            width=80, height=35)
+        self.json_btn_container.pack(side=tk.LEFT, padx=(0, 10))
+        
+        self.folder_btn_container = self.create_rounded_button(self.result_buttons_frame, "Pasta", 
+                                                              self.open_folder, self.colors['btn_orange'], 
+                                                              width=80, height=35)
+        self.folder_btn_container.pack(side=tk.LEFT)
+        
+        # Barra de progresso simples (mantida para compatibilidade)
         self.progress_var = tk.DoubleVar()
         progress_bg = tk.Frame(section, bg=self.colors['divider'], height=6)
-        progress_bg.pack(fill=tk.X, pady=(0, 10))
+        progress_bg.pack(fill=tk.X, pady=(15, 0))
         
         self.progress_canvas = tk.Canvas(progress_bg, height=6, bg=self.colors['divider'], 
                                         highlightthickness=0, bd=0)
         self.progress_canvas.pack(fill=tk.X)
         self.progress_bar_id = self.progress_canvas.create_rectangle(0, 0, 0, 6, 
                                                                     fill=self.colors['primary'], outline="")
+    
+    def create_main_action_button(self, parent):
+        """Cria o botão principal grande com gradiente"""
+        # Container para o botão principal
+        button_container = tk.Frame(parent, bg=self.colors['background'])
+        button_container.pack(fill=tk.X, pady=30, padx=20)
         
-        # Status
-        self.status_label = tk.Label(section, text="Pronto para iniciar",
-                                   font=('Segoe UI', 10), fg=self.colors['on_surface'],
-                                   bg=self.colors['surface'])
-        self.status_label.pack(pady=(0, 10))
-        
-        # Botões de resultado
-        results = tk.Frame(section, bg=self.colors['surface'])
-        results.pack()
-        
-        self.open_csv_btn = self.create_button(results, "CSV", self.open_csv_files,
-                                             self.colors['secondary'], state=tk.DISABLED)
-        self.open_csv_btn.pack(side=tk.LEFT, padx=(0, 5))
-        
-        self.open_json_btn = self.create_button(results, "JSON", self.open_json_files,
-                                              self.colors['info'], state=tk.DISABLED)
-        self.open_json_btn.pack(side=tk.LEFT, padx=(0, 5))
-        
-        self.open_folder_btn = self.create_button(results, "Pasta", self.open_folder,
-                                                self.colors['warning'], state=tk.DISABLED)
-        self.open_folder_btn.pack(side=tk.LEFT)
+        # Botão principal grande arredondado com gradiente
+        self.main_start_btn_container = self.create_main_gradient_button(button_container, 
+                                                                        "Pronto para iniciar", 
+                                                                        self.start_scraping)
+        self.main_start_btn_container.pack(fill=tk.X, pady=(0, 10))
+
         
     def create_log_section(self, parent):
-        """Cria a seção de log"""
-        section, self.log_section_title = self.create_card(parent, translator.get('log_section'), expand=True)
+        """Cria a seção de log com design moderno (oculta por padrão)"""
+        # Card principal (inicialmente oculto)
+        self.log_card = tk.Frame(parent, bg=self.colors['surface'], relief='flat', bd=0)
+        
+        # Padding interno
+        section = tk.Frame(self.log_card, bg=self.colors['surface'])
+        section.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        
+        # Cabeçalho com título e botão de toggle
+        header = tk.Frame(section, bg=self.colors['surface'])
+        header.pack(fill=tk.X, pady=(0, 10))
+        
+        self.log_section_title = tk.Label(header, text="Log de Atividades",
+                                         font=('Segoe UI', 16, 'bold'),
+                                         fg=self.colors['on_surface'],
+                                         bg=self.colors['surface'])
+        self.log_section_title.pack(side=tk.LEFT)
+        
+        # Botão para mostrar/ocultar log
+        self.toggle_log_btn = tk.Button(header, text="▼ Mostrar",
+                                       font=('Segoe UI', 10),
+                                       bg=self.colors['surface'], fg=self.colors['disabled'],
+                                       relief='flat', bd=0, cursor='hand2',
+                                       command=self.toggle_log_visibility)
+        self.toggle_log_btn.pack(side=tk.RIGHT)
+        
+        # Container do log (inicialmente oculto)
+        self.log_container = tk.Frame(section, bg=self.colors['surface'])
         
         # Text com scrollbar
-        log_frame = tk.Frame(section, bg=self.colors['surface'])
+        log_frame = tk.Frame(self.log_container, bg=self.colors['surface'])
         log_frame.pack(fill=tk.BOTH, expand=True)
         
-        scrollbar = tk.Scrollbar(log_frame)
+        scrollbar = tk.Scrollbar(log_frame, bg=self.colors['surface'])
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
-        self.log_text = tk.Text(log_frame, wrap=tk.WORD, font=('Consolas', 9),
-                               bg='#F8F9FA', fg=self.colors['on_surface'],
-                               relief='flat', bd=0, padx=10, pady=10, height=8,
-                               yscrollcommand=scrollbar.set)
+        self.log_text = tk.Text(log_frame, wrap=tk.WORD, font=('Consolas', 10),
+                               bg=self.colors['background'], fg=self.colors['on_background'],
+                               relief='flat', bd=0, padx=15, pady=15, height=8,
+                               yscrollcommand=scrollbar.set, insertbackground=self.colors['on_background'])
         self.log_text.pack(fill=tk.BOTH, expand=True)
         scrollbar.config(command=self.log_text.yview)
         
+        # Estado inicial: log oculto
+        self.log_visible = False
+        
         # Log inicial
-        self.log(translator.get('scraper_started'))
+        self.log("Sistema iniciado - Pronto para coletar reviews!")
+    
+    def toggle_log_visibility(self):
+        """Mostra/oculta a seção de log"""
+        if self.log_visible:
+            # Ocultar log
+            self.log_container.pack_forget()
+            self.log_card.pack_forget()
+            self.toggle_log_btn.config(text="▼ Mostrar Log")
+            self.log_visible = False
+        else:
+            # Mostrar log
+            self.log_card.pack(fill=tk.X, pady=(0, 20), padx=20)
+            self.log_container.pack(fill=tk.BOTH, expand=True, pady=(10, 0))
+            self.toggle_log_btn.config(text="▲ Ocultar Log")
+            self.log_visible = True
 
     def create_status_bar(self):
-        """Cria a barra de status"""
-        self.status_var = tk.StringVar(value="Pronto")
-        tk.Label(self.root, textvariable=self.status_var, anchor=tk.W,
-                font=('Segoe UI', 9), bg=self.colors['surface'],
-                fg=self.colors['on_surface'], padx=15, pady=5).pack(side=tk.BOTTOM, fill=tk.X)
+        """Cria a barra de status moderna"""
+        status_frame = tk.Frame(self.root, bg=self.colors['surface'], height=30)
+        status_frame.pack(side=tk.BOTTOM, fill=tk.X)
+        status_frame.pack_propagate(False)
+        
+        self.status_var = tk.StringVar(value="Pronto para iniciar")
+        status_label = tk.Label(status_frame, textvariable=self.status_var, anchor=tk.W,
+                               font=('Segoe UI', 10), bg=self.colors['surface'],
+                               fg=self.colors['disabled'], padx=20, pady=8)
+        status_label.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
     def create_card(self, parent, title, expand=False):
         """Cria um card simples"""
@@ -773,28 +968,128 @@ class ReviewScraperApp:
         
         return inner, title_label
     
+    def create_rounded_button(self, parent, text, command, bg_color, width=120, height=35, font_size=11, text_color='white'):
+        """Cria um botão estilizado com aparência arredondada usando frames aninhados"""
+        # Container principal com padding para simular bordas arredondadas
+        btn_outer = tk.Frame(parent, bg=self.colors['border'], relief='flat', bd=0)
+        
+        # Frame interno com a cor do botão
+        btn_inner = tk.Frame(btn_outer, bg=bg_color, relief='flat', bd=0)
+        btn_inner.pack(padx=1, pady=1, fill=tk.BOTH, expand=True)
+        
+        # Botão real dentro do frame interno
+        btn = tk.Button(btn_inner, text=text, command=command,
+                       bg=bg_color, fg=text_color,
+                       font=('Segoe UI', font_size, 'bold'),
+                       relief='flat', bd=0, cursor='hand2',
+                       activebackground=self.lighten_color(bg_color),
+                       activeforeground=text_color)
+        
+        # Calcula padding baseado no tamanho desejado
+        pad_x = max(1, (width - len(text) * font_size) // 4)
+        pad_y = max(1, (height - font_size) // 4)
+        
+        btn.pack(padx=pad_x, pady=pad_y, fill=tk.BOTH, expand=True)
+        
+        # Hover effects mais suaves
+        hover_color = self.lighten_color(bg_color)
+        
+        def on_enter(event):
+            btn.config(bg=hover_color)
+            btn_inner.config(bg=hover_color)
+        
+        def on_leave(event):
+            btn.config(bg=bg_color)
+            btn_inner.config(bg=bg_color)
+        
+        # Bind eventos para hover
+        btn.bind("<Enter>", on_enter)
+        btn.bind("<Leave>", on_leave)
+        btn_inner.bind("<Enter>", on_enter)
+        btn_inner.bind("<Leave>", on_leave)
+        
+        # Configura tamanho mínimo
+        btn_outer.config(width=width, height=height)
+        btn_outer.pack_propagate(False)
+        
+        return btn_outer
+    
+    def lighten_color(self, color):
+        """Clareia uma cor para hover effect no tema claro"""
+        color_map = {
+            # Cores principais
+            self.colors['primary']: '#6366F1',      # Azul mais claro
+            self.colors['secondary']: '#8B5CF6',    # Roxo mais claro
+            self.colors['accent']: '#F472B6',       # Rosa mais claro
+            self.colors['error']: '#EF4444',        # Vermelho mais claro
+            self.colors['warning']: '#F59E0B',      # Laranja mais claro
+            self.colors['info']: '#06B6D4',         # Ciano mais claro
+            self.colors['success']: '#10B981',      # Verde mais claro
+            
+            # Cores específicas dos botões
+            self.colors['btn_blue']: '#3B82F6',     # Azul hover
+            self.colors['btn_purple']: '#A855F7',   # Roxo hover
+            self.colors['btn_pink']: '#EC4899',     # Rosa hover
+            self.colors['btn_red']: '#EF4444',      # Vermelho hover
+            self.colors['btn_orange']: '#F97316',   # Laranja hover
+            self.colors['btn_cyan']: '#06B6D4',     # Ciano hover
+            self.colors['btn_green']: '#22C55E',    # Verde hover
+            self.colors['btn_indigo']: '#6366F1',   # Índigo hover
+        }
+        return color_map.get(color, color)
+    
+    def create_main_gradient_button(self, parent, text, command):
+        """Cria o botão principal com gradiente simulado usando frames"""
+        # Container principal
+        btn_container = tk.Frame(parent, bg=parent['bg'])
+        
+        # Frame externo para sombra
+        shadow_frame = tk.Frame(btn_container, bg=self.colors['border'], relief='flat', bd=0)
+        shadow_frame.pack(fill=tk.X, padx=2, pady=2)
+        
+        # Frame do gradiente (simula com cor intermediária)
+        gradient_color = self.colors['btn_indigo']  # Cor principal
+        gradient_frame = tk.Frame(shadow_frame, bg=gradient_color, relief='flat', bd=0)
+        gradient_frame.pack(fill=tk.X, padx=1, pady=1)
+        
+        # Botão principal
+        main_btn = tk.Button(gradient_frame, text=text, command=command,
+                           bg=gradient_color, fg='white',
+                           font=('Segoe UI', 16, 'bold'),
+                           relief='flat', bd=0, cursor='hand2',
+                           activebackground=self.colors['btn_purple'],
+                           activeforeground='white')
+        main_btn.pack(fill=tk.X, padx=8, pady=12)
+        
+        # Hover effects
+        def on_enter(event):
+            hover_color = self.colors['btn_purple']
+            main_btn.config(bg=hover_color)
+            gradient_frame.config(bg=hover_color)
+        
+        def on_leave(event):
+            main_btn.config(bg=gradient_color)
+            gradient_frame.config(bg=gradient_color)
+        
+        # Bind eventos
+        main_btn.bind("<Enter>", on_enter)
+        main_btn.bind("<Leave>", on_leave)
+        gradient_frame.bind("<Enter>", on_enter)
+        gradient_frame.bind("<Leave>", on_leave)
+        
+        # Salva referência para poder alterar o texto depois
+        self.main_button = main_btn
+        self.main_button_text = text
+        
+        return btn_container
+    
     def create_button(self, parent, text, command, bg, primary=False, state=tk.NORMAL):
-        """Cria um botão padronizado com tamanho fixo"""
-        # Tamanho fixo para todos os botões
+        """Cria um botão padronizado com bordas arredondadas"""
+        # Usa o novo método de botão arredondado
         if primary:
-            font = ('Segoe UI', 11, 'bold')
-            width, height = 15, 2  # Botão principal maior
+            return self.create_rounded_button(parent, text, command, bg, width=150, height=40, font_size=12)
         else:
-            font = ('Segoe UI', 10, 'normal')
-            width, height = 12, 2  # Botões secundários
-        
-        btn = tk.Button(parent, text=text, command=command, bg=bg, fg='white',
-                       font=font, relief='flat', bd=0, cursor='hand2', state=state,
-                       width=width, height=height,  # Tamanho fixo
-                       activeforeground='white',
-                       disabledforeground='white')
-        
-        # Hover effect mantendo texto branco
-        hover_bg = self.darken_color(bg)
-        btn.bind("<Enter>", lambda e: btn.config(bg=hover_bg, fg='white') if btn['state'] != tk.DISABLED else None)
-        btn.bind("<Leave>", lambda e: btn.config(bg=bg, fg='white') if btn['state'] != tk.DISABLED else None)
-        
-        return btn
+            return self.create_rounded_button(parent, text, command, bg, width=100, height=32, font_size=10)
     
     def darken_color(self, color):
         """Escurece uma cor para hover effect"""
@@ -907,42 +1202,37 @@ class ReviewScraperApp:
             widget.destroy()
         
         if not self.urls_list:
-            # Mostra mensagem vazia
+            # Mostra mensagem vazia para tema claro
             empty_label = tk.Label(self.list_scrollable_frame, text="Nenhum app adicionado ainda",
-                                  font=('Segoe UI', 10), fg=self.colors['disabled'],
-                                  bg=self.colors['background'])
-            empty_label.pack(pady=20)
+                                  font=('Segoe UI', 11), fg=self.colors['disabled'],
+                                  bg=self.colors['input_bg'])
+            empty_label.pack(pady=30)
+            # Atualiza status
             self.urls_status_label.config(text="Nenhum app adicionado", fg=self.colors['disabled'])
         else:
-            # Mostra lista de apps
+            # Mostra lista de apps com design claro
             for i, url_data in enumerate(self.urls_list):
                 app_id = url_data['app_id']
                 
-                # Frame do item
-                item_frame = tk.Frame(self.list_scrollable_frame, bg=self.colors['surface'],
-                                     relief='solid', bd=1)
-                item_frame.pack(fill=tk.X, padx=5, pady=2)
+                # Frame do item com bordas suaves
+                item_outer = tk.Frame(self.list_scrollable_frame, bg=self.colors['border'])
+                item_outer.pack(fill=tk.X, padx=8, pady=3)
+                
+                item_frame = tk.Frame(item_outer, bg=self.colors['surface'])
+                item_frame.pack(fill=tk.X, padx=1, pady=1)
                 
                 # Número e App ID
-                info_label = tk.Label(item_frame, text=f"{i+1}. {app_id}",
+                info_label = tk.Label(item_frame, text=f"✓ {i+1}. {app_id}",
                                      font=('Segoe UI', 10), fg=self.colors['on_surface'],
                                      bg=self.colors['surface'])
-                info_label.pack(side=tk.LEFT, padx=10, pady=5)
+                info_label.pack(side=tk.LEFT, padx=12, pady=8)
                 
-                # Botão remover
-                remove_btn = tk.Button(item_frame, text="✕", font=('Segoe UI', 10, 'bold'),
-                                      bg=self.colors['error'], fg='white', relief='flat',
-                                      bd=0, width=3, cursor='hand2',
-                                      command=lambda aid=app_id: self.remove_url(aid))
-                remove_btn.pack(side=tk.RIGHT, padx=5, pady=2)
-                
-                # Hover effect
-                def on_enter(e, btn=remove_btn):
-                    btn.config(bg=self.darken_color(self.colors['error']))
-                def on_leave(e, btn=remove_btn):
-                    btn.config(bg=self.colors['error'])
-                remove_btn.bind("<Enter>", on_enter)
-                remove_btn.bind("<Leave>", on_leave)
+                # Botão remover arredondado com cor contrastante
+                remove_btn_container = self.create_rounded_button(item_frame, "✕", 
+                                                                lambda aid=app_id: self.remove_url(aid), 
+                                                                self.colors['btn_red'], 
+                                                                width=25, height=25, font_size=10)
+                remove_btn_container.pack(side=tk.RIGHT, padx=8, pady=4)
             
             # Atualiza status
             count = len(self.urls_list)
@@ -997,11 +1287,8 @@ class ReviewScraperApp:
         
         # Atualiza interface
         self.is_running = True
-        self.start_btn.config(state=tk.DISABLED, bg=self.colors['disabled'], fg='white')
-        self.stop_btn.config(state=tk.NORMAL, bg=self.colors['error'], fg='white')
-        self.open_csv_btn.config(state=tk.DISABLED, bg=self.colors['disabled'], fg='white')
-        self.open_json_btn.config(state=tk.DISABLED, bg=self.colors['disabled'], fg='white')
-        self.open_folder_btn.config(state=tk.DISABLED, bg=self.colors['disabled'], fg='white')
+        self.update_main_button_text("Processando...")
+        self.disable_result_buttons()
         self.progress_var.set(0)
         self.update_progress(0)
         
@@ -1106,16 +1393,25 @@ class ReviewScraperApp:
     def reset_ui(self):
         """Reseta a interface"""
         self.is_running = False
-        self.start_btn.config(state=tk.NORMAL, bg=self.colors['primary'], fg='white')
-        self.stop_btn.config(state=tk.DISABLED, bg=self.colors['disabled'], fg='white')
-        self.status_var.set("Pronto")
+        self.update_main_button_text("Pronto para iniciar")
+        self.status_var.set("Pronto para iniciar")
     
     def enable_result_buttons(self):
         """Habilita botões de resultado"""
-        # Para múltiplos apps, apenas habilita o botão de pasta
-        self.open_csv_btn.config(state=tk.NORMAL, bg=self.colors['secondary'], fg='white')
-        self.open_json_btn.config(state=tk.NORMAL, bg=self.colors['info'], fg='white')
-        self.open_folder_btn.config(state=tk.NORMAL, bg=self.colors['warning'], fg='white')
+        # Como os botões são canvas, eles já estão sempre habilitados
+        # Apenas mostra o frame se estiver oculto
+        if hasattr(self, 'result_buttons_frame'):
+            self.result_buttons_frame.pack(fill=tk.X, pady=(10, 0))
+    
+    def disable_result_buttons(self):
+        """Desabilita botões de resultado"""
+        # Para botões canvas, podemos ocultar temporariamente
+        pass  # Os botões canvas não precisam ser desabilitados
+    
+    def update_main_button_text(self, text):
+        """Atualiza o texto do botão principal"""
+        if hasattr(self, 'main_button'):
+            self.main_button.config(text=text)
     
     def show_statistics(self, reviews_data):
         """Mostra estatísticas"""
