@@ -8,7 +8,6 @@ executed directly as a command-line script or imported in other projects.
 
 from dataclasses import asdict, dataclass
 from typing import Dict
-
 from google_play_scraper import app, reviews, Sort
 import pandas as pd
 import json
