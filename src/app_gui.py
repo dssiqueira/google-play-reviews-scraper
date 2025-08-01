@@ -1,3 +1,5 @@
+"""Graphical user interface for the Google Play Reviews Scraper."""
+
 import tkinter as tk
 from tkinter import messagebox, filedialog
 import threading
@@ -8,6 +10,7 @@ from translations import translator
 from time_stats import time_stats
 
 class ReviewScraperApp:
+    """Main application window that manages the scraping workflow."""
     def __init__(self, root):
         self.root = root
         self.root.title("Google Play Reviews Scraper")
