@@ -39,52 +39,29 @@
 ### 🖥️ Interface Moderna
 *Interface bonita e intuitiva com suporte a múltiplos idiomas*
 
-![Prévia da Interface](../assets/screenshots/interface-preview.png)
+![Prévia da Interface](../assets/screenshots/google-play-reviews-scraper.png)
 
-### ⚡ Processamento em Lote
-*Processe múltiplos apps simultaneamente com progresso em tempo real*
+### ⚡ Aplicação em Ação
+*Veja o scraper funcionando com progresso em tempo real*
 
-![Processamento em Lote](../assets/screenshots/batch-processing.gif)
+![Demo da Aplicação](../assets/screenshots/google-play-reviews-scraper.gif)
 
-### 📊 Formatos de Saída Ricos
-*Exporte para CSV, JSON com análises detalhadas*
+### 📊 Interface de Linha de Comando
+*Também disponível via terminal para automação*
 
-![Formatos de Saída](../assets/screenshots/output-formats.png)
+![Demo do Terminal](../assets/screenshots/google-play-reviews-scraper-terminal.gif)
 
 </div>
 
 ---
 
-## 🎯 **O que faz?**
-
-Extrai **TODOS** os reviews disponíveis de qualquer app do Google Play Store de forma rápida, organizada e confiável. Ideal para:
-
-- 📊 **Análise de mercado** e concorrência
-- 🔍 **Pesquisa de UX** e feedback de usuários  
-- 📈 **Monitoramento** de reputação de apps
-- 🎯 **Insights** para desenvolvimento de produtos
-- 📋 **Relatórios** e apresentações
-
----
-
-## 🚀 **Instalação Rápida**
-
-### 🖥️ **Compatibilidade de Plataformas**
-
-| Plataforma | Interface Gráfica | Linha de Comando | Executável |
-|------------|-------------------|------------------|------------|
-| 🪟 **Windows** | ✅ Suporte completo | ✅ Suportado | ✅ Disponível |
-| 🍎 **macOS** | ✅ **NOVO!** Interface Nativa | ✅ Suportado | ❌ Não disponível |
-| 🐧 **Linux** | ❌ Apenas terminal | ✅ Suportado | ❌ Não disponível |
-
-> **✨ NOVO**: macOS agora tem interface visual nativa com 6 idiomas e design nativo!
 ## ⚡ Início Rápido
 
 ### 🎯 **Opção 1: Aplicação GUI (Recomendada)**
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/your-username/google-play-reviews-scraper.git
+git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
 cd google-play-reviews-scraper
 
 # 2. Instale as dependências
@@ -164,7 +141,7 @@ tkinter            # Framework GUI (geralmente pré-instalado)
 
 #### **Método 1: Git Clone (Recomendado)**
 ```bash
-git clone https://github.com/your-username/google-play-reviews-scraper.git
+git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
 cd google-play-reviews-scraper
 pip install -r requirements.txt
 ```
@@ -576,8 +553,6 @@ A aplicação suporta **6 idiomas** com tradução completa da interface:
 
 *Cada versão de idioma inclui exemplos localizados, contexto cultural e orientações específicas da região*
 
-**📋 [Ver Todos os Idiomas e Guia de Tradução](LANGUAGES.md)**
-
 </div>
 
 ---
@@ -658,9 +633,35 @@ Sim! A ferramenta acessa apenas dados publicamente disponíveis do Google Play S
 
 ---
 
+## 🎯 Casos de Uso
+
+### 💼 **Perfeito para:**
+
+- **📊 Pesquisadores de Mercado** - Analisar apps concorrentes e tendências de mercado
+- **🎯 Product Managers** - Coletar feedback de usuários para planejamento de funcionalidades  
+- **🔍 Pesquisadores UX** - Entender pontos de dor e preferências dos usuários
+- **📈 Desenvolvedores de Apps** - Monitorar performance e satisfação dos usuários
+- **🏢 Analistas de Negócios** - Gerar insights para decisões estratégicas
+- **🎓 Estudantes e Acadêmicos** - Coletar dados para projetos de pesquisa
+
+---
+
 ## 📄 Licença
 
 Este projeto está licenciado sob a **Licença MIT** - veja o arquivo [LICENSE](../LICENSE) para detalhes.
+
+---
+
+<div align="center">
+
+**🚀 Desenvolvido com ❤️ para a comunidade**
+
+**Se este projeto te ajudou, considere dar uma ⭐!**
+
+[![GitHub stars](https://img.shields.io/github/stars/dssiqueira/google-play-reviews-scraper?style=social)](../../stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/dssiqueira/google-play-reviews-scraper?style=social)](../../network/members)
+
+</div>
 
 ### 🔓 **O que isso significa:**
 - ✅ **Uso comercial** permitido
@@ -691,7 +692,7 @@ Este projeto foi criado para democratizar o acesso a dados de app stores para pe
 
 ## ⭐ **Histórico de Estrelas**
 
-[![Star History Chart](https://api.star-history.com/svg?repos=your-username/google-play-reviews-scraper&type=Date)](https://star-history.com/#your-username/google-play-reviews-scraper&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=dssiqueira/google-play-reviews-scraper&type=Date)](https://star-history.com/#dssiqueira/google-play-reviews-scraper&Date)
 
 ---
 
@@ -701,8 +702,8 @@ Este projeto foi criado para democratizar o acesso a dados de app stores para pe
 
 *Seu apoio nos motiva a continuar melhorando e adicionando novos recursos*
 
-[![GitHub stars](https://img.shields.io/github/stars/your-username/google-play-reviews-scraper?style=social)](../../stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/your-username/google-play-reviews-scraper?style=social)](../../network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/your-username/google-play-reviews-scraper?style=social)](../../watchers)
+[![GitHub stars](https://img.shields.io/github/stars/dssiqueira/google-play-reviews-scraper?style=social)](../../stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/dssiqueira/google-play-reviews-scraper?style=social)](../../network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/dssiqueira/google-play-reviews-scraper?style=social)](../../watchers)
 
 </div>

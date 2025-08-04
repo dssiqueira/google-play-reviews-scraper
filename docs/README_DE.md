@@ -39,55 +39,29 @@
 ### 🖥️ Moderne Oberfläche
 *Schöne, intuitive GUI mit mehrsprachiger Unterstützung*
 
-![Interface Vorschau](../assets/screenshots/interface-preview.png)
+![Interface Vorschau](../assets/screenshots/google-play-reviews-scraper.png)
 
-### ⚡ Batch-Verarbeitung
-*Verarbeitet mehrere Apps gleichzeitig mit Echtzeit-Fortschritt*
+### ⚡ Anwendung in Aktion
+*Sehen Sie den Scraper mit Echtzeit-Fortschritt arbeiten*
 
-![Batch-Verarbeitung](../assets/screenshots/batch-processing.gif)
+![Anwendungs-Demo](../assets/screenshots/google-play-reviews-scraper.gif)
 
-### 📊 Reichhaltige Ausgabeformate
-*Export nach CSV, JSON mit detaillierten Analysen*
+### 📊 Kommandozeilen-Interface
+*Auch über Terminal für Automatisierung verfügbar*
 
-![Ausgabeformate](../assets/screenshots/output-formats.png)
+![Terminal-Demo](../assets/screenshots/google-play-reviews-scraper-terminal.gif)
 
 </div>
 
 ---
 
-## 🎯 **Was macht es?**
+## ⚡ Schnellstart
 
-Extrahiert **ALLE** verfügbaren Bewertungen von jeder Google Play Store App schnell, organisiert und zuverlässig. Ideal für:
+### 🎯 **Option 1: GUI-Anwendung (Empfohlen)**
 
-- 📊 **Marktanalyse** und Wettbewerbsforschung
-- 🔍 **UX-Forschung** und Benutzerfeedback-Analyse  
-- 📈 **Überwachung** des App-Rufs
-- 🎯 **Insights** für Produktentwicklung
-- 📋 **Berichte** und Präsentationen
-
----
-
-## 🚀 **Schnelle Installation**
-
-### 🖥️ **Plattform-Kompatibilität**
-
-| Plattform | Grafische Oberfläche | Kommandozeile | Ausführbare Datei |
-|-----------|----------------------|---------------|-------------------|
-| 🪟 **Windows** | ✅ Vollständige Unterstützung | ✅ Unterstützt | ✅ Verfügbar |
-| 🍎 **macOS** | ✅ **NEU!** Native Oberfläche | ✅ Unterstützt | ❌ Nicht verfügbar |
-| 🐧 **Linux** | ❌ Nur Terminal | ✅ Unterstützt | ❌ Nicht verfügbar |
-
-> **✨ NEU**: macOS hat jetzt eine native visuelle Oberfläche mit 6 Sprachen und nativem Design!
-
-### Option 1: Ausführbare Datei (Nur Windows)
-1. Laden Sie die ausführbare Datei von der [Releases-Seite](../../releases) herunter
-2. Führen Sie `GooglePlayReviewScraper.exe` aus
-3. Fertig! Python muss nicht installiert werden
-
-### Option 2: Visuelle Oberfläche (Windows & macOS)
 ```bash
 # 1. Repository klonen
-git clone https://github.com/your-username/google-play-reviews-scraper.git
+git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
 cd google-play-reviews-scraper
 
 # 2. Abhängigkeiten installieren
@@ -104,7 +78,7 @@ python src/app_gui.py
 python src/review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
 
 # Batch-Verarbeitung mehrerer Apps
-python src/review_scraper.py --batch app_liste.txt --output ergebnisse/
+python src/review_scraper.py --batch apps_liste.txt --output ergebnisse/
 ```
 
 ### 📦 **Option 3: Python-Modul**
@@ -123,11 +97,11 @@ print(f"{len(reviews)} Bewertungen extrahiert!")
 
 <div align="center">
 
-| 🎯 **Hauptfunktionen** | 🎨 **Oberfläche** | 📊 **Ausgabe** | 🌍 **Mehrsprachig** |
+| 🎯 **Kernfunktionen** | 🎨 **Interface** | 📊 **Ausgabe** | 🌍 **Multi-Sprache** |
 |:---:|:---:|:---:|:---:|
 | Extrahiert **ALLE** Bewertungen | Moderne GUI mit Themes | CSV & JSON Export | 6 Sprachen unterstützt |
 | **Batch-Verarbeitung** | Echtzeit-Fortschritt | Detaillierte Analysen | Auto-Spracherkennung |
-| **Intelligente Filterung** | Drag & Drop URLs | Zeitstatistiken | Benutzerdefinierte Übersetzungen |
+| **Intelligente Filterung** | Drag & Drop URLs | Zeit-Statistiken | Benutzerdefinierte Übersetzungen |
 | **Rate Limiting** | Multi-App-Warteschlange | Fehlerbehandlung | RTL-Unterstützung |
 
 </div>
@@ -135,20 +109,20 @@ print(f"{len(reviews)} Bewertungen extrahiert!")
 ### 🚀 **Was macht es besonders?**
 
 - **🎯 Vollständige Extraktion**: Erhält ALLE verfügbaren Bewertungen, nicht nur die neuesten
-- **⚡ Blitzschnell**: Optimiertes Scraping mit intelligentem Rate Limiting  
-- **🎨 Schöne Oberfläche**: Moderne GUI mit Hell-/Dunkel-Themes
-- **📊 Reichhaltige Analysen**: Detaillierte Statistiken und Zeitverfolgung
-- **🔄 Batch-Verarbeitung**: Verarbeitet mehrere Apps gleichzeitig
-- **🌍 Mehrsprachig**: Oberfläche in 6 Sprachen verfügbar
+- **⚡ Blitzschnell**: Optimiertes Scraping mit intelligenter Geschwindigkeitsbegrenzung  
+- **🎨 Schöne Oberfläche**: Moderne GUI mit hellen/dunklen Themes
+- **📊 Reiche Analysen**: Detaillierte Statistiken und Zeitverfolgung
+- **🔄 Batch-Verarbeitung**: Behandelt mehrere Apps gleichzeitig
+- **🌍 Multi-Sprache**: Oberfläche in 6 Sprachen verfügbar
 - **📱 Intelligente Erkennung**: Erkennt App-Infos automatisch und behandelt Fehler elegant
-- **💾 Mehrere Formate**: Export nach CSV, JSON mit anpassbaren Feldern
+- **💾 Mehrere Formate**: Exportiert zu CSV, JSON mit anpassbaren Feldern
 - **🛡️ Robust**: Behandelt Netzwerkprobleme, Rate Limits und Grenzfälle
 
 ---
 
 ## 🛠️ Installation
 
-### 📋 **Voraussetzungen**
+### 📋 **Anforderungen**
 
 - **Python 3.7+** (3.9+ empfohlen)
 - **Internetverbindung** für Scraping
@@ -157,7 +131,7 @@ print(f"{len(reviews)} Bewertungen extrahiert!")
 ### 📦 **Schnelle Installation**
 
 ```bash
-git clone https://github.com/your-username/google-play-reviews-scraper.git
+git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
 cd google-play-reviews-scraper
 pip install -r requirements.txt
 python src/app_gui.py
@@ -170,45 +144,28 @@ python src/app_gui.py
 ### 💼 **Perfekt für:**
 
 - **📊 Marktforscher** - Konkurrenz-Apps und Markttrends analysieren
-- **🎯 Produktmanager** - Nutzerfeedback für Feature-Planung sammeln  
-- **🔍 UX-Forscher** - Schmerzpunkte und Nutzerpräferenzen verstehen
-- **📈 App-Entwickler** - Performance und Nutzerzufriedenheit überwachen
+- **🎯 Product Manager** - Benutzerfeedback für Feature-Planung sammeln  
+- **🔍 UX-Forscher** - Benutzerschmerzen und Präferenzen verstehen
+- **📈 App-Entwickler** - App-Performance und Benutzerzufriedenheit überwachen
 - **🏢 Business-Analysten** - Insights für strategische Entscheidungen generieren
-- **🎓 Studenten und Akademiker** - Daten für Forschungsprojekte sammeln
+- **🎓 Studenten & Akademiker** - Daten für Forschungsprojekte sammeln
 
 ---
-
-## 🌍 **Vollständige Dokumentation in anderen Sprachen**
-
-<div align="center">
-
-**📖 Vollständige Dokumentation mit detaillierten Anleitungen, Beispielen und Tutorials:**
-
-[![🇺🇸 Complete English Documentation](https://img.shields.io/badge/🇺🇸-Complete_Documentation-4285f4?style=for-the-badge)](../README.md)
-[![🇧🇷 Documentação Completa em Português](https://img.shields.io/badge/🇧🇷-Documentação_Completa-00a86b?style=for-the-badge)](README_PT.md)
-[![🇪🇸 Documentación Completa en Español](https://img.shields.io/badge/🇪🇸-Documentación_Completa-ea4335?style=for-the-badge)](README_ES.md)
-[![🇫🇷 Documentation Complète en Français](https://img.shields.io/badge/🇫🇷-Documentation_Complète-4285f4?style=for-the-badge)](README_FR.md)
-[![🇮🇹 Documentazione Completa in Italiano](https://img.shields.io/badge/🇮🇹-Documentazione_Completa-00a86b?style=for-the-badge)](README_IT.md)
-
-**📋 [Alle Sprachen und Übersetzungsanleitung anzeigen](LANGUAGES.md)**
-
-</div>
-
 ---
 
-## 📄 Lizenz
+## ?? Lizenz
 
-Dieses Projekt steht unter der **MIT-Lizenz** - siehe die [LICENSE](../LICENSE) Datei für Details.
+Dieses Projekt steht unter der **MIT-Lizenz** - siehe die [LICENSE](../LICENSE) Datei f�r Details.
 
 ---
 
 <div align="center">
 
-**🚀 Mit ❤️ für die Community entwickelt**
+**?? Mit ?? f�r die Community entwickelt**
 
-**Wenn dieses Projekt Ihnen geholfen hat, geben Sie ihm bitte einen ⭐!**
+**Wenn dieses Projekt Ihnen geholfen hat, geben Sie ihm bitte einen ?!**
 
-[![GitHub stars](https://img.shields.io/github/stars/your-username/google-play-reviews-scraper?style=social)](../../stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/your-username/google-play-reviews-scraper?style=social)](../../network/members)
+[![GitHub stars](https://img.shields.io/github/stars/dssiqueira/google-play-reviews-scraper?style=social)](../../stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/dssiqueira/google-play-reviews-scraper?style=social)](../../network/members)
 
 </div>

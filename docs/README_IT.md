@@ -39,17 +39,17 @@
 ### 🖥️ Interfaccia Moderna
 *Interfaccia bella e intuitiva con supporto multi-lingua*
 
-![Anteprima Interfaccia](../assets/screenshots/interface-preview.png)
+![Anteprima Interfaccia](../assets/screenshots/google-play-reviews-scraper.png)
 
-### ⚡ Elaborazione in Batch
-*Elabora più app simultaneamente con progresso in tempo reale*
+### ⚡ Applicazione in Azione
+*Vedi il scraper funzionare con progresso in tempo reale*
 
-![Elaborazione in Batch](../assets/screenshots/batch-processing.gif)
+![Demo dell'Applicazione](../assets/screenshots/google-play-reviews-scraper.gif)
 
-### 📊 Formati di Output Ricchi
-*Esporta in CSV, JSON con analisi dettagliate*
+### 📊 Interfaccia a Riga di Comando
+*Disponibile anche via terminale per automazione*
 
-![Formati di Output](../assets/screenshots/output-formats.png)
+![Demo del Terminale](../assets/screenshots/google-play-reviews-scraper-terminal.gif)
 
 </div>
 
@@ -91,43 +91,81 @@ Estrae **TUTTE** le recensioni disponibili da qualsiasi app del Google Play Stor
 
 ```bash
 # 1. Clonare il repository
-git clone https://github.com/your-username/google-play-reviews-scraper.git
+git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
 cd google-play-reviews-scraper
 
 # 2. Installare le dipendenze
 pip install -r requirements.txt
 
-# Windows: Esegui l'interfaccia grafica
-python app_gui.py
-
-# macOS: Esegui l'interfaccia nativa
-cd src && python3 app_gui_mac.py
+# 3. Avviare la GUI
+python src/app_gui.py
 ```
 
-### Opzione 3: Riga di Comando (Tutte le Piattaforme)
+### 🔧 **Opzione 2: Riga di Comando**
+
 ```bash
-# Dopo aver clonato e installato le dipendenze
-python review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
+# Estrarre recensioni da una singola app
+python src/review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
+
+# Elaborazione in batch di più app
+python src/review_scraper.py --batch lista_app.txt --output risultati/
 ```
 
-**🪟 Utenti Windows**: L'interfaccia si aprirà in Portoghese. Usa il selettore di bandiere nell'angolo in alto a destra per cambiare lingua!
-**🍎 Utenti macOS**: Interfaccia nativa con 6 lingue, font SF Pro e integrazione Finder!
-**🐧 Utenti Linux**: Utilizza l'interfaccia a riga di comando con i parametri mostrati di seguito.
+### 📦 **Opzione 3: Modulo Python**
+
+```python
+from src.review_scraper import GooglePlayReviewScraper
+
+scraper = GooglePlayReviewScraper()
+reviews = scraper.scrape_reviews("com.whatsapp")
+print(f"{len(reviews)} recensioni estratte!")
+```
 
 ---
 
-## 💻 **Interfaccia Grafica Moderna**
+## 📖 Caratteristiche
 
-![Google Play Reviews Scraper Screenshot](../assets/screenshots/google-play-reviews-scraper.png)
+<div align="center">
 
-### 🎬 **Applicazione in Azione**
-![Google Play Reviews Scraper Demo](../assets/screenshots/google-play-reviews-scraper.gif)
+| 🎯 **Caratteristiche Principali** | 🎨 **Interfaccia** | 📊 **Output** | 🌍 **Multi-Lingua** |
+|:---:|:---:|:---:|:---:|
+| Estrae **TUTTE** le recensioni | GUI moderna con temi | Esportazione CSV e JSON | 6 lingue supportate |
+| **Elaborazione in batch** | Progresso tempo reale | Analisi dettagliate | Auto-rilevamento lingua |
+| **Filtraggio intelligente** | Drag & drop URL | Statistiche tempo | Traduzioni personalizzate |
+| **Limitazione velocità** | Coda multi-app | Gestione errori | Supporto RTL |
 
-### ✨ Caratteristiche dell'Interfaccia:
-- 🎨 **Design Material Design** moderno e intuitivo
-- 🌍 **Multi-lingua** con selettore di bandiere (6 lingue)
-- 📋 **Incolla URL** direttamente dal browser
-- ⚙️ **Impostazioni semplici** (paese, lingua, cartella)
+</div>
+
+### 🚀 **Cosa lo rende speciale?**
+
+- **🎯 Estrazione Completa**: Ottiene TUTTE le recensioni disponibili, non solo quelle recenti
+- **⚡ Super Veloce**: Scraping ottimizzato con limitazione intelligente della velocità  
+- **🎨 Interfaccia Bella**: GUI moderna con temi chiaro/scuro
+- **📊 Analisi Ricche**: Statistiche dettagliate e tracciamento del tempo
+- **🔄 Elaborazione in Batch**: Gestisce più app simultaneamente
+- **🌍 Multi-Lingua**: Interfaccia disponibile in 6 lingue
+- **📱 Rilevamento Intelligente**: Auto-rileva info app e gestisce errori elegantemente
+- **💾 Formati Multipli**: Esporta in CSV, JSON con campi personalizzabili
+- **🛡️ Robusto**: Gestisce problemi di rete, limiti di velocità e casi estremi
+
+---
+
+## 🛠️ Installazione
+
+### 📋 **Requisiti**
+
+- **Python 3.7+** (3.9+ consigliato)
+- **Connessione internet** per lo scraping
+- **2GB RAM** minimo (4GB+ per grandi dataset)
+
+### 📦 **Installazione Rapida**
+
+```bash
+git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
+cd google-play-reviews-scraper
+pip install -r requirements.txt
+python src/app_gui.py
+```
 - 📊 **Progresso in tempo reale** con barra visuale
 - 📁 **Apertura automatica** dei file generati
 - 📜 **Scorrimento fluido** per schermi piccoli
@@ -156,7 +194,7 @@ python review_scraper.py --url "https://play.google.com/store/apps/details?id=co
 Poiché l'interfaccia grafica è esclusiva per Windows, gli utenti Mac e Linux devono utilizzare la riga di comando:
 
 ```bash
-git clone https://github.com/your-username/google-play-reviews-scraper.git
+git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
 cd google-play-reviews-scraper
 pip install -r requirements.txt
 python src/app_gui.py
@@ -177,37 +215,19 @@ python src/app_gui.py
 
 ---
 
-## 🌍 **Documentazione Completa in Altre Lingue**
+## ?? Licenza
 
-<div align="center">
-
-**📖 Documentazione completa con guide dettagliate, esempi e tutorial:**
-
-[![🇺🇸 Complete English Documentation](https://img.shields.io/badge/🇺🇸-Complete_Documentation-4285f4?style=for-the-badge)](../README.md)
-[![🇧� Documuentação Completa em Português](https://img.shields.io/badge/🇧🇷-Documentação_Completa-00a86b?style=for-the-badge)](README_PT.md)
-[![🇪🇸 Documentación Completa en Español](https://img.shields.io/badge/🇪🇸-Documentación_Completa-ea4335?style=for-the-badge)](README_ES.md)
-[![🇫🇷 Documentation Complète en Français](https://img.shields.io/badge/🇫🇷-Documentation_Complète-4285f4?style=for-the-badge)](README_FR.md)
-[![🇩🇪 Vollständige Dokumentation auf Deutsch](https://img.shields.io/badge/🇩🇪-Vollständige_Dokumentation-333333?style=for-the-badge)](README_DE.md)
-
-**📋 [Vedi Tutte le Lingue e Guida alla Traduzione](LANGUAGES.md)**
-
-</div>
-
----
-
-## � Licenza
-
-Questo progetto è sotto licenza **MIT** - vedi il file [LICENSE](../LICENSE) per i dettagli.
+Questo progetto � sotto licenza **MIT** - vedi il file [LICENSE](../LICENSE) per i dettagli.
 
 ---
 
 <div align="center">
 
-**🚀 Sviluppato con ❤️ per la comunità**
+**?? Sviluppato con ?? per la comunit�**
 
-**Se questo progetto ti ha aiutato, considera di dargli una ⭐!**
+**Se questo progetto ti ha aiutato, considera di dargli una ?!**
 
-[![GitHub stars](https://img.shields.io/github/stars/your-username/google-play-reviews-scraper?style=social)](../../stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/your-username/google-play-reviews-scraper?style=social)](../../network/members)
+[![GitHub stars](https://img.shields.io/github/stars/dssiqueira/google-play-reviews-scraper?style=social)](../../stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/dssiqueira/google-play-reviews-scraper?style=social)](../../network/members)
 
 </div>
