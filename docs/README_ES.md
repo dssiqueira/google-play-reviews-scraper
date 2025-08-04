@@ -44,17 +44,17 @@ Extrae **TODAS** las reseñas disponibles de cualquier app de Google Play Store 
 | Plataforma | Interfaz Gráfica | Línea de Comandos | Ejecutable |
 |------------|------------------|-------------------|------------|
 | 🪟 **Windows** | ✅ Soporte completo | ✅ Soportado | ✅ Disponible |
-| 🍎 **macOS** | ❌ Solo terminal | ✅ Soportado | ❌ No disponible |
+| 🍎 **macOS** | ✅ **¡NUEVO!** Interfaz Nativa | ✅ Soportado | ❌ No disponible |
 | 🐧 **Linux** | ❌ Solo terminal | ✅ Soportado | ❌ No disponible |
 
-> **Nota**: La interfaz gráfica está disponible solo para Windows. Los usuarios de Mac y Linux deben usar la versión de línea de comandos.
+> **✨ NUEVO**: ¡macOS ahora tiene interfaz visual nativa con 6 idiomas y diseño nativo!
 
 ### Opción 1: Ejecutable (Solo Windows)
 1. Descarga el ejecutable de la [página de releases](../../releases)
 2. Ejecuta `GooglePlayReviewScraper.exe`
 3. ¡Listo! No necesitas instalar Python
 
-### Opción 2: Código Fuente (Todas las Plataformas)
+### Opción 2: Interfaz Visual (Windows & macOS)
 ```bash
 # Clona el repositorio
 git clone https://github.com/tu-usuario/google-play-reviews-scraper.git
@@ -66,12 +66,19 @@ pip install -r requirements.txt
 # Windows: Ejecuta la interfaz gráfica
 python app_gui.py
 
-# Mac/Linux: Usa la línea de comandos
+# macOS: Ejecuta la interfaz nativa
+cd src && python3 app_gui_mac.py
+```
+
+### Opción 3: Línea de Comandos (Todas las Plataformas)
+```bash
+# Después de clonar e instalar dependencias
 python review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
 ```
 
-**Usuarios Windows**: La interfaz se abrirá en Portugués. ¡Usa el selector de banderas en la esquina superior derecha para cambiar idioma!
-**Usuarios Mac/Linux**: Utiliza la interfaz de línea de comandos con los parámetros mostrados a continuación.
+**🪟 Usuarios Windows**: La interfaz se abrirá en Portugués. ¡Usa el selector de banderas en la esquina superior derecha para cambiar idioma!
+**🍎 Usuarios macOS**: ¡Interfaz nativa con 6 idiomas, fuentes SF Pro e integración con Finder!
+**🐧 Usuarios Linux**: Utiliza la interfaz de línea de comandos con los parámetros mostrados a continuación.
 
 ---
 

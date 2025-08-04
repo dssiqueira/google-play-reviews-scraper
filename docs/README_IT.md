@@ -44,17 +44,17 @@ Estrae **TUTTE** le recensioni disponibili da qualsiasi app del Google Play Stor
 | Piattaforma | Interfaccia Grafica | Riga di Comando | Eseguibile |
 |-------------|---------------------|-----------------|------------|
 | 🪟 **Windows** | ✅ Supporto completo | ✅ Supportato | ✅ Disponibile |
-| 🍎 **macOS** | ❌ Solo terminale | ✅ Supportato | ❌ Non disponibile |
+| 🍎 **macOS** | ✅ **NUOVO!** Interfaccia Nativa | ✅ Supportato | ❌ Non disponibile |
 | 🐧 **Linux** | ❌ Solo terminale | ✅ Supportato | ❌ Non disponibile |
 
-> **Nota**: L'interfaccia grafica è disponibile solo per Windows. Gli utenti Mac e Linux devono utilizzare la versione a riga di comando.
+> **✨ NUOVO**: macOS ora ha un'interfaccia visuale nativa con 6 lingue e design nativo!
 
 ### Opzione 1: Eseguibile (Solo Windows)
 1. Scarica l'eseguibile dalla [pagina delle release](../../releases)
 2. Esegui `GooglePlayReviewScraper.exe`
 3. Fatto! Non è necessario installare Python
 
-### Opzione 2: Codice Sorgente (Tutte le Piattaforme)
+### Opzione 2: Interfaccia Visuale (Windows & macOS)
 ```bash
 # Clona il repository
 git clone https://github.com/tuo-utente/google-play-reviews-scraper.git
@@ -66,12 +66,19 @@ pip install -r requirements.txt
 # Windows: Esegui l'interfaccia grafica
 python app_gui.py
 
-# Mac/Linux: Usa la riga di comando
+# macOS: Esegui l'interfaccia nativa
+cd src && python3 app_gui_mac.py
+```
+
+### Opzione 3: Riga di Comando (Tutte le Piattaforme)
+```bash
+# Dopo aver clonato e installato le dipendenze
 python review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
 ```
 
-**Utenti Windows**: L'interfaccia si aprirà in Portoghese. Usa il selettore di bandiere nell'angolo in alto a destra per cambiare lingua!
-**Utenti Mac/Linux**: Utilizza l'interfaccia a riga di comando con i parametri mostrati di seguito.
+**🪟 Utenti Windows**: L'interfaccia si aprirà in Portoghese. Usa il selettore di bandiere nell'angolo in alto a destra per cambiare lingua!
+**🍎 Utenti macOS**: Interfaccia nativa con 6 lingue, font SF Pro e integrazione Finder!
+**🐧 Utenti Linux**: Utilizza l'interfaccia a riga di comando con i parametri mostrati di seguito.
 
 ---
 

@@ -44,17 +44,17 @@ Extrahiert **ALLE** verfügbaren Bewertungen von jeder Google Play Store App sch
 | Plattform | Grafische Oberfläche | Kommandozeile | Ausführbare Datei |
 |-----------|----------------------|---------------|-------------------|
 | 🪟 **Windows** | ✅ Vollständige Unterstützung | ✅ Unterstützt | ✅ Verfügbar |
-| 🍎 **macOS** | ❌ Nur Terminal | ✅ Unterstützt | ❌ Nicht verfügbar |
+| 🍎 **macOS** | ✅ **NEU!** Native Oberfläche | ✅ Unterstützt | ❌ Nicht verfügbar |
 | 🐧 **Linux** | ❌ Nur Terminal | ✅ Unterstützt | ❌ Nicht verfügbar |
 
-> **Hinweis**: Die grafische Benutzeroberfläche ist nur für Windows verfügbar. Mac- und Linux-Benutzer müssen die Kommandozeilenversion verwenden.
+> **✨ NEU**: macOS hat jetzt eine native visuelle Oberfläche mit 6 Sprachen und nativem Design!
 
 ### Option 1: Ausführbare Datei (Nur Windows)
 1. Laden Sie die ausführbare Datei von der [Releases-Seite](../../releases) herunter
 2. Führen Sie `GooglePlayReviewScraper.exe` aus
 3. Fertig! Python muss nicht installiert werden
 
-### Option 2: Quellcode (Alle Plattformen)
+### Option 2: Visuelle Oberfläche (Windows & macOS)
 ```bash
 # Repository klonen
 git clone https://github.com/ihr-benutzername/google-play-reviews-scraper.git
@@ -66,12 +66,19 @@ pip install -r requirements.txt
 # Windows: GUI ausführen
 python app_gui.py
 
-# Mac/Linux: Kommandozeile verwenden
+# macOS: Native Oberfläche ausführen
+cd src && python3 app_gui_mac.py
+```
+
+### Option 3: Kommandozeile (Alle Plattformen)
+```bash
+# Nach dem Klonen und Installieren der Abhängigkeiten
 python review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
 ```
 
-**Windows-Benutzer**: Die Benutzeroberfläche öffnet sich auf Portugiesisch. Verwenden Sie den Flaggen-Selektor in der oberen rechten Ecke, um die Sprache zu ändern!
-**Mac/Linux-Benutzer**: Verwenden Sie die Kommandozeilenschnittstelle mit den unten gezeigten Parametern.
+**🪟 Windows-Benutzer**: Die Benutzeroberfläche öffnet sich auf Portugiesisch. Verwenden Sie den Flaggen-Selektor in der oberen rechten Ecke, um die Sprache zu ändern!
+**🍎 macOS-Benutzer**: Native Oberfläche mit 6 Sprachen, SF Pro Schriften und Finder-Integration!
+**🐧 Linux-Benutzer**: Verwenden Sie die Kommandozeilenschnittstelle mit den unten gezeigten Parametern.
 
 ---
 

@@ -19,7 +19,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)](https://windows.microsoft.com)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](#-quick-installation)
 
 </div>
 
@@ -44,17 +44,17 @@ Extracts **ALL** available reviews from any Google Play Store app quickly, organ
 | Platform | GUI Interface | Command Line | Executable |
 |----------|---------------|--------------|------------|
 | 🪟 **Windows** | ✅ Full support | ✅ Supported | ✅ Available |
-| 🍎 **macOS** | ❌ Terminal only | ✅ Supported | ❌ Not available |
+| 🍎 **macOS** | ✅ **NEW!** Native GUI | ✅ Supported | ❌ Not available |
 | 🐧 **Linux** | ❌ Terminal only | ✅ Supported | ❌ Not available |
 
-> **Note**: The graphical interface is currently Windows-only. Mac and Linux users can use the command-line version.
+> **✨ NEW**: macOS now has a native visual interface with 6 languages and native design!
 
 ### Option 1: Executable (Windows Only)
 1. Download the executable from [releases page](../../releases)
 2. Run `GooglePlayReviewScraper.exe`
 3. Done! No need to install Python
 
-### Option 2: Source Code (All Platforms)
+### Option 2: Visual Interface (Windows & macOS)
 ```bash
 # Clone the repository
 git clone https://github.com/your-username/google-play-reviews-scraper.git
@@ -66,12 +66,19 @@ pip install -r requirements.txt
 # Windows: Run GUI
 python app_gui.py
 
-# Mac/Linux: Use command line
+# macOS: Run native GUI
+cd src && python3 app_gui_mac.py
+```
+
+### Option 3: Command Line (All Platforms)
+```bash
+# After cloning and installing dependencies
 python review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
 ```
 
-**Windows users**: Interface opens in Portuguese. Use the flag selector in the top-right corner to change language!
-**Mac/Linux users**: Use the command-line interface with the parameters shown below.
+**🪟 Windows users**: Interface opens in Portuguese. Use the flag selector in the top-right corner to change language!
+**🍎 macOS users**: Native interface with 6 languages, SF Pro fonts, and Finder integration!
+**🐧 Linux users**: Use the command-line interface with the parameters shown below.
 
 ---
 

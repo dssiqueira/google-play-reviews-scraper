@@ -44,17 +44,17 @@ Extrait **TOUS** les avis disponibles de n'importe quelle application du Google 
 | Plateforme | Interface Graphique | Ligne de Commande | Exécutable |
 |------------|---------------------|-------------------|------------|
 | 🪟 **Windows** | ✅ Support complet | ✅ Supporté | ✅ Disponible |
-| 🍎 **macOS** | ❌ Terminal uniquement | ✅ Supporté | ❌ Non disponible |
+| 🍎 **macOS** | ✅ **NOUVEAU!** Interface Native | ✅ Supporté | ❌ Non disponible |
 | 🐧 **Linux** | ❌ Terminal uniquement | ✅ Supporté | ❌ Non disponible |
 
-> **Note** : L'interface graphique est disponible uniquement pour Windows. Les utilisateurs Mac et Linux doivent utiliser la version en ligne de commande.
+> **✨ NOUVEAU**: macOS a maintenant une interface visuelle native avec 6 langues et un design natif!
 
 ### Option 1 : Exécutable (Windows Uniquement)
 1. Téléchargez l'exécutable depuis la [page des releases](../../releases)
 2. Exécutez `GooglePlayReviewScraper.exe`
 3. Terminé ! Pas besoin d'installer Python
 
-### Option 2 : Code Source (Toutes Plateformes)
+### Option 2 : Interface Visuelle (Windows & macOS)
 ```bash
 # Clonez le dépôt
 git clone https://github.com/votre-utilisateur/google-play-reviews-scraper.git
@@ -66,12 +66,19 @@ pip install -r requirements.txt
 # Windows : Exécutez l'interface graphique
 python app_gui.py
 
-# Mac/Linux : Utilisez la ligne de commande
+# macOS : Exécutez l'interface native
+cd src && python3 app_gui_mac.py
+```
+
+### Option 3 : Ligne de Commande (Toutes Plateformes)
+```bash
+# Après avoir cloné et installé les dépendances
 python review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
 ```
 
-**Utilisateurs Windows** : L'interface s'ouvrira en Portugais. Utilisez le sélecteur de drapeaux dans le coin supérieur droit pour changer de langue !
-**Utilisateurs Mac/Linux** : Utilisez l'interface en ligne de commande avec les paramètres montrés ci-dessous.
+**🪟 Utilisateurs Windows** : L'interface s'ouvrira en Portugais. Utilisez le sélecteur de drapeaux dans le coin supérieur droit pour changer de langue !
+**🍎 Utilisateurs macOS** : Interface native avec 6 langues, polices SF Pro et intégration Finder !
+**🐧 Utilisateurs Linux** : Utilisez l'interface en ligne de commande avec les paramètres montrés ci-dessous.
 
 ---
 
