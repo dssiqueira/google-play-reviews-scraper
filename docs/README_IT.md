@@ -87,18 +87,28 @@ Estrae **TUTTE** le recensioni disponibili da qualsiasi app del Google Play Stor
 ### Opzione 2: Interfaccia Visuale (Windows & macOS)
 ## ⚡ Avvio Rapido
 
+### 🖥️ **Compatibilità delle Piattaforme**
+
+| Piattaforma | Interfaccia Grafica | Riga di Comando | Note |
+|:-----------:|:-------------------:|:---------------:|:-----|
+| 🪟 **Windows** | ✅ Supporto Completo | ✅ Supportato | GUI moderna con tutte le funzionalità |
+| 🍎 **macOS** | ✅ Interfaccia Nativa | ✅ Supportato | Ottimizzata per il design macOS |
+| 🐧 **Linux** | ⚠️ GUI Base | ✅ Supportato | GUI disponibile ma CLI raccomandato |
+
 ### 🎯 **Opzione 1: Applicazione GUI (Consigliata)**
 
+#### **🚀 Installazione con Un Comando**
 ```bash
-# 1. Clonare il repository
 git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
 cd google-play-reviews-scraper
+python install.py
+```
 
-# 2. Installare le dipendenze
-pip install -r requirements.txt
-
-# 3. Avviare la GUI
-python src/app_gui.py
+#### **🔧 Installazione Manuale**
+```bash
+# Windows: python src/app_gui.py
+# macOS: python src/app_gui_mac.py  
+# Linux: python src/app_gui.py
 ```
 
 ### 🔧 **Opzione 2: Riga di Comando**
@@ -120,6 +130,25 @@ scraper = GooglePlayReviewScraper()
 reviews = scraper.scrape_reviews("com.whatsapp")
 print(f"{len(reviews)} recensioni estratte!")
 ```
+
+---
+
+## 📈 **Review Stats Pro - Analisi Professionale**
+
+Dopo aver estratto le recensioni, analizza i tuoi dati con la nostra piattaforma professionale:
+
+**🔗 [Review Stats Pro](https://review-stats-pro.lovable.app/)**
+
+### ✨ **Caratteristiche:**
+- 📊 **Analisi del Sentiment** - Comprendi le emozioni degli utenti
+- 📈 **Rilevamento Tendenze** - Identifica pattern temporali
+- 🔍 **Estrazione Parole Chiave** - Trova argomenti più menzionati
+- 📊 **Grafici Interattivi** - Visualizzazioni professionali
+
+### 💡 **Flusso di lavoro:**
+1. Estrarre recensioni con questo strumento
+2. Caricare JSON su Review Stats Pro
+3. Ottenere analisi professionali istantanee
 
 ---
 
@@ -217,13 +246,13 @@ python src/app_gui.py
 
 ## ?? Licenza
 
-Questo progetto � sotto licenza **MIT** - vedi il file [LICENSE](../LICENSE) per i dettagli.
+Questo progetto � sotto licenza **MIT** - vedi il file [LICENSE](../LICENSE) per i dettagli.
 
 ---
 
 <div align="center">
 
-**?? Sviluppato con ?? per la comunit�**
+**?? Sviluppato con ?? per la comunit�**
 
 **Se questo progetto ti ha aiutato, considera di dargli una ?!**
 

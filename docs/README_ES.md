@@ -57,18 +57,28 @@
 
 ## ⚡ Inicio Rápido
 
+### 🖥️ **Compatibilidad de Plataformas**
+
+| Plataforma | Interfaz Gráfica | Línea de Comandos | Notas |
+|:----------:|:----------------:|:-----------------:|:------|
+| 🪟 **Windows** | ✅ Soporte Completo | ✅ Soportado | GUI moderna con todas las características |
+| 🍎 **macOS** | ✅ Interfaz Nativa | ✅ Soportado | Optimizada para diseño macOS |
+| 🐧 **Linux** | ⚠️ GUI Básica | ✅ Soportado | GUI disponible pero CLI recomendado |
+
 ### 🎯 **Opción 1: Aplicación GUI (Recomendada)**
 
+#### **🚀 Instalación con Un Comando**
 ```bash
-# 1. Clonar el repositorio
 git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
 cd google-play-reviews-scraper
+python install.py
+```
 
-# 2. Instalar dependencias
-pip install -r requirements.txt
-
-# 3. Ejecutar la GUI
-python src/app_gui.py
+#### **🔧 Instalación Manual**
+```bash
+# Windows: python src/app_gui.py
+# macOS: python src/app_gui_mac.py  
+# Linux: python src/app_gui.py
 ```
 
 ### 🔧 **Opción 2: Línea de Comandos**
@@ -90,6 +100,25 @@ scraper = GooglePlayReviewScraper()
 reviews = scraper.scrape_reviews("com.whatsapp")
 print(f"¡Extraídas {len(reviews)} reseñas!")
 ```
+
+---
+
+## 📈 **Review Stats Pro - Análisis Profesional**
+
+Después de extraer reseñas, analiza tus datos con nuestra plataforma profesional:
+
+**🔗 [Review Stats Pro](https://review-stats-pro.lovable.app/)**
+
+### ✨ **Características:**
+- 📊 **Análisis de Sentimiento** - Comprende emociones de usuarios
+- 📈 **Detección de Tendencias** - Identifica patrones temporales
+- 🔍 **Extracción de Palabras Clave** - Encuentra temas más mencionados
+- 📊 **Gráficos Interactivos** - Visualizaciones profesionales
+
+### 💡 **Flujo de trabajo:**
+1. Extraer reseñas con esta herramienta
+2. Subir JSON a Review Stats Pro
+3. Obtener análisis profesionales instantáneos
 
 ---
 

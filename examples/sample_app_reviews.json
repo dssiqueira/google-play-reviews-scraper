@@ -1,0 +1,135 @@
+{
+  "collection_info": {
+    "collected_at": "2024-01-20 14:30:45",
+    "total_reviews": 10,
+    "country": "br",
+    "language": "pt"
+  },
+  "app_info": {
+    "appId": "com.example.sampleapp",
+    "title": "Sample App - Exemplo de Aplicativo",
+    "developer": "Example Developer Inc.",
+    "genre": "Productivity",
+    "price": "Free",
+    "score": 4.2,
+    "reviews": 1250,
+    "installs": "10,000+",
+    "contentRating": "Everyone",
+    "updated": "2024-01-15",
+    "version": "2.1.5",
+    "androidVersion": "5.0",
+    "description": "Este é um aplicativo de exemplo para demonstrar a estrutura dos dados coletados pelo Google Play Reviews Scraper."
+  },
+  "reviews": [
+    {
+      "review_id": "gp:AOqpTOH1234567890",
+      "user_name": "João Silva",
+      "content": "Excelente aplicativo! Muito fácil de usar e funciona perfeitamente. Recomendo para todos.",
+      "score": 5,
+      "thumbs_up_count": 12,
+      "at": "2024-01-15 10:30:00",
+      "reply_content": "Obrigado pelo feedback positivo! Continuaremos melhorando.",
+      "reply_at": "2024-01-16 09:15:00",
+      "app_version": "2.1.5"
+    },
+    {
+      "review_id": "gp:AOqpTOH0987654321",
+      "user_name": "Maria Santos",
+      "content": "App muito bom, mas poderia ter mais opções de personalização. No geral estou satisfeita.",
+      "score": 4,
+      "thumbs_up_count": 8,
+      "at": "2024-01-14 16:45:00",
+      "reply_content": "Agradecemos a sugestão! Estamos trabalhando em novas funcionalidades.",
+      "reply_at": "2024-01-15 11:20:00",
+      "app_version": "2.1.4"
+    },
+    {
+      "review_id": "gp:AOqpTOH1122334455",
+      "user_name": "Pedro Costa",
+      "content": "Aplicativo travou algumas vezes, mas depois da última atualização melhorou bastante.",
+      "score": 3,
+      "thumbs_up_count": 5,
+      "at": "2024-01-13 14:20:00",
+      "reply_content": "Obrigado por reportar. Corrigimos vários bugs na versão mais recente.",
+      "reply_at": "2024-01-14 08:30:00",
+      "app_version": "2.1.5"
+    },
+    {
+      "review_id": "gp:AOqpTOH5566778899",
+      "user_name": "Ana Oliveira",
+      "content": "Perfeito! Uso todos os dias e nunca tive problemas. Interface muito intuitiva.",
+      "score": 5,
+      "thumbs_up_count": 15,
+      "at": "2024-01-12 09:10:00",
+      "reply_content": "Ficamos felizes em saber que você está gostando!",
+      "reply_at": "2024-01-12 15:45:00",
+      "app_version": "2.1.4"
+    },
+    {
+      "review_id": "gp:AOqpTOH9988776655",
+      "user_name": "Carlos Ferreira",
+      "content": "Não consegui fazer login. Tentei várias vezes mas sempre dá erro.",
+      "score": 1,
+      "thumbs_up_count": 3,
+      "at": "2024-01-11 20:30:00",
+      "reply_content": "Lamentamos o problema. Entre em contato conosco pelo suporte para resolvermos.",
+      "reply_at": "2024-01-12 07:00:00",
+      "app_version": "2.1.3"
+    },
+    {
+      "review_id": "gp:AOqpTOH4433221100",
+      "user_name": "Lucia Mendes",
+      "content": "App funciona bem, mas consome muita bateria. Seria bom otimizar isso.",
+      "score": 3,
+      "thumbs_up_count": 7,
+      "at": "2024-01-10 13:15:00",
+      "reply_content": "Estamos trabalhando na otimização de bateria para a próxima versão.",
+      "reply_at": "2024-01-11 10:30:00",
+      "app_version": "2.1.4"
+    },
+    {
+      "review_id": "gp:AOqpTOH7788990011",
+      "user_name": "Roberto Lima",
+      "content": "Muito bom! Facilita muito minha rotina diária. Parabéns aos desenvolvedores.",
+      "score": 5,
+      "thumbs_up_count": 20,
+      "at": "2024-01-09 11:45:00",
+      "reply_content": "Muito obrigado! Seu feedback nos motiva a continuar melhorando.",
+      "reply_at": "2024-01-09 16:20:00",
+      "app_version": "2.1.4"
+    },
+    {
+      "review_id": "gp:AOqpTOH2233445566",
+      "user_name": "Fernanda Rocha",
+      "content": "Interface bonita, mas algumas funcionalidades são confusas. Precisa de tutorial.",
+      "score": 4,
+      "thumbs_up_count": 6,
+      "at": "2024-01-08 17:30:00",
+      "reply_content": "Obrigado pela sugestão! Estamos desenvolvendo um tutorial interativo.",
+      "reply_at": "2024-01-09 09:15:00",
+      "app_version": "2.1.3"
+    },
+    {
+      "review_id": "gp:AOqpTOH6677889900",
+      "user_name": "Marcos Alves",
+      "content": "Aplicativo lento para carregar. Demora muito para abrir as telas.",
+      "score": 2,
+      "thumbs_up_count": 4,
+      "at": "2024-01-07 12:00:00",
+      "reply_content": "Identificamos o problema e já lançamos uma correção. Atualize para a versão mais recente.",
+      "reply_at": "2024-01-08 08:45:00",
+      "app_version": "2.1.5"
+    },
+    {
+      "review_id": "gp:AOqpTOH1357924680",
+      "user_name": "Juliana Pereira",
+      "content": "Adorei! Finalmente um app que faz exatamente o que promete. 5 estrelas merecidas!",
+      "score": 5,
+      "thumbs_up_count": 18,
+      "at": "2024-01-06 15:20:00",
+      "reply_content": "Obrigado pela avaliação! É muito gratificante saber que atendemos suas expectativas.",
+      "reply_at": "2024-01-07 10:10:00",
+      "app_version": "2.1.4"
+    }
+  ]
+}

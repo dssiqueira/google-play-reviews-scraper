@@ -57,18 +57,28 @@
 
 ## ⚡ Schnellstart
 
+### 🖥️ **Plattform-Kompatibilität**
+
+| Plattform | Grafische Oberfläche | Kommandozeile | Hinweise |
+|:---------:|:--------------------:|:-------------:|:---------|
+| 🪟 **Windows** | ✅ Vollständige Unterstützung | ✅ Unterstützt | Moderne GUI mit allen Funktionen |
+| 🍎 **macOS** | ✅ Native Oberfläche | ✅ Unterstützt | Für macOS-Design optimiert |
+| 🐧 **Linux** | ⚠️ Basis-GUI | ✅ Unterstützt | GUI verfügbar, aber CLI empfohlen |
+
 ### 🎯 **Option 1: GUI-Anwendung (Empfohlen)**
 
+#### **🚀 Ein-Befehl-Installation**
 ```bash
-# 1. Repository klonen
 git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
 cd google-play-reviews-scraper
+python install.py
+```
 
-# 2. Abhängigkeiten installieren
-pip install -r requirements.txt
-
-# 3. GUI starten
-python src/app_gui.py
+#### **🔧 Manuelle Installation**
+```bash
+# Windows: python src/app_gui.py
+# macOS: python src/app_gui_mac.py  
+# Linux: python src/app_gui.py
 ```
 
 ### 🔧 **Option 2: Kommandozeile**
@@ -90,6 +100,25 @@ scraper = GooglePlayReviewScraper()
 reviews = scraper.scrape_reviews("com.whatsapp")
 print(f"{len(reviews)} Bewertungen extrahiert!")
 ```
+
+---
+
+## 📈 **Review Stats Pro - Professionelle Analyse**
+
+Nach der Extraktion von Bewertungen analysieren Sie Ihre Daten mit unserer professionellen Plattform:
+
+**🔗 [Review Stats Pro](https://review-stats-pro.lovable.app/)**
+
+### ✨ **Funktionen:**
+- 📊 **Sentiment-Analyse** - Verstehen Sie Benutzeremotionen
+- 📈 **Trend-Erkennung** - Identifizieren Sie zeitliche Muster
+- 🔍 **Schlüsselwort-Extraktion** - Finden Sie die meist erwähnten Themen
+- 📊 **Interaktive Diagramme** - Professionelle Visualisierungen
+
+### 💡 **Arbeitsablauf:**
+1. Bewertungen mit diesem Tool extrahieren
+2. JSON zu Review Stats Pro hochladen
+3. Sofortige professionelle Analysen erhalten
 
 ---
 
@@ -155,13 +184,13 @@ python src/app_gui.py
 
 ## ?? Lizenz
 
-Dieses Projekt steht unter der **MIT-Lizenz** - siehe die [LICENSE](../LICENSE) Datei f�r Details.
+Dieses Projekt steht unter der **MIT-Lizenz** - siehe die [LICENSE](../LICENSE) Datei f�r Details.
 
 ---
 
 <div align="center">
 
-**?? Mit ?? f�r die Community entwickelt**
+**?? Mit ?? f�r die Community entwickelt**
 
 **Wenn dieses Projekt Ihnen geholfen hat, geben Sie ihm bitte einen ?!**
 

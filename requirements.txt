@@ -1,4 +1,15 @@
-google-play-scraper
-pandas
-pyinstaller
-pefile
+# Core dependencies
+google-play-scraper>=3.1.2
+pandas>=1.5.0
+
+# GUI dependencies (tkinter is usually pre-installed)
+# tkinter - included with Python
+
+# Optional: For building executables
+pyinstaller>=5.0.0
+pefile>=2023.2.7
+
+# Development dependencies (uncomment if needed)
+# pytest>=7.0.0
+# black>=22.0.0
+# flake8>=5.0.0

@@ -20,15 +20,19 @@ wheels/
 .installed.cfg
 *.egg
 
-# Arquivos de saída do scraper
-*.csv
-*.json
-src/time_stats.json
-
 # Virtual Environment
 venv/
 env/
 .env
+
+# Output files (reviews data)
+*.csv
+*.json
+!examples/*.csv
+!examples/*.json
+
+# Time statistics
+src/time_stats.json
 
 # IDE
 .vscode/
@@ -42,3 +46,34 @@ Thumbs.db
 
 # Logs
 *.log
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
