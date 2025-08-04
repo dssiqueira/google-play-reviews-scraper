@@ -55,6 +55,29 @@
 
 ---
 
+## 🎯 **O que faz?**
+
+Extrai **TODOS** os reviews disponíveis de qualquer app do Google Play Store de forma rápida, organizada e confiável. Ideal para:
+
+- 📊 **Análise de mercado** e concorrência
+- 🔍 **Pesquisa de UX** e feedback de usuários  
+- 📈 **Monitoramento** de reputação de apps
+- 🎯 **Insights** para desenvolvimento de produtos
+- 📋 **Relatórios** e apresentações
+
+---
+
+## 🚀 **Instalação Rápida**
+
+### 🖥️ **Compatibilidade de Plataformas**
+
+| Plataforma | Interface Gráfica | Linha de Comando | Executável |
+|------------|-------------------|------------------|------------|
+| 🪟 **Windows** | ✅ Suporte completo | ✅ Suportado | ✅ Disponível |
+| 🍎 **macOS** | ✅ **NOVO!** Interface Nativa | ✅ Suportado | ❌ Não disponível |
+| 🐧 **Linux** | ❌ Apenas terminal | ✅ Suportado | ❌ Não disponível |
+
+> **✨ NOVO**: macOS agora tem interface visual nativa com 6 idiomas e design nativo!
 ## ⚡ Início Rápido
 
 ### 🎯 **Opção 1: Aplicação GUI (Recomendada)**
@@ -319,7 +342,7 @@ Maria Santos,4,"Bom mas precisa melhorar a interface",15,1.2.2,2024-01-14,1.2.3
 2. Execute `GooglePlayReviewScraper.exe`
 3. Pronto! Não precisa instalar Python
 
-### Opção 2: Código Fonte (Todas as Plataformas)
+### Opção 2: Interface Visual (Windows & macOS)
 ```bash
 # Clone o repositório
 git clone https://github.com/seu-usuario/google-play-reviews-scraper.git
@@ -331,12 +354,19 @@ pip install -r requirements.txt
 # Windows: Execute a interface gráfica
 python app_gui.py
 
-# Mac/Linux: Use a linha de comando
+# macOS: Execute a interface nativa
+cd src && python3 app_gui_mac.py
+```
+
+### Opção 3: Linha de Comando (Todas as Plataformas)
+```bash
+# Após clonar e instalar dependências
 python review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
 ```
 
-**Usuários Windows**: A interface abrirá em Português. Use o seletor de bandeiras no canto superior direito para trocar idioma!
-**Usuários Mac/Linux**: Use a interface de linha de comando com os parâmetros mostrados abaixo.
+**🪟 Usuários Windows**: A interface abrirá em Português. Use o seletor de bandeiras no canto superior direito para trocar idioma!
+**🍎 Usuários macOS**: Interface nativa com 6 idiomas, fontes SF Pro e integração com Finder!
+**🐧 Usuários Linux**: Use a interface de linha de comando com os parâmetros mostrados abaixo.
 
 ---
 

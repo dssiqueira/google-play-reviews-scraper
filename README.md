@@ -50,6 +50,9 @@
 *Export to CSV, JSON with detailed analytics*
 
 ![Output Formats](assets/screenshots/output-formats.png)
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](#-quick-start)
 
 </div>
 
@@ -57,8 +60,28 @@
 
 ## ⚡ Quick Start
 
-### 🎯 **Option 1: GUI Application (Recommended)**
+### 🎯 **🪟 Option 1: GUI Application (Recommended)**
 
+### **🍎 macOS Users (Visual Interface)**
+```bash
+# Clone the repository
+git clone https://github.com/your-username/google-play-reviews-scraper.git
+cd google-play-reviews-scraper
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the macOS visual interface
+cd src && python3 app_gui_mac.py
+```
+
+**✨ macOS Features:**
+- 🌍 **6 languages**: Portuguese, English, Spanish, French, German, Italian
+- 🎨 **Native macOS design** with SF Pro fonts
+- 🖱️ **Trackpad support** and native scroll
+- 📁 **Finder integration** for easy file access
+
+### **🐧 Linux Users (Command Line)**
 ```bash
 # 1. Clone the repository
 git clone https://github.com/your-username/google-play-reviews-scraper.git

@@ -55,6 +55,36 @@
 
 ---
 
+## 🎯 **Cosa fa?**
+
+Estrae **TUTTE** le recensioni disponibili da qualsiasi app del Google Play Store in modo rapido, organizzato e affidabile. Ideale per:
+
+- 📊 **Analisi di mercato** e ricerca della concorrenza
+- 🔍 **Ricerca UX** e analisi del feedback degli utenti  
+- 📈 **Monitoraggio** della reputazione delle app
+- 🎯 **Insights** per lo sviluppo di prodotti
+- 📋 **Report** e presentazioni
+
+---
+
+## 🚀 **Installazione Rapida**
+
+### 🖥️ **Compatibilità delle Piattaforme**
+
+| Piattaforma | Interfaccia Grafica | Riga di Comando | Eseguibile |
+|-------------|---------------------|-----------------|------------|
+| 🪟 **Windows** | ✅ Supporto completo | ✅ Supportato | ✅ Disponibile |
+| 🍎 **macOS** | ✅ **NUOVO!** Interfaccia Nativa | ✅ Supportato | ❌ Non disponibile |
+| 🐧 **Linux** | ❌ Solo terminale | ✅ Supportato | ❌ Non disponibile |
+
+> **✨ NUOVO**: macOS ora ha un'interfaccia visuale nativa con 6 lingue e design nativo!
+
+### Opzione 1: Eseguibile (Solo Windows)
+1. Scarica l'eseguibile dalla [pagina delle release](../../releases)
+2. Esegui `GooglePlayReviewScraper.exe`
+3. Fatto! Non è necessario installare Python
+
+### Opzione 2: Interfaccia Visuale (Windows & macOS)
 ## ⚡ Avvio Rapido
 
 ### 🎯 **Opzione 1: Applicazione GUI (Consigliata)**
@@ -67,68 +97,63 @@ cd google-play-reviews-scraper
 # 2. Installare le dipendenze
 pip install -r requirements.txt
 
-# 3. Avviare la GUI
-python src/app_gui.py
+# Windows: Esegui l'interfaccia grafica
+python app_gui.py
+
+# macOS: Esegui l'interfaccia nativa
+cd src && python3 app_gui_mac.py
 ```
 
-### 🔧 **Opzione 2: Riga di Comando**
-
+### Opzione 3: Riga di Comando (Tutte le Piattaforme)
 ```bash
-# Estrarre recensioni da una singola app
-python src/review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
-
-# Elaborazione in batch di più app
-python src/review_scraper.py --batch lista_app.txt --output risultati/
+# Dopo aver clonato e installato le dipendenze
+python review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
 ```
 
-### 📦 **Opzione 3: Modulo Python**
-
-```python
-from src.review_scraper import GooglePlayReviewScraper
-
-scraper = GooglePlayReviewScraper()
-reviews = scraper.scrape_reviews("com.whatsapp")
-print(f"{len(reviews)} recensioni estratte!")
-```
+**🪟 Utenti Windows**: L'interfaccia si aprirà in Portoghese. Usa il selettore di bandiere nell'angolo in alto a destra per cambiare lingua!
+**🍎 Utenti macOS**: Interfaccia nativa con 6 lingue, font SF Pro e integrazione Finder!
+**🐧 Utenti Linux**: Utilizza l'interfaccia a riga di comando con i parametri mostrati di seguito.
 
 ---
 
-## 📖 Caratteristiche
+## 💻 **Interfaccia Grafica Moderna**
 
-<div align="center">
+![Google Play Reviews Scraper Screenshot](../assets/screenshots/google-play-reviews-scraper.png)
 
-| 🎯 **Caratteristiche Principali** | 🎨 **Interfaccia** | 📊 **Output** | 🌍 **Multi-Lingua** |
-|:---:|:---:|:---:|:---:|
-| Estrae **TUTTE** le recensioni | GUI moderna con temi | Esportazione CSV e JSON | 6 lingue supportate |
-| **Elaborazione in batch** | Progresso tempo reale | Analisi dettagliate | Auto-rilevamento lingua |
-| **Filtraggio intelligente** | Drag & drop URL | Statistiche tempo | Traduzioni personalizzate |
-| **Limitazione velocità** | Coda multi-app | Gestione errori | Supporto RTL |
+### 🎬 **Applicazione in Azione**
+![Google Play Reviews Scraper Demo](../assets/screenshots/google-play-reviews-scraper.gif)
 
-</div>
+### ✨ Caratteristiche dell'Interfaccia:
+- 🎨 **Design Material Design** moderno e intuitivo
+- 🌍 **Multi-lingua** con selettore di bandiere (6 lingue)
+- 📋 **Incolla URL** direttamente dal browser
+- ⚙️ **Impostazioni semplici** (paese, lingua, cartella)
+- 📊 **Progresso in tempo reale** con barra visuale
+- 📁 **Apertura automatica** dei file generati
+- 📜 **Scorrimento fluido** per schermi piccoli
+- ℹ️ **Modal "Informazioni"** con informazioni dello sviluppatore
+- 🎯 **Icona personalizzata** nella barra delle applicazioni
 
-### 🚀 **Cosa lo rende speciale?**
+### 🌍 **Sistema Multi-lingua**
+- **🇺🇸 English**
+- **🇧🇷 Português**
+- **🇪🇸 Español**
+- **🇫🇷 Français**
+- **🇩🇪 Deutsch**
+- **🇮🇹 Italiano** (Predefinito)
 
-- **🎯 Estrazione Completa**: Ottiene TUTTE le recensioni disponibili, non solo quelle recenti
-- **⚡ Super Veloce**: Scraping ottimizzato con limitazione intelligente della velocità  
-- **🎨 Interfaccia Bella**: GUI moderna con temi chiaro/scuro
-- **📊 Analisi Ricche**: Statistiche dettagliate e tracciamento del tempo
-- **🔄 Elaborazione in Batch**: Gestisce più app simultaneamente
-- **🌍 Multi-Lingua**: Interfaccia disponibile in 6 lingue
-- **📱 Rilevamento Intelligente**: Auto-rileva info app e gestisce errori elegantemente
-- **💾 Formati Multipli**: Esporta in CSV, JSON con campi personalizzabili
-- **🛡️ Robusto**: Gestisce problemi di rete, limiti di velocità e casi estremi
+**Selettore con bandiere reali**: Clicca sulla bandiera nell'angolo in alto a destra per cambiare lingua istantaneamente!
 
 ---
 
-## 🛠️ Installazione
+## 🛠️ **Interfaccia a Riga di Comando**
 
-### 📋 **Requisiti**
+### 🎬 **Dimostrazione del Terminal**
+![Google Play Reviews Scraper Terminal Demo](../assets/screenshots/google-play-reviews-scraper-terminal.gif)
 
-- **Python 3.7+** (3.9+ consigliato)
-- **Connessione internet** per lo scraping
-- **2GB RAM** minimo (4GB+ per grandi dataset)
+### 🍎🐧 **Per Utenti Mac/Linux (Obbligatorio)**
 
-### 📦 **Installazione Rapida**
+Poiché l'interfaccia grafica è esclusiva per Windows, gli utenti Mac e Linux devono utilizzare la riga di comando:
 
 ```bash
 git clone https://github.com/your-username/google-play-reviews-scraper.git

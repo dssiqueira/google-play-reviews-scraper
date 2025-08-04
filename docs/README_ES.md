@@ -55,10 +55,36 @@
 
 ---
 
-## ⚡ Inicio Rápido
+## 🎯 **¿Qué hace?**
 
-### 🎯 **Opción 1: Aplicación GUI (Recomendada)**
+Extrae **TODAS** las reseñas disponibles de cualquier app de Google Play Store de forma rápida, organizada y confiable. Ideal para:
 
+- 📊 **Análisis de mercado** y competencia
+- 🔍 **Investigación de UX** y feedback de usuarios  
+- 📈 **Monitoreo** de reputación de apps
+- 🎯 **Insights** para desarrollo de productos
+- 📋 **Informes** y presentaciones
+
+---
+
+## 🚀 **Instalación Rápida**
+
+### 🖥️ **Compatibilidad de Plataformas**
+
+| Plataforma | Interfaz Gráfica | Línea de Comandos | Ejecutable |
+|------------|------------------|-------------------|------------|
+| 🪟 **Windows** | ✅ Soporte completo | ✅ Soportado | ✅ Disponible |
+| 🍎 **macOS** | ✅ **¡NUEVO!** Interfaz Nativa | ✅ Soportado | ❌ No disponible |
+| 🐧 **Linux** | ❌ Solo terminal | ✅ Soportado | ❌ No disponible |
+
+> **✨ NUEVO**: ¡macOS ahora tiene interfaz visual nativa con 6 idiomas y diseño nativo!
+
+### Opción 1: Ejecutable (Solo Windows)
+1. Descarga el ejecutable de la [página de releases](../../releases)
+2. Ejecuta `GooglePlayReviewScraper.exe`
+3. ¡Listo! No necesitas instalar Python
+
+### Opción 2: Interfaz Visual (Windows & macOS)
 ```bash
 # 1. Clonar el repositorio
 git clone https://github.com/your-username/google-play-reviews-scraper.git
