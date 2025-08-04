@@ -23,6 +23,12 @@ wheels/
 # Arquivos de saída do scraper
 *.csv
 *.json
+src/time_stats.json
+
+# Virtual Environment
+venv/
+env/
+.env
 
 # IDE
 .vscode/
@@ -33,3 +39,6 @@ wheels/
 # OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log

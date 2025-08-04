@@ -24,14 +24,17 @@ TRANSLATIONS = {
         
         # Botões
         'paste_button': 'Colar',
+        'add_button': 'Adicionar',
         'choose_button': 'Escolher',
         'start_button': 'Iniciar Coleta',
         'stop_button': 'Parar',
-        'clear_button': 'Limpar',
+        'clear_button': 'Limpar Todos',
         'csv_button': 'CSV',
         'json_button': 'JSON',
         'folder_button': 'Pasta',
         'close_button': 'Fechar',
+        'show_log_button': '▼ Mostrar Log',
+        'hide_log_button': '▲ Ocultar Log',
         
         # Modal de tempo economizado
         'time_saved_title': 'Tempo Economizado!',
@@ -140,14 +143,17 @@ Funcionalidades:
         
         # Buttons
         'paste_button': 'Paste',
+        'add_button': 'Add',
         'choose_button': 'Choose',
         'start_button': 'Start Collection',
         'stop_button': 'Stop',
-        'clear_button': 'Clear',
+        'clear_button': 'Clear All',
         'csv_button': 'CSV',
         'json_button': 'JSON',
         'folder_button': 'Folder',
         'close_button': 'Close',
+        'show_log_button': '▼ Show Log',
+        'hide_log_button': '▲ Hide Log',
         
         # Time saved modal
         'time_saved_title': 'Time Saved!',
@@ -256,14 +262,17 @@ Features:
         
         # Botones
         'paste_button': 'Pegar',
+        'add_button': 'Añadir',
         'choose_button': 'Elegir',
         'start_button': 'Iniciar Recopilación',
         'stop_button': 'Parar',
-        'clear_button': 'Limpiar',
+        'clear_button': 'Limpiar Todo',
         'csv_button': 'CSV',
         'json_button': 'JSON',
         'folder_button': 'Carpeta',
         'close_button': 'Cerrar',
+        'show_log_button': '▼ Mostrar Log',
+        'hide_log_button': '▲ Ocultar Log',
         
         # Modal de tiempo ahorrado
         'time_saved_title': '¡Tiempo Ahorrado!',
@@ -372,14 +381,17 @@ Características:
         
         # Boutons
         'paste_button': 'Coller',
+        'add_button': 'Ajouter',
         'choose_button': 'Choisir',
         'start_button': 'Démarrer Collection',
         'stop_button': 'Arrêter',
-        'clear_button': 'Effacer',
+        'clear_button': 'Effacer Tout',
         'csv_button': 'CSV',
         'json_button': 'JSON',
         'folder_button': 'Dossier',
         'close_button': 'Fermer',
+        'show_log_button': '▼ Afficher Log',
+        'hide_log_button': '▲ Masquer Log',
         
         # Modal de temps économisé
         'time_saved_title': 'Temps Économisé !',
@@ -488,14 +500,17 @@ Fonctionnalités:
         
         # Schaltflächen
         'paste_button': 'Einfügen',
+        'add_button': 'Hinzufügen',
         'choose_button': 'Wählen',
         'start_button': 'Sammlung Starten',
         'stop_button': 'Stoppen',
-        'clear_button': 'Löschen',
+        'clear_button': 'Alle Löschen',
         'csv_button': 'CSV',
         'json_button': 'JSON',
         'folder_button': 'Ordner',
         'close_button': 'Schließen',
+        'show_log_button': '▼ Log Anzeigen',
+        'hide_log_button': '▲ Log Ausblenden',
         
         # Modal für gesparte Zeit
         'time_saved_title': 'Zeit Gespart!',
@@ -604,14 +619,17 @@ Funktionen:
         
         # Pulsanti
         'paste_button': 'Incolla',
+        'add_button': 'Aggiungi',
         'choose_button': 'Scegli',
         'start_button': 'Inizia Raccolta',
         'stop_button': 'Ferma',
-        'clear_button': 'Pulisci',
+        'clear_button': 'Pulisci Tutto',
         'csv_button': 'CSV',
         'json_button': 'JSON',
         'folder_button': 'Cartella',
         'close_button': 'Chiudi',
+        'show_log_button': '▼ Mostra Log',
+        'hide_log_button': '▲ Nascondi Log',
         
         # Modal tempo risparmiato
         'time_saved_title': 'Tempo Risparmiato!',

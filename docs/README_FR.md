@@ -1,231 +1,188 @@
-# 📱 Google Play Reviews Scraper
-
 <div align="center">
 
-**🌍 Language / Idioma / Langue / Sprache / Lingua**
-
-[![🇺🇸 English](https://img.shields.io/badge/🇺🇸-English-blue?style=for-the-badge)](README.md)
-[![🇧🇷 Português](https://img.shields.io/badge/🇧🇷-Português-green?style=for-the-badge)](README_PT.md)
-[![🇪🇸 Español](https://img.shields.io/badge/🇪🇸-Español-red?style=for-the-badge)](README_ES.md)
-[![🇫🇷 Français](https://img.shields.io/badge/🇫🇷-Français-blue?style=for-the-badge)](README_FR.md)
-[![🇩🇪 Deutsch](https://img.shields.io/badge/🇩🇪-Deutsch-black?style=for-the-badge)](README_DE.md)
-[![🇮🇹 Italiano](https://img.shields.io/badge/🇮🇹-Italiano-green?style=for-the-badge)](README_IT.md)
-
----
+# 📱 Google Play Reviews Scraper
 
 ![Google Play Reviews Scraper](../assets/icons/google-play.png)
 
-**Outil professionnel pour extraire et analyser les avis d'applications du Google Play Store**
+**🚀 Outil professionnel pour extraire et analyser les avis d'applications du Google Play Store**
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)](https://windows.microsoft.com)
+*Extrayez des milliers d'avis en quelques minutes avec une interface moderne et belle*
+
+---
+
+## 🌍 **Choisissez votre Langue / Choose Your Language**
+
+[![🇺🇸 English](https://img.shields.io/badge/🇺🇸-English-4285f4?style=for-the-badge&labelColor=white)](../README.md)
+[![🇧🇷 Português](https://img.shields.io/badge/🇧🇷-Português-00a86b?style=for-the-badge&labelColor=white)](README_PT.md)
+[![🇪🇸 Español](https://img.shields.io/badge/🇪🇸-Español-ea4335?style=for-the-badge&labelColor=white)](README_ES.md)
+[![🇫🇷 Français](https://img.shields.io/badge/🇫🇷-Français-4285f4?style=for-the-badge&labelColor=white)](README_FR.md)
+[![🇩🇪 Deutsch](https://img.shields.io/badge/🇩🇪-Deutsch-333333?style=for-the-badge&labelColor=white)](README_DE.md)
+[![🇮🇹 Italiano](https://img.shields.io/badge/🇮🇹-Italiano-00a86b?style=for-the-badge&labelColor=white)](README_IT.md)
+
+---
+
+[![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](../LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Cross--Platform-lightgrey?style=for-the-badge)](https://github.com)
+[![GUI](https://img.shields.io/badge/Interface-GUI_Moderne-blue?style=for-the-badge)](../src/app_gui.py)
+
+**[🎬 Voir Démo](#-démo) • [⚡ Démarrage Rapide](#-démarrage-rapide) • [📖 Fonctionnalités](#-fonctionnalités) • [🛠️ Installation](#️-installation)**
+
+---
+
+</div>
+
+## 🎬 Démo
+
+<div align="center">
+
+### 🖥️ Interface Moderne
+*Interface belle et intuitive avec support multi-langues*
+
+![Aperçu Interface](../assets/screenshots/interface-preview.png)
+
+### ⚡ Traitement par Lots
+*Traite plusieurs applications simultanément avec progression en temps réel*
+
+![Traitement par Lots](../assets/screenshots/batch-processing.gif)
+
+### 📊 Formats de Sortie Riches
+*Exporte vers CSV, JSON avec analyses détaillées*
+
+![Formats de Sortie](../assets/screenshots/output-formats.png)
 
 </div>
 
 ---
 
-## 🎯 **Que fait-il ?**
+## ⚡ Démarrage Rapide
 
-Extrait **TOUS** les avis disponibles de n'importe quelle application du Google Play Store de manière rapide, organisée et fiable. Idéal pour :
+### 🎯 **Option 1: Application GUI (Recommandée)**
 
-- 📊 **Analyse de marché** et recherche concurrentielle
-- 🔍 **Recherche UX** et analyse des commentaires utilisateurs  
-- 📈 **Surveillance** de la réputation des applications
-- 🎯 **Insights** pour le développement de produits
-- 📋 **Rapports** et présentations
-
----
-
-## 🚀 **Installation Rapide**
-
-### 🖥️ **Compatibilité des Plateformes**
-
-| Plateforme | Interface Graphique | Ligne de Commande | Exécutable |
-|------------|---------------------|-------------------|------------|
-| 🪟 **Windows** | ✅ Support complet | ✅ Supporté | ✅ Disponible |
-| 🍎 **macOS** | ❌ Terminal uniquement | ✅ Supporté | ❌ Non disponible |
-| 🐧 **Linux** | ❌ Terminal uniquement | ✅ Supporté | ❌ Non disponible |
-
-> **Note** : L'interface graphique est disponible uniquement pour Windows. Les utilisateurs Mac et Linux doivent utiliser la version en ligne de commande.
-
-### Option 1 : Exécutable (Windows Uniquement)
-1. Téléchargez l'exécutable depuis la [page des releases](../../releases)
-2. Exécutez `GooglePlayReviewScraper.exe`
-3. Terminé ! Pas besoin d'installer Python
-
-### Option 2 : Code Source (Toutes Plateformes)
 ```bash
-# Clonez le dépôt
-git clone https://github.com/votre-utilisateur/google-play-reviews-scraper.git
+# 1. Cloner le dépôt
+git clone https://github.com/your-username/google-play-reviews-scraper.git
 cd google-play-reviews-scraper
 
-# Installez les dépendances
+# 2. Installer les dépendances
 pip install -r requirements.txt
 
-# Windows : Exécutez l'interface graphique
-python app_gui.py
-
-# Mac/Linux : Utilisez la ligne de commande
-python review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
+# 3. Lancer la GUI
+python src/app_gui.py
 ```
 
-**Utilisateurs Windows** : L'interface s'ouvrira en Portugais. Utilisez le sélecteur de drapeaux dans le coin supérieur droit pour changer de langue !
-**Utilisateurs Mac/Linux** : Utilisez l'interface en ligne de commande avec les paramètres montrés ci-dessous.
-
----
-
-## 💻 **Interface Graphique Moderne**
-
-![Google Play Reviews Scraper Screenshot](../assets/screenshots/google-play-reviews-scraper.png)
-
-### 🎬 **Application en Action**
-![Google Play Reviews Scraper Demo](../assets/screenshots/google-play-reviews-scraper.gif)
-
-### ✨ Fonctionnalités de l'Interface :
-- 🎨 **Design Material Design** moderne et intuitif
-- 🌍 **Multi-langues** avec sélecteur de drapeaux (6 langues)
-- 📋 **Collez l'URL** directement depuis le navigateur
-- ⚙️ **Configuration simple** (pays, langue, dossier)
-- 📊 **Progression en temps réel** avec barre visuelle
-- 📁 **Ouverture automatique** des fichiers générés
-- 📜 **Défilement fluide** pour les petits écrans
-- ℹ️ **Modal "À propos"** avec informations du développeur
-- 🎯 **Icône personnalisée** dans la barre des tâches
-
-### 🌍 **Système Multi-langues**
-- **🇺🇸 English**
-- **🇧🇷 Português**
-- **🇪🇸 Español**
-- **🇫🇷 Français** (Par défaut)
-- **🇩🇪 Deutsch**
-- **🇮🇹 Italiano**
-
-**Sélecteur avec vrais drapeaux** : Cliquez sur le drapeau dans le coin supérieur droit pour changer de langue instantanément !
-
----
-
-## 🛠️ **Interface en Ligne de Commande**
-
-### 🎬 **Démonstration du Terminal**
-![Google Play Reviews Scraper Terminal Demo](../assets/screenshots/google-play-reviews-scraper-terminal.gif)
-
-### 🍎🐧 **Pour les Utilisateurs Mac/Linux (Obligatoire)**
-
-Comme l'interface graphique est exclusive à Windows, les utilisateurs Mac et Linux doivent utiliser la ligne de commande :
+### 🔧 **Option 2: Ligne de Commande**
 
 ```bash
-# Usage de base
-python review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
+# Extraire les avis d'une seule application
+python src/review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
 
-# Avec des paramètres personnalisés
-python review_scraper.py \
-  --app-id "com.whatsapp" \
-  --country "fr" \
-  --lang "fr" \
-  --output "whatsapp_reviews"
-
-# Obtenir de l'aide
-python review_scraper.py --help
+# Traitement par lots de plusieurs applications
+python src/review_scraper.py --batch liste_apps.txt --output resultats/
 ```
 
-### 🪟 **Pour les Utilisateurs Windows (Optionnel)**
+### 📦 **Option 3: Module Python**
 
-Les utilisateurs Windows peuvent aussi utiliser la ligne de commande pour l'automatisation :
+```python
+from src.review_scraper import GooglePlayReviewScraper
+
+scraper = GooglePlayReviewScraper()
+reviews = scraper.scrape_reviews("com.whatsapp")
+print(f"{len(reviews)} avis extraits!")
+```
+
+---
+
+## 📖 Fonctionnalités
+
+<div align="center">
+
+| 🎯 **Fonctionnalités Principales** | 🎨 **Interface** | 📊 **Sortie** | 🌍 **Multi-Langues** |
+|:---:|:---:|:---:|:---:|
+| Extrait **TOUS** les avis | GUI moderne avec thèmes | Export CSV et JSON | 6 langues supportées |
+| **Traitement par lots** | Progression temps réel | Analyses détaillées | Auto-détection langue |
+| **Filtrage intelligent** | Glisser-déposer URLs | Statistiques temps | Traductions personnalisées |
+| **Limitation de débit** | File d'attente multi-apps | Gestion d'erreurs | Support RTL |
+
+</div>
+
+### 🚀 **Ce qui le rend spécial?**
+
+- **🎯 Extraction Complète**: Obtient TOUS les avis disponibles, pas seulement les récents
+- **⚡ Super Rapide**: Scraping optimisé avec limitation intelligente de débit  
+- **🎨 Interface Belle**: GUI moderne avec thèmes clair/sombre
+- **📊 Analyses Riches**: Statistiques détaillées et suivi du temps
+- **🔄 Traitement par Lots**: Gère plusieurs applications simultanément
+- **🌍 Multi-Langues**: Interface disponible en 6 langues
+- **📱 Détection Intelligente**: Auto-détecte les infos de l'app et gère les erreurs élégamment
+- **💾 Formats Multiples**: Exporte vers CSV, JSON avec champs personnalisables
+- **🛡️ Robuste**: Gère les problèmes réseau, limites de débit et cas extrêmes
+
+---
+
+## 🛠️ Installation
+
+### 📋 **Prérequis**
+
+- **Python 3.7+** (3.9+ recommandé)
+- **Connexion internet** pour le scraping
+- **2GB RAM** minimum (4GB+ pour gros datasets)
+
+### 📦 **Installation Rapide**
 
 ```bash
-# Exemple de base
-python review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
-
-# Avec des paramètres personnalisés
-python review_scraper.py \
-  --app-id "com.whatsapp" \
-  --country "us" \
-  --lang "en" \
-  --output "whatsapp_usa_reviews"
-
-# Aide complète
-python review_scraper.py --help
-```
-
-### **Paramètres Disponibles :**
-```
---url, -u          URL complète de l'app
---app-id, -a       ID de l'app (ex: com.whatsapp)
---country, -c      Code du pays (défaut: fr)
---lang, -l         Code de la langue (défaut: fr)
---output, -o       Nom des fichiers de sortie
---help, -h         Affiche cette aide
+git clone https://github.com/your-username/google-play-reviews-scraper.git
+cd google-play-reviews-scraper
+pip install -r requirements.txt
+python src/app_gui.py
 ```
 
 ---
 
-## 📖 **Comment Utiliser**
+## 🎯 Cas d'Usage
 
-### 1️⃣ **Trouvez l'Application**
-Allez sur Google Play Store et trouvez l'application désirée. Exemple :
-```
-https://play.google.com/store/apps/details?id=com.whatsapp
-```
+### 💼 **Parfait pour:**
 
-### 2️⃣ **Collez l'URL**
-- Ouvrez Google Play Reviews Scraper
-- Collez l'URL complète dans le champ
-- L'ID de l'application sera extrait automatiquement
-
-### 3️⃣ **Configurez (Optionnel)**
-- **Pays** : `fr` (France), `us` (États-Unis), `br` (Brésil)...
-- **Langue** : `fr` (Français), `en` (Anglais), `pt` (Portugais)...
-- **Dossier** : Choisissez où sauvegarder les fichiers
-
-### 4️⃣ **Exécutez**
-Cliquez sur "Démarrer Collection" et attendez. Le processus est automatique !
+- **📊 Chercheurs de Marché** - Analyser les applications concurrentes et tendances
+- **🎯 Chefs de Produit** - Collecter les retours utilisateurs pour planification  
+- **🔍 Chercheurs UX** - Comprendre les points de douleur et préférences
+- **📈 Développeurs d'Apps** - Surveiller performance et satisfaction utilisateurs
+- **🏢 Analystes Business** - Générer des insights pour décisions stratégiques
+- **🎓 Étudiants et Académiques** - Collecter données pour projets de recherche
 
 ---
 
-## 🌍 **Langues Supportées dans l'Interface**
+## 🌍 **Documentation Complète dans d'Autres Langues**
 
-L'application supporte **6 langues** avec traduction complète de l'interface :
+<div align="center">
 
-| Drapeau | Code | Langue | Statut |
-|---------|------|--------|--------|
-| 🇺🇸 | `en` | **English** | ✅ Complet |
-| 🇧🇷 | `pt` | **Português** | ✅ Complet |
-| 🇪🇸 | `es` | **Español** | ✅ Complet |
-| 🇫🇷 | `fr` | **Français** | ✅ Par défaut |
-| 🇩🇪 | `de` | **Deutsch** | ✅ Complet |
-| 🇮🇹 | `it` | **Italiano** | ✅ Complet |
+**📖 Documentation complète avec guides détaillés, exemples et tutoriels:**
 
-**Comment utiliser** : Cliquez sur le drapeau dans le coin supérieur droit de l'interface pour changer de langue instantanément !
+[![🇺🇸 Complete English Documentation](https://img.shields.io/badge/🇺🇸-Complete_Documentation-4285f4?style=for-the-badge)](../README.md)
+[![🇧🇷 Documentação Completa em Português](https://img.shields.io/badge/🇧🇷-Documentação_Completa-00a86b?style=for-the-badge)](README_PT.md)
+[![🇪🇸 Documentación Completa en Español](https://img.shields.io/badge/🇪🇸-Documentación_Completa-ea4335?style=for-the-badge)](README_ES.md)
+[![🇩🇪 Vollständige Dokumentation auf Deutsch](https://img.shields.io/badge/🇩🇪-Vollständige_Dokumentation-333333?style=for-the-badge)](README_DE.md)
+[![🇮🇹 Documentazione Completa in Italiano](https://img.shields.io/badge/🇮🇹-Documentazione_Completa-00a86b?style=for-the-badge)](README_IT.md)
 
-### 🎯 **Ce qui est traduit :**
-- ✅ Tous les boutons et étiquettes
-- ✅ Titres des sections
-- ✅ Messages de statut et journal
-- ✅ Modal "À propos" complet
-- ✅ Placeholders et tooltips
-- ✅ Messages d'erreur
+**📋 [Voir Toutes les Langues et Guide de Traduction](LANGUAGES.md)**
+
+</div>
 
 ---
 
-## 🚀 **Nouveautés de la Version Actuelle**
+## 📄 Licence
 
-### ✨ **Fonctionnalités Implémentées**
-- 🌍 **Système multi-langues complet** (6 langues)
-- 🎨 **Interface Material Design** moderne et responsive
-- 🏳️ **Sélecteur de drapeaux** avec images PNG réelles (24x24px)
-- 📜 **Défilement fluide** pour écrans de toute taille
-- 🎯 **Icône personnalisée** Google Play dans la barre des tâches
-- ℹ️ **Modal "À propos"** avec informations du projet
-- 🔄 **Traduction instantanée** de toute l'interface
-- 📊 **Barres de progression** visuelles et informatives
+Ce projet est sous licence **MIT** - voir le fichier [LICENSE](../LICENSE) pour les détails.
 
 ---
 
 <div align="center">
 
-**Développé avec ❤️ par [DSiqueira](https://dsiqueira.com)**
+**🚀 Développé avec ❤️ pour la communauté**
 
-⭐ **Si ce projet vous a été utile, laissez une étoile !** ⭐
+**Si ce projet vous a aidé, considérez lui donner une ⭐!**
+
+[![GitHub stars](https://img.shields.io/github/stars/your-username/google-play-reviews-scraper?style=social)](../../stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/your-username/google-play-reviews-scraper?style=social)](../../network/members)
 
 </div>

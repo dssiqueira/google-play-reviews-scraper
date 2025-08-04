@@ -170,10 +170,10 @@ class ReviewScraperApp:
             'en': 'en.png',    # English -> Inglaterra/EUA
             'es': 'es.png',    # Español -> Espanha
             'fr': 'fr.png',    # Français -> França
-            'de': 'al.png',    # Deutsch -> Alemanha (usando al.png)
+            'de': 'de.png',    # Deutsch -> Alemanha
             'it': 'it.png',    # Italiano -> Itália
             'br': 'br.png',    # Brasil
-            'al': 'al.png'     # Alemanha
+            'de': 'de.png'     # Alemanha
         }
         
         for code, filename in flag_files.items():
@@ -191,7 +191,7 @@ class ReviewScraperApp:
         # Se não conseguiu carregar nenhuma imagem, cria placeholders
         if not self.flag_images:
             print("Nenhuma bandeira carregada, usando placeholders")
-            for code in ['pt', 'en', 'es', 'fr', 'de', 'it', 'br', 'al']:
+            for code in ['pt', 'en', 'es', 'fr', 'de', 'it', 'br']:
                 # Cria uma imagem placeholder 24x24
                 placeholder = tk.PhotoImage(width=24, height=24)
                 placeholder.put("#CCCCCC", to=(0, 0, 24, 24))
@@ -204,7 +204,7 @@ class ReviewScraperApp:
             'en': 'en',    # English -> Inglaterra
             'es': 'es',    # Español -> Espanha
             'fr': 'fr',    # Français -> França
-            'de': 'al',    # Deutsch -> Alemanha
+            'de': 'de',    # Deutsch -> Alemanha
             'it': 'it'     # Italiano -> Itália
         }
         return flag_mapping.get(lang_code, 'br')
@@ -263,7 +263,7 @@ class ReviewScraperApp:
             if hasattr(self, 'flag_images') and flag_code in self.flag_images:
                 self.current_lang_display.config(
                     image=self.flag_images[flag_code],
-                    text=lang_code.upper()
+                    text=f" {lang_code.upper()}"
                 )
             self.hide_language_menu()
             self.update_ui_texts()
@@ -311,14 +311,32 @@ class ReviewScraperApp:
         # Botões
         if hasattr(self, 'paste_btn'):
             self.paste_btn.config(text=translator.get('paste_button'))
+        if hasattr(self, 'add_btn'):
+            self.add_btn.config(text=translator.get('add_button'))
         if hasattr(self, 'choose_btn'):
             self.choose_btn.config(text=translator.get('choose_button'))
-        if hasattr(self, 'start_btn'):
-            self.start_btn.config(text=translator.get('start_button'))
-        if hasattr(self, 'stop_btn'):
-            self.stop_btn.config(text=translator.get('stop_button'))
         if hasattr(self, 'clear_btn'):
             self.clear_btn.config(text=translator.get('clear_button'))
+        if hasattr(self, 'csv_btn'):
+            self.csv_btn.config(text=translator.get('csv_button'))
+        if hasattr(self, 'json_btn'):
+            self.json_btn.config(text=translator.get('json_button'))
+        if hasattr(self, 'folder_btn'):
+            self.folder_btn.config(text=translator.get('folder_button'))
+        
+        # Botão principal
+        if hasattr(self, 'main_button'):
+            if hasattr(self, 'is_running') and self.is_running:
+                self.main_button.config(text=translator.get('stop_button'))
+            else:
+                self.main_button.config(text=translator.get('start_button'))
+        
+        # Botão toggle do log
+        if hasattr(self, 'toggle_log_btn'):
+            if hasattr(self, 'log_visible') and self.log_visible:
+                self.toggle_log_btn.config(text=translator.get('hide_log_button'))
+            else:
+                self.toggle_log_btn.config(text=translator.get('show_log_button'))
         
         # Placeholder da URL
         self.setup_placeholder()
@@ -590,12 +608,23 @@ class ReviewScraperApp:
         controls_frame = tk.Frame(header_container, bg=self.colors['background'])
         controls_frame.pack(side=tk.RIGHT, anchor=tk.NE, padx=(10, 0))
         
-        # Botão de configurações (ícone de engrenagem)
-        settings_btn = tk.Button(controls_frame, text="⚙", font=('Segoe UI', 16),
+        # Container horizontal para alinhar seletor e botão de configurações
+        controls_horizontal = tk.Frame(controls_frame, bg=self.colors['background'])
+        controls_horizontal.pack()
+        
+        # Seletor de idiomas com bandeiras (lado esquerdo)
+        self.create_language_selector(controls_horizontal)
+        
+        # Espaçamento horizontal entre seletor e botão de configurações
+        spacer = tk.Frame(controls_horizontal, bg=self.colors['background'], width=15)
+        spacer.pack(side=tk.LEFT, padx=5)
+        
+        # Botão de configurações (ícone de engrenagem) - lado direito
+        settings_btn = tk.Button(controls_horizontal, text="⚙", font=('Segoe UI', 16),
                                bg=self.colors['surface'], fg=self.colors['disabled'], 
                                relief='flat', bd=0, width=3, height=1, cursor='hand2',
                                command=self.show_about)
-        settings_btn.pack()
+        settings_btn.pack(side=tk.LEFT)
         
         # Hover effect para o botão de configurações
         def on_enter(e):
@@ -646,13 +675,13 @@ class ReviewScraperApp:
         buttons_container.pack(side=tk.RIGHT, padx=(10, 0))
         
         # Botão Colar arredondado com cor contrastante
-        paste_btn_container = self.create_rounded_button(buttons_container, "Colar", 
+        paste_btn_container, self.paste_btn = self.create_rounded_button(buttons_container, "Colar", 
                                                         self.paste_url, self.colors['btn_pink'], 
                                                         width=70, height=35)
         paste_btn_container.pack(side=tk.LEFT, padx=(0, 8))
         
         # Botão Adicionar arredondado com cor contrastante
-        add_btn_container = self.create_rounded_button(buttons_container, "Adicionar", 
+        add_btn_container, self.add_btn = self.create_rounded_button(buttons_container, "Adicionar", 
                                                       self.add_url, self.colors['btn_blue'], 
                                                       width=90, height=35)
         add_btn_container.pack(side=tk.LEFT)
@@ -697,7 +726,7 @@ class ReviewScraperApp:
                                        lambda e: self.list_canvas.configure(scrollregion=self.list_canvas.bbox("all")))
         
         # Botão Limpar Todos arredondado com cor contrastante
-        clear_btn_container = self.create_rounded_button(queue_section, "Limpar Todos", 
+        clear_btn_container, self.clear_btn = self.create_rounded_button(queue_section, "Limpar Todos", 
                                                         self.clear_all_urls, self.colors['btn_red'], 
                                                         width=120, height=32)
         clear_btn_container.pack(anchor=tk.W, pady=(5, 0))
@@ -802,7 +831,7 @@ class ReviewScraperApp:
         self.folder_label.bind("<Button-1>", lambda e: self.open_folder())
         
         # Botão Escolher arredondado com cor contrastante
-        choose_btn_container = self.create_rounded_button(folder_row, "Escolher", 
+        choose_btn_container, self.choose_btn = self.create_rounded_button(folder_row, "Escolher", 
                                                          self.choose_folder, self.colors['btn_cyan'], 
                                                          width=100, height=32)
         choose_btn_container.pack(side=tk.RIGHT)
@@ -839,17 +868,17 @@ class ReviewScraperApp:
         self.result_buttons_frame.pack(fill=tk.X, pady=(10, 0))
         
         # Botões de resultado arredondados com cores contrastantes
-        self.csv_btn_container = self.create_rounded_button(self.result_buttons_frame, "CSV", 
+        self.csv_btn_container, self.csv_btn = self.create_rounded_button(self.result_buttons_frame, "CSV", 
                                                            self.open_csv_files, self.colors['btn_green'], 
                                                            width=80, height=35)
         self.csv_btn_container.pack(side=tk.LEFT, padx=(0, 10))
         
-        self.json_btn_container = self.create_rounded_button(self.result_buttons_frame, "JSON", 
+        self.json_btn_container, self.json_btn = self.create_rounded_button(self.result_buttons_frame, "JSON", 
                                                             self.open_json_files, self.colors['btn_blue'], 
                                                             width=80, height=35)
         self.json_btn_container.pack(side=tk.LEFT, padx=(0, 10))
         
-        self.folder_btn_container = self.create_rounded_button(self.result_buttons_frame, "Pasta", 
+        self.folder_btn_container, self.folder_btn = self.create_rounded_button(self.result_buttons_frame, "Pasta", 
                                                               self.open_folder, self.colors['btn_orange'], 
                                                               width=80, height=35)
         self.folder_btn_container.pack(side=tk.LEFT)
@@ -1025,7 +1054,7 @@ class ReviewScraperApp:
         btn_outer.config(width=width, height=height)
         btn_outer.pack_propagate(False)
         
-        return btn_outer
+        return btn_outer, btn
     
     def lighten_color(self, color):
         """Clareia uma cor para hover effect no tema claro"""
@@ -1118,20 +1147,30 @@ class ReviewScraperApp:
 
     def setup_placeholder(self):
         """Configura placeholder para URL única"""
-        placeholder = "Cole a URL do app do Google Play Store..."
+        placeholder = translator.get('url_placeholder')
         
         def on_focus_in(e):
-            if self.url_entry.get() == placeholder:
+            current_placeholder = translator.get('url_placeholder')
+            if self.url_entry.get() == current_placeholder:
                 self.url_entry.delete(0, tk.END)
                 self.url_entry.config(fg=self.colors['on_surface'])
         
         def on_focus_out(e):
             if not self.url_entry.get():
-                self.url_entry.insert(0, placeholder)
+                current_placeholder = translator.get('url_placeholder')
+                self.url_entry.insert(0, current_placeholder)
                 self.url_entry.config(fg=self.colors['disabled'])
         
+        # Limpa o campo primeiro
+        self.url_entry.delete(0, tk.END)
         self.url_entry.insert(0, placeholder)
         self.url_entry.config(fg=self.colors['disabled'])
+        
+        # Remove bindings antigos e adiciona novos
+        self.url_entry.unbind('<FocusIn>')
+        self.url_entry.unbind('<FocusOut>')
+        self.url_entry.unbind('<Return>')
+        
         self.url_entry.bind('<FocusIn>', on_focus_in)
         self.url_entry.bind('<FocusOut>', on_focus_out)
         
@@ -1142,7 +1181,7 @@ class ReviewScraperApp:
         """Cola URL da área de transferência"""
         try:
             clipboard_content = self.root.clipboard_get()
-            placeholder = "Cole a URL do app do Google Play Store..."
+            placeholder = translator.get('url_placeholder')
             
             if self.url_entry.get() == placeholder:
                 self.url_entry.delete(0, tk.END)
@@ -1241,7 +1280,7 @@ class ReviewScraperApp:
                 info_label.pack(side=tk.LEFT, padx=12, pady=8)
                 
                 # Botão remover arredondado com cor contrastante
-                remove_btn_container = self.create_rounded_button(item_frame, "✕", 
+                remove_btn_container, remove_btn = self.create_rounded_button(item_frame, "✕", 
                                                                 lambda aid=app_id: self.remove_url(aid), 
                                                                 self.colors['btn_red'], 
                                                                 width=25, height=25, font_size=10)
