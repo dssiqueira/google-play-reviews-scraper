@@ -58,8 +58,8 @@ class GooglePlayReviewScraper:
         self.lang = lang
     
     def extract_app_id_from_url(self, url):
-        """Extrai o app_id de uma URL do Google Play Store"""
-        # Método mais eficiente usando parse_qs diretamente
+        """Extracts app_id from a Google Play Store URL"""
+        # More efficient method using parse_qs directly
         try:
             parsed_url = urlparse(url)
             query_params = parse_qs(parsed_url.query)
@@ -78,11 +78,11 @@ class GooglePlayReviewScraper:
             raise ValueError(f"Erro ao processar URL: {e}")
     
     def validate_app_id(self, app_id):
-        """Valida se o app_id está no formato correto"""
+        """Validates if app_id is in correct format"""
         return bool(re.match(r'^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+$', app_id))
 
     def get_app_info(self, app_id: str) -> Dict[str, str]:
-        """Retorna informações básicas do aplicativo."""
+        """Returns basic application information."""
         try:
             info = app(app_id, lang=self.lang, country=self.country)
             print(f"App: {info.get('title', 'N/A')}")
@@ -95,9 +95,9 @@ class GooglePlayReviewScraper:
     def extract_all_reviews(self, app_id):
         """Extrai TODOS os reviews de um app do Google Play Store"""
         
-        print(f"Coletando informações do app: {app_id}")
+        print(f"Collecting app information: {app_id}")
 
-        # Informações básicas do app
+        # Basic app information
         app_info = self.get_app_info(app_id)
         
         print("Iniciando coleta de reviews...")
@@ -152,7 +152,7 @@ class GooglePlayReviewScraper:
         elif filename_prefix is None:
             filename_prefix = "google_play_reviews"
         
-        # Normaliza objetos Review para dicionários simples
+        # Normalize Review objects to simple dictionaries
         rows = [r.to_dict() if isinstance(r, Review) else r for r in reviews_data]
 
         # Salva CSV
@@ -176,8 +176,8 @@ class GooglePlayReviewScraper:
         print(f"Arquivos salvos: {filename_prefix}.csv e {filename_prefix}.json")
     
     def clean_filename(self, filename):
-        """Limpa o nome do arquivo removendo caracteres inválidos"""
-        # Remove caracteres inválidos e normaliza
+        """Cleans filename by removing invalid characters"""
+        # Remove invalid characters and normalize
         cleaned = re.sub(r'[<>:"/\\|?*]', '', filename)
         cleaned = re.sub(r'\s+', '_', cleaned)
         cleaned = re.sub(r'[^\w\-_.]', '', cleaned)
@@ -186,7 +186,7 @@ class GooglePlayReviewScraper:
         return (cleaned[:40] if len(cleaned) > 40 else cleaned).lower() or "app"
     
     def show_statistics(self, reviews_data):
-        """Mostra estatísticas dos reviews"""
+        """Shows review statistics"""
         if not reviews_data:
             return
             
@@ -219,11 +219,11 @@ class GooglePlayReviewScraper:
                 print(f"   Resposta: {data['reply_content'][:60]}...")
 
 def main():
-    """Função principal"""
+    """Main function"""
     
-    # Configuração de argumentos de linha de comando
+    # Command line arguments configuration
     parser = argparse.ArgumentParser(
-        description='Scraper para coletar reviews do Google Play Store',
+        description='Scraper to collect Google Play Store reviews',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Exemplos de uso:
@@ -279,11 +279,11 @@ Exemplos de uso:
         reviews_data, app_info = scraper.extract_all_reviews(app_id)
         
         if reviews_data:
-            # Salva os dados (usa nome do app se output não foi especificado)
+            # Save data (use app name if output wasn't specified)
             output_name = args.output if args.output != 'google_play_reviews' else None
             scraper.save_reviews(reviews_data, app_info, output_name)
             
-            # Mostra estatísticas
+            # Show statistics
             scraper.show_statistics(reviews_data)
             
             # Mostra exemplos
@@ -325,12 +325,12 @@ def interactive_mode():
             print("❌ Opção inválida")
             return
         
-        # Configurações opcionais
-        country = input("\nPaís (padrão: br): ").strip() or 'br'
-        lang = input("Idioma (padrão: pt): ").strip() or 'pt'
-        output = input("Nome do arquivo (padrão: google_play_reviews): ").strip() or 'google_play_reviews'
+        # Optional settings
+        country = input("\nCountry (default: br): ").strip() or 'br'
+        lang = input("Language (default: pt): ").strip() or 'pt'
+        output = input("File name (default: google_play_reviews): ").strip() or 'google_play_reviews'
         
-        # Recria scraper com configurações
+        # Recreate scraper with settings
         scraper = GooglePlayReviewScraper(country=country, lang=lang)
         
         print(f"\n🔍 Iniciando coleta para: {app_id}")
@@ -339,7 +339,7 @@ def interactive_mode():
         reviews_data, app_info = scraper.extract_all_reviews(app_id)
         
         if reviews_data:
-            # Usa nome do app se output padrão foi mantido
+            # Use app name if default output was kept
             output_name = output if output != 'google_play_reviews' else None
             scraper.save_reviews(reviews_data, app_info, output_name)
             scraper.show_statistics(reviews_data)
@@ -353,7 +353,7 @@ def interactive_mode():
 if __name__ == "__main__":
     import sys
     
-    # Se não há argumentos, executa modo interativo
+    # If no arguments, run interactive mode
     if len(sys.argv) == 1:
         interactive_mode()
     else:

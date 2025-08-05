@@ -9,7 +9,7 @@ TRANSLATIONS = {
         'window_title': 'Google Play Reviews Scraper',
         'window_subtitle': 'Colete reviews de apps do Google Play Store',
         
-        # Seções
+        # Sections
         'url_section': 'URL do App',
         'config_section': 'Configurações',
         'progress_section': 'Progresso',
@@ -33,7 +33,7 @@ TRANSLATIONS = {
         'hide_log': '▲ Ocultar Log',
         'ready_to_start': 'Pronto para iniciar',
         
-        # Botões
+        # Buttons
         'paste_button': 'Colar',
         'add_button': 'Adicionar',
         'add_button': 'Adicionar',
@@ -59,7 +59,7 @@ TRANSLATIONS = {
         'accumulated_totals': 'Totais Acumulados',
         'total_summary': '{} reviews • {} economizados • {} sessões',
         
-        # Modal "Sobre" - Estatísticas
+        # "About" Modal - Statistics
         'usage_statistics': 'Estatísticas de Uso',
         'total_time_saved': 'Tempo Total Economizado',
         'reviews_collected': 'Reviews Coletadas',
@@ -322,7 +322,7 @@ Features:
         'accumulated_totals': 'Totales Acumulados',
         'total_summary': '{} reseñas • {} ahorrados • {} sesiones',
         
-        # Modal "Acerca de" - Estadísticas
+        # "About" Modal - Statistics
         'usage_statistics': 'Estadísticas de Uso',
         'total_time_saved': 'Tiempo Total Ahorrado',
         'reviews_collected': 'Reseñas Recopiladas',
@@ -400,7 +400,7 @@ Características:
     },
     
     'fr': {
-        # Fenêtre principale
+        # Main window
         'window_title': 'Google Play Reviews Scraper',
         'window_subtitle': 'Collectez les avis d\'apps du Google Play Store',
         
@@ -444,7 +444,7 @@ Características:
         'show_log_button': '▼ Afficher Log',
         'hide_log_button': '▲ Masquer Log',
         
-        # Modal de temps économisé
+        # Time saved modal
         'time_saved_title': 'Temps Économisé !',
         'collection_completed': 'Collection terminée avec succès !',
         'reviews_processed': '{} avis traités automatiquement.',
@@ -454,14 +454,14 @@ Características:
         'accumulated_totals': 'Totaux Accumulés',
         'total_summary': '{} avis • {} économisés • {} sessions',
         
-        # Modal "À propos" - Statistiques
+        # "About" Modal - Statistics
         'usage_statistics': 'Statistiques d\'Utilisation',
         'total_time_saved': 'Temps Total Économisé',
         'reviews_collected': 'Avis collectés',
         'usage_sessions': 'Sessions d\'utilisation',
         'no_stats_message': 'Aucune collecte effectuée pour le moment.\nUtilisez l\'outil pour voir vos statistiques ici !',
         
-        # État
+        # Status
         'ready_status': 'Prêt à commencer',
         'starting_status': 'Démarrage de la collection...',
         'running_status': 'En cours...',
@@ -492,7 +492,7 @@ Características:
         'error_invalid_url_status': 'URL invalide',
         'error_app_id_extraction': 'ID App extrait: {}',
         
-        # Modal À propos
+        # About modal
         'about_title': 'À propos - Google Play Reviews Scraper',
         'about_description': '''Outil pour extraire et analyser les avis d\'applications du Google Play Store.
 
@@ -808,24 +808,24 @@ class Translator:
         return False
     
     def get(self, key, *args):
-        """Obtém uma tradução"""
+        """Gets a translation"""
         try:
             text = self.translations[self.current_language][key]
             if args:
                 return text.format(*args)
             return text
         except KeyError:
-            # Fallback para português se a chave não existir
+            # Fallback to Portuguese if key doesn't exist
             try:
                 text = self.translations['pt'][key]
                 if args:
                     return text.format(*args)
                 return text
             except KeyError:
-                return f"[{key}]"  # Mostra a chave se não encontrar tradução
+                return f"[{key}]"  # Show key if translation not found
     
     def get_available_languages(self):
-        """Retorna lista de idiomas disponíveis"""
+        """Returns list of available languages"""
         return list(self.translations.keys())
     
     def get_language_name(self, lang_code):
@@ -833,8 +833,8 @@ class Translator:
         return self.get('languages').get(lang_code, lang_code)
     
     def get_country_name(self, country_code):
-        """Retorna o nome do país"""
+        """Returns the country name"""
         return self.get('countries').get(country_code, country_code)
 
-# Instância global do tradutor
+# Global translator instance
 translator = Translator()

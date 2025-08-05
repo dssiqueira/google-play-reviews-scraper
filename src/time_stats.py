@@ -8,14 +8,14 @@ import os
 from datetime import datetime
 
 class TimeStats:
-    """Gerencia estatísticas de tempo economizado"""
+    """Manages time saved statistics"""
     
     def __init__(self, stats_file="time_stats.json"):
         self.stats_file = stats_file
         self.stats = self.load_stats()
     
     def load_stats(self):
-        """Carrega estatísticas do arquivo"""
+        """Loads statistics from file"""
         default_stats = {
             "total_reviews_collected": 0,
             "total_time_saved_seconds": 0,
@@ -36,7 +36,7 @@ class TimeStats:
             return default_stats
     
     def save_stats(self):
-        """Salva estatísticas no arquivo"""
+        """Saves statistics to file"""
         try:
             with open(self.stats_file, 'w', encoding='utf-8') as f:
                 json.dump(self.stats, f, ensure_ascii=False, indent=2, default=str)
@@ -44,25 +44,25 @@ class TimeStats:
             print(f"Erro ao salvar estatísticas: {e}")
     
     def add_session(self, reviews_count):
-        """Adiciona uma nova sessão e retorna tempo economizado"""
+        """Adds a new session and returns time saved"""
         if reviews_count <= 0:
             return 0
         
-        # Calcula tempo economizado (30 segundos por review)
+        # Calculate time saved (30 seconds per review)
         time_saved = reviews_count * 30
         
-        # Atualiza estatísticas
+        # Update statistics
         self.stats["total_reviews_collected"] += reviews_count
         self.stats["total_time_saved_seconds"] += time_saved
         self.stats["total_sessions"] += 1
         
-        # Atualiza datas
+        # Update dates
         now = datetime.now().isoformat()
         if not self.stats["first_use"]:
             self.stats["first_use"] = now
         self.stats["last_use"] = now
         
-        # Salva no arquivo
+        # Save to file
         self.save_stats()
         
         return time_saved
@@ -76,11 +76,11 @@ class TimeStats:
         return self.stats["total_reviews_collected"]
     
     def get_total_sessions(self):
-        """Retorna total de sessões"""
+        """Returns total sessions"""
         return self.stats["total_sessions"]
     
     def format_time(self, seconds):
-        """Formata tempo em formato legível"""
+        """Formats time in readable format"""
         if seconds < 60:
             return f"{seconds}s"
         elif seconds < 3600:
@@ -103,7 +103,7 @@ class TimeStats:
         return self.format_time(self.get_total_time_saved())
     
     def get_stats_summary(self):
-        """Retorna resumo das estatísticas"""
+        """Returns statistics summary"""
         return {
             "total_reviews": self.get_total_reviews(),
             "total_time_saved_seconds": self.get_total_time_saved(),
@@ -113,5 +113,5 @@ class TimeStats:
             "last_use": self.stats["last_use"]
         }
 
-# Instância global
+# Global instance
 time_stats = TimeStats()

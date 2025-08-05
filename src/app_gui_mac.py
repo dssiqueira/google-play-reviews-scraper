@@ -20,63 +20,63 @@ class ReviewScraperApp:
         self.root.resizable(True, True)
         self.root.minsize(700, 600)
         
-        # Configurar ícone da aplicação (adaptado para Mac)
+        # Configure application icon (adapted for Mac)
         self.setup_icon()
         
-        # Tema claro com cores contrastantes e vibrantes
+        # Light theme with vibrant and contrasting colors
         self.colors = {
-            # Cores principais mais vibrantes e contrastantes
-            'primary': '#4F46E5',        # Azul índigo mais intenso
-            'secondary': '#7C3AED',      # Roxo violeta mais vibrante
-            'accent': '#EC4899',         # Rosa magenta vibrante
-            'error': '#DC2626',          # Vermelho mais intenso
-            'warning': '#D97706',        # Laranja mais contrastante
-            'info': '#0891B2',           # Ciano mais escuro
-            'success': '#059669',        # Verde mais intenso
+            # Main vibrant and contrasting colors
+            'primary': '#4F46E5',        # Intense indigo blue
+            'secondary': '#7C3AED',      # Vibrant violet purple
+            'accent': '#EC4899',         # Vibrant magenta pink
+            'error': '#DC2626',          # Intense red
+            'warning': '#D97706',        # Contrasting orange
+            'info': '#0891B2',           # Dark cyan
+            'success': '#059669',        # Intense green
             
-            # Cores específicas para botões contrastantes
-            'btn_blue': '#2563EB',       # Azul royal vibrante
-            'btn_purple': '#9333EA',     # Roxo vibrante
-            'btn_pink': '#DB2777',       # Rosa pink intenso
-            'btn_red': '#DC2626',        # Vermelho intenso
-            'btn_orange': '#EA580C',     # Laranja vibrante
-            'btn_cyan': '#0891B2',       # Ciano intenso
-            'btn_green': '#16A34A',      # Verde vibrante
-            'btn_indigo': '#4338CA',     # Índigo profundo
+            # Specific colors for contrasting buttons
+            'btn_blue': '#2563EB',       # Vibrant royal blue
+            'btn_purple': '#9333EA',     # Vibrant purple
+            'btn_pink': '#DB2777',       # Intense pink
+            'btn_red': '#DC2626',        # Intense red
+            'btn_orange': '#EA580C',     # Vibrant orange
+            'btn_cyan': '#0891B2',       # Intense cyan
+            'btn_green': '#16A34A',      # Vibrant green
+            'btn_indigo': '#4338CA',     # Deep indigo
             
-            # Cores de interface
-            'background': '#F8FAFC',     # Slate 50 (fundo principal)
-            'surface': '#FFFFFF',        # Branco (cards)
-            'surface_light': '#F1F5F9',  # Slate 100 (hover suave)
-            'surface_dark': '#E2E8F0',   # Slate 200 (bordas)
-            'on_surface': '#1E293B',     # Slate 800 (texto escuro)
-            'on_background': '#334155',  # Slate 700 (texto médio)
-            'disabled': '#94A3B8',       # Slate 400 (desabilitado)
-            'divider': '#E2E8F0',        # Slate 200 (divisores)
+            # Interface colors
+            'background': '#F8FAFC',     # Slate 50 (main background)
+            'surface': '#FFFFFF',        # White (cards)
+            'surface_light': '#F1F5F9',  # Slate 100 (soft hover)
+            'surface_dark': '#E2E8F0',   # Slate 200 (borders)
+            'on_surface': '#1E293B',     # Slate 800 (dark text)
+            'on_background': '#334155',  # Slate 700 (medium text)
+            'disabled': '#94A3B8',       # Slate 400 (disabled)
+            'divider': '#E2E8F0',        # Slate 200 (dividers)
             'input_bg': '#F8FAFC',       # Slate 50 (inputs)
-            'input_border': '#D1D5DB',   # Gray 300 (bordas inputs)
+            'input_border': '#D1D5DB',   # Gray 300 (input borders)
             'hover': '#F1F5F9',          # Slate 100 (hover)
-            'border': '#E5E7EB',         # Gray 200 (bordas suaves)
-            'shadow': '#0000001A'        # Sombra sutil (10% opacidade)
+            'border': '#E5E7EB',         # Gray 200 (soft borders)
+            'shadow': '#0000001A'        # Subtle shadow (10% opacity)
         }
         
-        # Configurar estilo
+        # Configure style
         self.setup_styles()
         
-        # Variáveis
+        # Variables
         self.country_var = tk.StringVar(value="br")
         self.lang_var = tk.StringVar(value="pt")
         self.output_dir_var = tk.StringVar(value=os.getcwd())
         
-        # Estado
-        self.scraper = GooglePlayReviewScraper()  # Inicializa scraper
+        # State
+        self.scraper = GooglePlayReviewScraper()  # Initialize scraper
         self.is_running = False
         self.csv_path = None
         self.json_path = None
 
         self.create_interface()
 
-        # Bind eventos (removido - agora usa on_urls_change)
+        # Bind events (removed - now uses on_urls_change)
 
     def center_window(self, window, width=None, height=None):
         """Centraliza uma janela definindo opcionalmente o tamanho."""
@@ -89,30 +89,30 @@ class ReviewScraperApp:
         window.geometry(geom)
 
     def create_language_selector(self, parent):
-        """Cria seletor de idioma customizado com bandeiras PNG"""
-        # Carrega as imagens das bandeiras
+        """Creates custom language selector with PNG flags"""
+        # Load flag images
         self.load_flag_images()
         
-        # Frame para o seletor (lado a lado com outros controles)
+        # Frame for selector (side by side with other controls)
         lang_frame = tk.Frame(parent, bg=self.colors['background'])
         lang_frame.pack(side=tk.LEFT, padx=(0, 10))
         
-        # Botão atual com bandeira usando Canvas para melhor suporte no Mac
+        # Current button with flag using Canvas for better Mac support
         current_flag = self.get_flag_code(translator.current_language)
         
-        # Container para o botão do seletor
+        # Container for selector button
         selector_container = tk.Frame(lang_frame, bg=self.colors['background'])
         selector_container.pack()
         
-        # Canvas para o botão do seletor (largura aumentada para não cortar bandeira)
+        # Canvas for selector button (increased width to not cut flag)
         self.lang_selector_canvas = tk.Canvas(selector_container, width=100, height=30,
                                             highlightthickness=0, bd=0, bg=self.colors['background'])
         self.lang_selector_canvas.pack()
         
-        # Desenha o botão do seletor (fundo branco por padrão)
+        # Draw selector button (white background by default)
         def draw_selector_button(bg_color='#ffffff', border_color=self.colors['border']):
             self.lang_selector_canvas.delete("selector_bg")
-            # Fundo do botão (largura aumentada)
+            # Button background (increased width)
             self.lang_selector_canvas.create_rectangle(1, 1, 99, 29, 
                                                      fill=bg_color, outline=border_color, 
                                                      tags="selector_bg")
@@ -152,14 +152,14 @@ class ReviewScraperApp:
         self.lang_selector_canvas.bind("<Button-1>", on_selector_click)
         self.lang_selector_canvas.bind("<Motion>", lambda e: self.lang_selector_canvas.config(cursor="hand2"))
         
-        # Salva referência para atualizações
-        self.current_lang_display = selector_container  # Para compatibilidade com código existente
+        # Save reference for updates
+        self.current_lang_display = selector_container  # For compatibility with existing code
         
-        # Menu dropdown (inicialmente oculto)
+        # Dropdown menu (initially hidden)
         self.lang_menu = tk.Frame(self.root, bg=self.colors['surface'], relief='solid', bd=1)
         self.lang_menu_visible = False
         
-        # Opções de idioma com bandeiras
+        # Language options with flags
         languages = [
             ('pt', 'Português'),
             ('en', 'English'),
@@ -201,19 +201,19 @@ class ReviewScraperApp:
         self.root.bind('<Button-1>', self.hide_language_menu)
 
     def load_flag_images(self):
-        """Carrega as imagens das bandeiras (24x24px)"""
+        """Loads flag images (24x24px)"""
         self.flag_images = {}
         
-        # Mapeamento de idiomas para arquivos de bandeira
+        # Language to flag file mapping
         flag_files = {
-            'pt': 'br.png',    # Português -> Brasil
-            'en': 'en.png',    # English -> Inglaterra/EUA
-            'es': 'es.png',    # Español -> Espanha
-            'fr': 'fr.png',    # Français -> França
-            'de': 'al.png',    # Deutsch -> Alemanha (usando al.png)
-            'it': 'it.png',    # Italiano -> Itália
-            'br': 'br.png',    # Brasil
-            'al': 'al.png'     # Alemanha
+            'pt': 'br.png',    # Portuguese -> Brazil
+            'en': 'en.png',    # English -> England/USA
+            'es': 'es.png',    # Spanish -> Spain
+            'fr': 'fr.png',    # French -> France
+            'de': 'al.png',    # German -> Germany (using al.png)
+            'it': 'it.png',    # Italian -> Italy
+            'br': 'br.png',    # Brazil
+            'al': 'al.png'     # Germany
         }
         
         for code, filename in flag_files.items():
@@ -223,53 +223,53 @@ class ReviewScraperApp:
                 if not os.path.exists(flag_path):
                     flag_path = os.path.join("assets", "flags", filename)
                 if os.path.exists(flag_path):
-                    # Carrega a imagem sem redimensionar (já está 24x24px)
+                    # Load image without resizing (already 24x24px)
                     flag_img = tk.PhotoImage(file=flag_path)
                     self.flag_images[code] = flag_img
                 else:
-                    print(f"Bandeira não encontrada: {flag_path}")
+                    print(f"Flag not found: {flag_path}")
             except Exception as e:
-                print(f"Erro ao carregar bandeira {filename}: {e}")
+                print(f"Error loading flag {filename}: {e}")
         
-        # Se não conseguiu carregar nenhuma imagem, cria placeholders
+        # If no images could be loaded, create placeholders
         if not self.flag_images:
-            print("Nenhuma bandeira carregada, usando placeholders")
+            print("No flags loaded, using placeholders")
             for code in ['pt', 'en', 'es', 'fr', 'de', 'it', 'br', 'al']:
-                # Cria uma imagem placeholder 24x24
+                # Create a 24x24 placeholder image
                 placeholder = tk.PhotoImage(width=24, height=24)
                 placeholder.put("#CCCCCC", to=(0, 0, 24, 24))
                 self.flag_images[code] = placeholder
 
     def get_flag_code(self, lang_code):
-        """Retorna o código da bandeira para o idioma"""
+        """Returns the flag code for the language"""
         flag_mapping = {
-            'pt': 'br',    # Português -> Brasil
-            'en': 'en',    # English -> Inglaterra
-            'es': 'es',    # Español -> Espanha
-            'fr': 'fr',    # Français -> França
-            'de': 'al',    # Deutsch -> Alemanha
-            'it': 'it'     # Italiano -> Itália
+            'pt': 'br',    # Portuguese -> Brazil
+            'en': 'en',    # English -> England
+            'es': 'es',    # Spanish -> Spain
+            'fr': 'fr',    # French -> France
+            'de': 'al',    # German -> Germany
+            'it': 'it'     # Italian -> Italy
         }
         return flag_mapping.get(lang_code, 'br')
 
     def toggle_language_menu(self):
-        """Mostra/oculta o menu de idiomas"""
+        """Shows/hides the language menu"""
         if self.lang_menu_visible:
             self.hide_language_menu()
         else:
             self.show_language_menu()
 
     def show_language_menu(self):
-        """Mostra o menu de idiomas"""
-        # Atualiza a posição antes de mostrar
+        """Shows the language menu"""
+        # Update position before showing
         self.root.update_idletasks()
         
-        # Posiciona o menu abaixo do seletor (coordenadas relativas à janela principal)
+        # Position menu below selector (coordinates relative to main window)
         button_x = self.current_lang_display.winfo_x()
         button_y = self.current_lang_display.winfo_y()
         button_height = self.current_lang_display.winfo_height()
         
-        # Encontra o frame pai para calcular posição correta
+        # Find parent frame to calculate correct position
         parent = self.current_lang_display.master
         while parent != self.root:
             button_x += parent.winfo_x()
@@ -284,12 +284,12 @@ class ReviewScraperApp:
         self.lang_menu_visible = True
 
     def hide_language_menu(self, event=None):
-        """Oculta o menu de idiomas"""
+        """Hides the language menu"""
         if hasattr(self, 'lang_menu') and self.lang_menu_visible:
-            # Verifica se o clique foi dentro do menu ou botão
+            # Check if click was inside menu or button
             if event:
                 widget = event.widget
-                # Se clicou no botão do seletor (Canvas), container ou no menu, não fecha
+                # If clicked on selector button (Canvas), container or menu, don't close
                 if (widget == self.current_lang_display or 
                     widget == self.lang_selector_canvas or
                     widget == self.lang_menu or 
@@ -300,16 +300,16 @@ class ReviewScraperApp:
             self.lang_menu_visible = False
 
     def select_language(self, lang_code):
-        """Seleciona um idioma"""
+        """Selects a language"""
         if translator.set_language(lang_code):
-            # Atualiza o botão Canvas com a nova bandeira
+            # Update Canvas button with new flag
             flag_code = self.get_flag_code(lang_code)
             if hasattr(self, 'flag_images') and flag_code in self.flag_images:
-                # Atualiza bandeira no Canvas
+                # Update flag in Canvas
                 if hasattr(self, 'lang_flag_id'):
                     self.lang_selector_canvas.itemconfig(self.lang_flag_id, image=self.flag_images[flag_code])
                 
-                # Atualiza texto no Canvas
+                # Update text in Canvas
                 if hasattr(self, 'lang_text_id'):
                     self.lang_selector_canvas.itemconfig(self.lang_text_id, text=lang_code.upper())
             
@@ -451,14 +451,14 @@ class ReviewScraperApp:
             print(f"Erro ao atualizar botões Canvas: {e}")
     
     def setup_styles(self):
-        """Configura estilos básicos"""
-        # Configuração mínima necessária
+        """Configure basic styles"""
+        # Minimum necessary configuration
         self.root.configure(bg=self.colors['background'])
 
     def setup_icon(self):
-        """Configura o ícone da aplicação (adaptado para Mac)"""
+        """Configure application icon (adapted for Mac)"""
         try:
-            # Caminho inteligente para o ícone
+            # Smart path for icon
             if os.path.exists("assets"):
                 png_path = os.path.join("assets", "icons", "google-play.png")
             else:

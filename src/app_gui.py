@@ -23,69 +23,69 @@ class ReviewScraperApp:
         self.root.resizable(True, True)
         self.root.minsize(700, 600)
         
-        # Configurar ícone da aplicação
+        # Configure application icon
         self.setup_icon()
         
-        # Força o ícone na barra de tarefas do Windows
+        # Force icon in Windows taskbar
         self.setup_taskbar_icon()
         
-        # Tema claro com cores contrastantes e vibrantes
+        # Light theme with vibrant and contrasting colors
         self.colors = {
-            # Cores principais mais vibrantes e contrastantes
-            'primary': '#4F46E5',        # Azul índigo mais intenso
-            'secondary': '#7C3AED',      # Roxo violeta mais vibrante
-            'accent': '#EC4899',         # Rosa magenta vibrante
-            'error': '#DC2626',          # Vermelho mais intenso
-            'warning': '#D97706',        # Laranja mais contrastante
-            'info': '#0891B2',           # Ciano mais escuro
-            'success': '#059669',        # Verde mais intenso
+            # Main vibrant and contrasting colors
+            'primary': '#4F46E5',        # Intense indigo blue
+            'secondary': '#7C3AED',      # Vibrant violet purple
+            'accent': '#EC4899',         # Vibrant magenta pink
+            'error': '#DC2626',          # Intense red
+            'warning': '#D97706',        # Contrasting orange
+            'info': '#0891B2',           # Dark cyan
+            'success': '#059669',        # Intense green
             
-            # Cores específicas para botões contrastantes
-            'btn_blue': '#2563EB',       # Azul royal vibrante
-            'btn_purple': '#9333EA',     # Roxo vibrante
-            'btn_pink': '#DB2777',       # Rosa pink intenso
-            'btn_red': '#DC2626',        # Vermelho intenso
-            'btn_orange': '#EA580C',     # Laranja vibrante
-            'btn_cyan': '#0891B2',       # Ciano intenso
-            'btn_green': '#16A34A',      # Verde vibrante
-            'btn_indigo': '#4338CA',     # Índigo profundo
+            # Specific colors for contrasting buttons
+            'btn_blue': '#2563EB',       # Vibrant royal blue
+            'btn_purple': '#9333EA',     # Vibrant purple
+            'btn_pink': '#DB2777',       # Intense pink
+            'btn_red': '#DC2626',        # Intense red
+            'btn_orange': '#EA580C',     # Vibrant orange
+            'btn_cyan': '#0891B2',       # Intense cyan
+            'btn_green': '#16A34A',      # Vibrant green
+            'btn_indigo': '#4338CA',     # Deep indigo
             
-            # Cores de interface
-            'background': '#F8FAFC',     # Slate 50 (fundo principal)
-            'surface': '#FFFFFF',        # Branco (cards)
-            'surface_light': '#F1F5F9',  # Slate 100 (hover suave)
-            'surface_dark': '#E2E8F0',   # Slate 200 (bordas)
-            'on_surface': '#1E293B',     # Slate 800 (texto escuro)
-            'on_background': '#334155',  # Slate 700 (texto médio)
-            'disabled': '#94A3B8',       # Slate 400 (desabilitado)
-            'divider': '#E2E8F0',        # Slate 200 (divisores)
+            # Interface colors
+            'background': '#F8FAFC',     # Slate 50 (main background)
+            'surface': '#FFFFFF',        # White (cards)
+            'surface_light': '#F1F5F9',  # Slate 100 (soft hover)
+            'surface_dark': '#E2E8F0',   # Slate 200 (borders)
+            'on_surface': '#1E293B',     # Slate 800 (dark text)
+            'on_background': '#334155',  # Slate 700 (medium text)
+            'disabled': '#94A3B8',       # Slate 400 (disabled)
+            'divider': '#E2E8F0',        # Slate 200 (dividers)
             'input_bg': '#F8FAFC',       # Slate 50 (inputs)
-            'input_border': '#D1D5DB',   # Gray 300 (bordas inputs)
+            'input_border': '#D1D5DB',   # Gray 300 (input borders)
             'hover': '#F1F5F9',          # Slate 100 (hover)
-            'border': '#E5E7EB',         # Gray 200 (bordas suaves)
-            'shadow': '#0000001A'        # Sombra sutil (10% opacidade)
+            'border': '#E5E7EB',         # Gray 200 (soft borders)
+            'shadow': '#0000001A'        # Subtle shadow (10% opacity)
         }
         
-        # Configurar estilo
+        # Configure style
         self.setup_styles()
         
-        # Variáveis
+        # Variables
         self.country_var = tk.StringVar(value="br")
         self.lang_var = tk.StringVar(value="pt")
         self.output_dir_var = tk.StringVar(value=os.getcwd())
         
-        # Estado
-        self.scraper = GooglePlayReviewScraper()  # Inicializa scraper
+        # State
+        self.scraper = GooglePlayReviewScraper()  # Initialize scraper
         self.is_running = False
         self.csv_path = None
         self.json_path = None
 
         self.create_interface()
         
-        # Mostra a janela centralizada após tudo estar pronto
+        # Show centered window after everything is ready
         self.show_window_centered()
 
-        # Bind eventos (removido - agora usa on_urls_change)
+        # Bind events (removed - now uses on_urls_change)
 
     def center_window(self, window, width=None, height=None):
         """Centraliza uma janela definindo opcionalmente o tamanho."""
@@ -98,30 +98,30 @@ class ReviewScraperApp:
         window.geometry(geom)
     
     def show_window_centered(self):
-        """Mostra a janela centralizada sem efeito de 'pulo'."""
-        # Atualiza todos os elementos para calcular tamanhos corretos
+        """Shows the centered window without 'jump' effect."""
+        # Update all elements to calculate correct sizes
         self.root.update_idletasks()
         
-        # Centraliza a janela
+        # Center the window
         self.center_window(self.root, 800, 700)
         
-        # Mostra a janela
+        # Show the window
         self.root.deiconify()
         
-        # Força foco na janela
+        # Force focus on window
         self.root.lift()
         self.root.focus_force()
 
     def create_language_selector(self, parent):
-        """Cria seletor de idioma customizado com bandeiras PNG"""
-        # Carrega as imagens das bandeiras
+        """Creates custom language selector with PNG flags"""
+        # Load flag images
         self.load_flag_images()
         
-        # Frame para o seletor
+        # Frame for selector
         lang_frame = tk.Frame(parent, bg=self.colors['background'])
         lang_frame.pack(side=tk.LEFT, padx=(0, 5))
         
-        # Botão atual com bandeira (usando get_flag_code para mapear corretamente)
+        # Current button with flag (using get_flag_code to map correctly)
         current_flag = self.get_flag_code(translator.current_language)
         self.current_lang_display = tk.Button(lang_frame,
                                             image=self.flag_images.get(current_flag),
@@ -138,11 +138,11 @@ class ReviewScraperApp:
                                             command=self.toggle_language_menu)
         self.current_lang_display.pack()
         
-        # Menu dropdown (inicialmente oculto)
+        # Dropdown menu (initially hidden)
         self.lang_menu = tk.Frame(self.root, bg=self.colors['surface'], relief='solid', bd=1)
         self.lang_menu_visible = False
         
-        # Opções de idioma com bandeiras
+        # Language options with flags
         languages = [
             ('pt', 'Português'),
             ('en', 'English'),
@@ -180,83 +180,83 @@ class ReviewScraperApp:
             btn.bind('<Enter>', on_enter)
             btn.bind('<Leave>', on_leave)
         
-        # Bind para fechar menu ao clicar fora
+        # Bind to close menu when clicking outside
         self.root.bind('<Button-1>', self.hide_language_menu)
 
     def load_flag_images(self):
-        """Carrega as imagens das bandeiras (24x24px)"""
+        """Loads flag images (24x24px)"""
         self.flag_images = {}
         
-        # Mapeamento de idiomas para arquivos de bandeira
+        # Language to flag file mapping
         flag_files = {
-            'pt': 'br.png',    # Português -> Brasil
-            'en': 'en.png',    # English -> Inglaterra/EUA
-            'es': 'es.png',    # Español -> Espanha
-            'fr': 'fr.png',    # Français -> França
-            'de': 'de.png',    # Deutsch -> Alemanha
-            'it': 'it.png',    # Italiano -> Itália
-            'br': 'br.png',    # Brasil
-            'de': 'de.png'     # Alemanha
+            'pt': 'br.png',    # Portuguese -> Brazil
+            'en': 'en.png',    # English -> England/USA
+            'es': 'es.png',    # Spanish -> Spain
+            'fr': 'fr.png',    # French -> France
+            'de': 'de.png',    # German -> Germany
+            'it': 'it.png',    # Italian -> Italy
+            'br': 'br.png',    # Brazil
+            'de': 'de.png'     # Germany
         }
         
         for code, filename in flag_files.items():
             try:
                 flag_path = os.path.join("assets", "flags", filename)
                 if os.path.exists(flag_path):
-                    # Carrega a imagem sem redimensionar (já está 24x24px)
+                    # Load image without resizing (already 24x24px)
                     flag_img = tk.PhotoImage(file=flag_path)
                     self.flag_images[code] = flag_img
                 else:
-                    print(f"Bandeira não encontrada: {flag_path}")
+                    print(f"Flag not found: {flag_path}")
             except Exception as e:
-                print(f"Erro ao carregar bandeira {filename}: {e}")
+                print(f"Error loading flag {filename}: {e}")
         
-        # Se não conseguiu carregar nenhuma imagem, cria placeholders
+        # If no images could be loaded, create placeholders
         if not self.flag_images:
-            print("Nenhuma bandeira carregada, usando placeholders")
+            print("No flags loaded, using placeholders")
             for code in ['pt', 'en', 'es', 'fr', 'de', 'it', 'br']:
-                # Cria uma imagem placeholder 24x24
+                # Create a 24x24 placeholder image
                 placeholder = tk.PhotoImage(width=24, height=24)
                 placeholder.put("#CCCCCC", to=(0, 0, 24, 24))
                 self.flag_images[code] = placeholder
 
     def get_flag_code(self, lang_code):
-        """Retorna o código da bandeira para o idioma"""
+        """Returns the flag code for the language"""
         flag_mapping = {
-            'pt': 'br',    # Português -> Brasil
-            'en': 'en',    # English -> Inglaterra
-            'es': 'es',    # Español -> Espanha
-            'fr': 'fr',    # Français -> França
-            'de': 'de',    # Deutsch -> Alemanha
-            'it': 'it'     # Italiano -> Itália
+            'pt': 'br',    # Portuguese -> Brazil
+            'en': 'en',    # English -> England
+            'es': 'es',    # Spanish -> Spain
+            'fr': 'fr',    # French -> France
+            'de': 'de',    # German -> Germany
+            'it': 'it'     # Italian -> Italy
         }
         return flag_mapping.get(lang_code, 'br')
 
     def toggle_language_menu(self):
-        """Mostra/oculta o menu de idiomas"""
+        """Shows/hides the language menu"""
         if self.lang_menu_visible:
             self.hide_language_menu()
         else:
             self.show_language_menu()
 
     def show_language_menu(self):
-        """Mostra o menu de idiomas"""
-        # Atualiza a posição antes de mostrar
+        """Shows the language menu"""
+        # Update position before showing
         self.root.update_idletasks()
         
-        # Posiciona o menu abaixo do seletor (coordenadas relativas à janela principal)
+        # Position menu below selector (coordinates relative to main window)
         button_x = self.current_lang_display.winfo_x()
         button_y = self.current_lang_display.winfo_y()
         button_height = self.current_lang_display.winfo_height()
         
-        # Encontra o frame pai para calcular posição correta
+        # Find parent frame to calculate correct position
         parent = self.current_lang_display.master
         while parent != self.root:
             button_x += parent.winfo_x()
             button_y += parent.winfo_y()
             parent = parent.master
         
-        # Posiciona o menu
+        # Position the menu
         menu_x = button_x
         menu_y = button_y + button_height + 2
         
@@ -264,12 +264,12 @@ class ReviewScraperApp:
         self.lang_menu_visible = True
 
     def hide_language_menu(self, event=None):
-        """Oculta o menu de idiomas"""
+        """Hides the language menu"""
         if hasattr(self, 'lang_menu') and self.lang_menu_visible:
-            # Verifica se o clique foi dentro do menu ou botão
+            # Check if click was inside menu or button
             if event:
                 widget = event.widget
-                # Se clicou no botão do seletor ou no menu, não fecha
+                # If clicked on selector button or menu, don't close
                 if (widget == self.current_lang_display or 
                     widget == self.lang_menu or 
                     widget in self.lang_menu.winfo_children()):
@@ -279,9 +279,9 @@ class ReviewScraperApp:
             self.lang_menu_visible = False
 
     def select_language(self, lang_code):
-        """Seleciona um idioma"""
+        """Selects a language"""
         if translator.set_language(lang_code):
-            # Atualiza o botão com a nova bandeira
+            # Update button with new flag
             flag_code = self.get_flag_code(lang_code)
             if hasattr(self, 'flag_images') and flag_code in self.flag_images:
                 self.current_lang_display.config(
@@ -294,11 +294,11 @@ class ReviewScraperApp:
 
 
     def update_ui_texts(self):
-        """Atualiza todos os textos da interface"""
-        # Título da janela
+        """Updates all interface texts"""
+        # Window title
         self.root.title(translator.get('window_title'))
         
-        # Atualiza seletor de idioma customizado
+        # Update custom language selector
         if hasattr(self, 'current_lang_display') and hasattr(self, 'flag_images'):
             flag_code = self.get_flag_code(translator.current_language)
             if flag_code in self.flag_images:
@@ -307,13 +307,13 @@ class ReviewScraperApp:
                     text=f" {translator.current_language.upper()}"
                 )
         
-        # Cabeçalho
+        # Header
         if hasattr(self, 'title_label'):
             self.title_label.config(text=translator.get('window_title'))
         if hasattr(self, 'subtitle_label'):
             self.subtitle_label.config(text=translator.get('window_subtitle'))
         
-        # Títulos das seções
+        # Section titles
         if hasattr(self, 'url_section_title'):
             self.url_section_title.config(text=translator.get('url_section'))
         if hasattr(self, 'config_section_title'):
@@ -323,7 +323,7 @@ class ReviewScraperApp:
         if hasattr(self, 'log_section_title'):
             self.log_section_title.config(text=translator.get('log_section'))
         
-        # Labels das seções
+        # Section labels
         if hasattr(self, 'country_label'):
             self.country_label.config(text=translator.get('country_label'))
         if hasattr(self, 'language_label'):
@@ -331,7 +331,7 @@ class ReviewScraperApp:
         if hasattr(self, 'folder_text_label'):
             self.folder_text_label.config(text=translator.get('folder_label'))
         
-        # Botões
+        # Buttons
         if hasattr(self, 'paste_btn'):
             self.paste_btn.config(text=translator.get('paste_button'))
         if hasattr(self, 'add_btn'):
@@ -347,21 +347,21 @@ class ReviewScraperApp:
         if hasattr(self, 'folder_btn'):
             self.folder_btn.config(text=translator.get('folder_button'))
         
-        # Botão principal
+        # Main button
         if hasattr(self, 'main_button'):
             if hasattr(self, 'is_running') and self.is_running:
                 self.main_button.config(text=translator.get('stop_button'))
             else:
                 self.main_button.config(text=translator.get('start_button'))
         
-        # Botão toggle do log
+        # Log toggle button
         if hasattr(self, 'toggle_log_btn'):
             if hasattr(self, 'log_visible') and self.log_visible:
                 self.toggle_log_btn.config(text=translator.get('hide_log_button'))
             else:
                 self.toggle_log_btn.config(text=translator.get('show_log_button'))
         
-        # Placeholder da URL
+        # URL placeholder
         self.setup_placeholder()
         
         # Status
@@ -371,36 +371,36 @@ class ReviewScraperApp:
         if hasattr(self, 'status_var'):
             self.status_var.set(translator.get('ready_status_bar'))
         
-        # Log inicial
+        # Initial log
         if hasattr(self, 'log_text'):
             self.log_text.delete(1.0, tk.END)
             self.log(translator.get('scraper_started'))
     
     def setup_styles(self):
-        """Configura estilos básicos"""
-        # Configuração mínima necessária
+        """Configure basic styles"""
+        # Minimum necessary configuration
         self.root.configure(bg=self.colors['background'])
 
     def setup_icon(self):
-        """Configura o ícone da aplicação (adaptado da versão Mac que funciona)"""
+        """Configure application icon (adapted from working Mac version)"""
         try:
-            # Usa PNG como na versão Mac (mais confiável)
+            # Use PNG like Mac version (more reliable)
             png_path = os.path.join("assets", "icons", "google-play.png")
             
             if os.path.exists(png_path):
                 try:
                     from PIL import Image, ImageTk
                     icon_image = Image.open(png_path)
-                    # Redimensiona para 64x64 como na versão Mac
+                    # Resize to 64x64 like Mac version
                     icon_image = icon_image.resize((64, 64), Image.Resampling.LANCZOS)
                     self.icon_photo = ImageTk.PhotoImage(icon_image)
                     
-                    # Método simples que funciona no Mac - só iconphoto(True)
+                    # Simple method that works on Mac - just iconphoto(True)
                     self.root.iconphoto(True, self.icon_photo)
                     return
                     
                 except ImportError:
-                    # Fallback sem PIL
+                    # Fallback without PIL
                     try:
                         self.icon_photo = tk.PhotoImage(file=png_path)
                         self.root.iconphoto(True, self.icon_photo)
@@ -411,7 +411,7 @@ class ReviewScraperApp:
                 except Exception:
                     pass
             
-            # Fallback para .ico se PNG falhar
+            # Fallback to .ico if PNG fails
             ico_path = os.path.join("assets", "icons", "google-play.ico")
             if os.path.exists(ico_path):
                 try:
@@ -424,9 +424,9 @@ class ReviewScraperApp:
             pass
 
     def setup_taskbar_icon(self):
-        """Método simplificado - iconphoto(True) já cuida da barra de tarefas"""
-        # Como na versão Mac, não precisa de nada extra!
-        # O iconphoto(True) já resolve janela + barra de tarefas
+        """Simplified method - iconphoto(True) already handles taskbar"""
+        # Like Mac version, no extra needed!
+        # iconphoto(True) already handles window + taskbar
         pass
 
     def create_interface(self):
@@ -460,7 +460,7 @@ class ReviewScraperApp:
                                bg=self.colors['background'], troughcolor=self.colors['divider'],
                                activebackground=self.colors['primary'])
         
-        # Frame scrollável dentro do canvas
+        # Scrollable frame inside canvas
         self.scrollable_frame = tk.Frame(self.canvas, bg=self.colors['background'])
         
         # Configura o scroll
@@ -486,7 +486,7 @@ class ReviewScraperApp:
         self.bind_mousewheel()
 
     def on_canvas_configure(self, event):
-        """Ajusta o tamanho do frame interno quando o canvas é redimensionado"""
+        """Adjusts internal frame size when canvas is resized"""
         canvas_width = event.width
         self.canvas.itemconfig(self.canvas_window, width=canvas_width)
 
@@ -524,7 +524,7 @@ class ReviewScraperApp:
         self.root.focus_set()
 
     def create_header(self, parent):
-        """Cria o cabeçalho moderno com ícone do Google Play"""
+        """Creates modern header with Google Play icon"""
         header = tk.Frame(parent, bg=self.colors['background'])
         header.pack(fill=tk.X, pady=(0, 30))
         
