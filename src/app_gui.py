@@ -14,6 +14,11 @@ class ReviewScraperApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Google Play Reviews Scraper")
+        
+        # Oculta a janela inicialmente para evitar o "pulo"
+        self.root.withdraw()
+        
+        # Define tamanho e propriedades
         self.root.geometry("800x700")
         self.root.resizable(True, True)
         self.root.minsize(700, 600)
@@ -76,6 +81,9 @@ class ReviewScraperApp:
         self.json_path = None
 
         self.create_interface()
+        
+        # Mostra a janela centralizada após tudo estar pronto
+        self.show_window_centered()
 
         # Bind eventos (removido - agora usa on_urls_change)
 
@@ -88,6 +96,21 @@ class ReviewScraperApp:
         y = (window.winfo_screenheight() // 2) - (h // 2)
         geom = f"{w}x{h}+{x}+{y}" if width and height else f"+{x}+{y}"
         window.geometry(geom)
+    
+    def show_window_centered(self):
+        """Mostra a janela centralizada sem efeito de 'pulo'."""
+        # Atualiza todos os elementos para calcular tamanhos corretos
+        self.root.update_idletasks()
+        
+        # Centraliza a janela
+        self.center_window(self.root, 800, 700)
+        
+        # Mostra a janela
+        self.root.deiconify()
+        
+        # Força foco na janela
+        self.root.lift()
+        self.root.focus_force()
 
     def create_language_selector(self, parent):
         """Cria seletor de idioma customizado com bandeiras PNG"""
@@ -359,114 +382,52 @@ class ReviewScraperApp:
         self.root.configure(bg=self.colors['background'])
 
     def setup_icon(self):
-        """Configura o ícone da aplicação"""
+        """Configura o ícone da aplicação (adaptado da versão Mac que funciona)"""
         try:
-            # Primeiro tenta usar o arquivo .ico (melhor para Windows)
-            ico_path = os.path.join("assets", "icons", "google-play.ico")
-            if os.path.exists(ico_path):
-                self.root.iconbitmap(ico_path)
-                return
-            
-            # Fallback para PNG se .ico não existir
+            # Usa PNG como na versão Mac (mais confiável)
             png_path = os.path.join("assets", "icons", "google-play.png")
+            
             if os.path.exists(png_path):
                 try:
                     from PIL import Image, ImageTk
                     icon_image = Image.open(png_path)
-                    icon_image = icon_image.resize((32, 32), Image.Resampling.LANCZOS)
+                    # Redimensiona para 64x64 como na versão Mac
+                    icon_image = icon_image.resize((64, 64), Image.Resampling.LANCZOS)
                     self.icon_photo = ImageTk.PhotoImage(icon_image)
+                    
+                    # Método simples que funciona no Mac - só iconphoto(True)
                     self.root.iconphoto(True, self.icon_photo)
+                    return
+                    
                 except ImportError:
-                    self.icon_photo = tk.PhotoImage(file=png_path)
-                    self.root.iconphoto(True, self.icon_photo)
-        except Exception as e:
-            print(f"Erro ao carregar ícone: {e}")
-
-    def setup_taskbar_icon(self):
-        """Configura o ícone na barra de tarefas do Windows"""
-        # Agenda para executar após a janela estar totalmente carregada
-        self.root.after(100, self._apply_taskbar_icon)
-    
-    def _apply_taskbar_icon(self):
-        """Aplica o ícone na barra de tarefas (executado após delay)"""
-        try:
-            import ctypes
-            import sys
-            
-            # Define o App User Model ID para que o Windows trate como aplicação separada
-            try:
-                ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("GooglePlayReviewScraper.1.0")
-            except:
-                pass
-            
-            # Aguarda a janela estar visível
-            self.root.update()
-            
-            # Obtém o handle da janela
-            hwnd = self.root.winfo_id()
-            
-            # Carrega o ícone do arquivo .ico
-            ico_path = os.path.join("assets", "icons", "google-play.ico")
-            if os.path.exists(ico_path):
-                ico_path = os.path.abspath(ico_path)
-                
-                # Constantes do Windows
-                IMAGE_ICON = 1
-                LR_LOADFROMFILE = 0x00000010
-                LR_DEFAULTSIZE = 0x00000040
-                WM_SETICON = 0x0080
-                ICON_SMALL = 0
-                ICON_BIG = 1
-                
-                # Carrega o ícone pequeno (16x16)
-                hicon_small = ctypes.windll.user32.LoadImageW(
-                    None, ico_path, IMAGE_ICON, 16, 16, LR_LOADFROMFILE
-                )
-                
-                # Carrega o ícone grande (32x32)
-                hicon_large = ctypes.windll.user32.LoadImageW(
-                    None, ico_path, IMAGE_ICON, 32, 32, LR_LOADFROMFILE
-                )
-                
-                # Define os ícones na janela
-                if hicon_small:
-                    ctypes.windll.user32.SendMessageW(hwnd, WM_SETICON, ICON_SMALL, hicon_small)
-                if hicon_large:
-                    ctypes.windll.user32.SendMessageW(hwnd, WM_SETICON, ICON_BIG, hicon_large)
-                
-                # Força atualização da barra de tarefas
-                try:
-                    # Força refresh da janela
-                    ctypes.windll.user32.RedrawWindow(hwnd, None, None, 0x0001 | 0x0004)
-                    
-                    # Agenda uma segunda tentativa se necessário
-                    self.root.after(500, self._force_icon_update)
-                except:
+                    # Fallback sem PIL
+                    try:
+                        self.icon_photo = tk.PhotoImage(file=png_path)
+                        self.root.iconphoto(True, self.icon_photo)
+                        return
+                    except Exception:
+                        pass
+                        
+                except Exception:
                     pass
-                    
-        except Exception as e:
-            print(f"Erro ao configurar ícone da barra de tarefas: {e}")
-    
-    def _force_icon_update(self):
-        """Força uma segunda atualização do ícone"""
-        try:
-            import ctypes
-            hwnd = self.root.winfo_id()
             
-            # Segunda tentativa de aplicar o ícone
+            # Fallback para .ico se PNG falhar
             ico_path = os.path.join("assets", "icons", "google-play.ico")
             if os.path.exists(ico_path):
-                ico_path = os.path.abspath(ico_path)
-                
-                hicon = ctypes.windll.user32.LoadImageW(
-                    None, ico_path, 1, 32, 32, 0x00000010
-                )
-                
-                if hicon:
-                    ctypes.windll.user32.SendMessageW(hwnd, 0x0080, 1, hicon)
+                try:
+                    self.root.iconbitmap(ico_path)
+                    return
+                except Exception:
+                    pass
                     
         except Exception:
             pass
+
+    def setup_taskbar_icon(self):
+        """Método simplificado - iconphoto(True) já cuida da barra de tarefas"""
+        # Como na versão Mac, não precisa de nada extra!
+        # O iconphoto(True) já resolve janela + barra de tarefas
+        pass
 
     def create_interface(self):
         """Cria a interface principal"""
@@ -1848,9 +1809,6 @@ def main():
     """Função principal"""
     root = tk.Tk()
     app = ReviewScraperApp(root)
-    
-    # Centraliza janela
-    app.center_window(root)
     
     root.mainloop()
 
