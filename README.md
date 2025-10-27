@@ -65,7 +65,40 @@
 | 🍎 **macOS** | ✅ Native Interface | ✅ Supported | Optimized for macOS design |
 | 🐧 **Linux** | ⚠️ Basic GUI | ✅ Supported | GUI available but CLI recommended |
 
-### 🎯 **Option 1: GUI Application (Recommended)**
+### 🎯 **Option 1: Standalone Executable (Windows - Easiest)**
+
+**📥 Download the ready-to-use executable - No Python installation required!**
+
+```bash
+# 1. Download from GitHub Releases
+# 2. Extract the release folder
+# 3. Double-click GooglePlayReviewsScraper.exe
+# That's it! 🎉
+```
+
+**✨ Executable Features:**
+- 🚀 **No installation needed** - Just download and run
+- 📦 **All-in-one file** - Everything included (~30MB)
+- 🎨 **Full GUI** with modern interface
+- 🌍 **6 languages** built-in
+
+**📖 Build your own executable:**
+```bash
+# Clone the repository
+git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
+cd google-play-reviews-scraper
+
+# Run the build script
+python build_exe.py
+
+# Executable will be in release/ folder
+```
+
+See [BUILD.md](BUILD.md) for detailed build instructions.
+
+---
+
+### 🎯 **Option 2: GUI Application (Python)**
 
 #### **🪟 Windows Users**
 ```bash
@@ -116,7 +149,7 @@ pip install -r requirements.txt
 python src/app_gui.py
 ```
 
-### 🔧 **Option 2: Command Line**
+### 🔧 **Option 3: Command Line**
 
 ```bash
 # Extract reviews from a single app
@@ -126,7 +159,7 @@ python src/review_scraper.py --url "https://play.google.com/store/apps/details?i
 python src/review_scraper.py --batch apps_list.txt --output results/
 ```
 
-### 📦 **Option 3: Python Module**
+### 📦 **Option 4: Python Module**
 
 ```python
 from src.review_scraper import GooglePlayReviewScraper

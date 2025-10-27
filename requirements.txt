@@ -1,5 +1,5 @@
 # Core dependencies
-google-play-scraper>=3.1.2
+google-play-scraper>=1.2.0
 pandas>=1.5.0
 
 # GUI dependencies (tkinter is usually pre-installed)

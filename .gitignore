@@ -42,7 +42,6 @@ src/time_stats.json
 
 # OS
 .DS_Store
-Thumbs.db
 
 # Logs
 *.log
@@ -50,6 +49,11 @@ Thumbs.db
 # PyInstaller
 *.manifest
 *.spec
+GooglePlayReviewsScraper_custom.spec
+build/
+dist/
+release/
+installer/
 
 # Unit test / coverage reports
 htmlcov/

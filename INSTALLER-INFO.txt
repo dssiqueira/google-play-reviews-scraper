@@ -1,0 +1,43 @@
+========================================
+Google Play Reviews Scraper
+========================================
+
+Bem-vindo ao instalador do Google Play Reviews Scraper!
+
+Este programa permite extrair e analisar reviews de aplicativos da Google Play Store de forma rápida e fácil.
+
+CARACTERÍSTICAS:
+- Interface gráfica moderna e intuitiva
+- Suporte a 6 idiomas (Português, Inglês, Espanhol, Francês, Alemão, Italiano)
+- Exportação em CSV e JSON
+- Coleta ilimitada de reviews
+- Estatísticas detalhadas
+
+REQUISITOS:
+- Windows 10 ou superior
+- Conexão com internet
+- Aproximadamente 100 MB de espaço em disco
+
+IMPORTANTE:
+Este é um executável standalone. Você NÃO precisa instalar:
+- Python
+- pip
+- Bibliotecas adicionais
+
+Tudo já está incluído no instalador!
+
+APÓS A INSTALAÇÃO:
+1. Execute o programa pelo Menu Iniciar ou atalho na área de trabalho
+2. Cole a URL de um app da Google Play Store
+3. Clique em "Iniciar Coleta"
+4. Aguarde a coleta finalizar
+5. Abra os arquivos CSV ou JSON gerados
+
+SUPORTE:
+- GitHub: https://github.com/dssiqueira/google-play-reviews-scraper
+- Issues: https://github.com/dssiqueira/google-play-reviews-scraper/issues
+
+LICENÇA:
+MIT License - Software livre e de código aberto
+
+Aproveite!
