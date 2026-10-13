@@ -1,0 +1,94 @@
+name: release
+
+# Push a tag like v2.0.0 to build the app on every OS and publish a GitHub Release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt pytest
+      - run: pytest -q
+
+  build:
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            asset: GooglePlayReviewsScraper-windows.exe
+          - os: macos-latest
+            asset: GooglePlayReviewsScraper-macos.zip
+          - os: ubuntu-22.04
+            asset: GooglePlayReviewsScraper-linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+
+      - name: Build (Windows, with installer)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          python build.py --installer
+          Copy-Item dist/GooglePlayReviewsScraper.exe "${{ matrix.asset }}"
+
+      - name: Build (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          python build.py
+          ditto -c -k --keepParent dist/GooglePlayReviewsScraper.app "${{ matrix.asset }}"
+
+      - name: Build (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          python build.py
+          cp dist/GooglePlayReviewsScraper "${{ matrix.asset }}"
+          chmod +x "${{ matrix.asset }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}
+          path: |
+            ${{ matrix.asset }}
+            installer/*.exe
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - run: ls -laR out
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          body: |
+            ### Downloads
+            - **Windows:** `GooglePlayReviewsScraper-Setup-*.exe` (installer) or `GooglePlayReviewsScraper-windows.exe` (portable)
+            - **macOS:** `GooglePlayReviewsScraper-macos.zip` — unzip, then right-click the app → Open (the app is not notarized)
+            - **Linux:** `GooglePlayReviewsScraper-linux` — `chmod +x` and run
+          fail_on_unmatched_files: true
+          files: |
+            out/*.exe
+            out/*.zip
+            out/*-linux
+            out/installer/*.exe
