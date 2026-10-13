@@ -1,9 +1,17 @@
 name: release
 
-# Push a tag like v2.0.0 to build the app on every OS and publish a GitHub Release.
+# Build the app on every OS and publish a GitHub Release. Either:
+#   - push a tag like v2.0.0, or
+#   - Actions -> release -> Run workflow, and type the version (creates the tag)
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version tag to create, e.g. v2.0.0"
+        required: true
+        default: "v2.0.0"
 
 permissions:
   contents: write
@@ -79,7 +87,9 @@ jobs:
       - run: ls -laR out
       - uses: softprops/action-gh-release@v2
         with:
-          name: ${{ github.ref_name }}
+          tag_name: ${{ inputs.version || github.ref_name }}
+          name: ${{ inputs.version || github.ref_name }}
+          target_commitish: ${{ github.sha }}
           generate_release_notes: true
           body: |
             ### Downloads
