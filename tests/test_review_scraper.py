@@ -18,19 +18,22 @@ from review_scraper import GooglePlayReviewScraper, Review, clean_filename, pars
 # Fake Play Store
 # --------------------------------------------------------------------------- #
 class Token:
-    def __init__(self, token):
+    def __init__(self, token, count=200):
         self.token = token
+        self.count = count
 
 
 class FakeStore:
-    """Mimics google_play_scraper: newest first, pages of `count`, and on a
-    network error returns an empty page with a None token (like the real lib)."""
+    """Mimics google_play_scraper: newest first; the page size is the `count` of
+    the first call (later calls reuse the one stored in the token, like the real
+    lib); on a network error it returns an empty page with a None token."""
 
     def __init__(self, total=450, fail_pages=(), title="My App"):
         self.total = total
         self.fail_pages = set(fail_pages)   # page numbers that fail once
         self.title = title
         self.calls = 0
+        self.page_sizes = []
         self.start = datetime(2026, 10, 1)
 
     def app(self, app_id, lang, country):
@@ -38,12 +41,16 @@ class FakeStore:
 
     def reviews(self, app_id, lang, country, sort, count, continuation_token=None):
         self.calls += 1
-        offset = continuation_token.token if continuation_token else 0
-        page = offset // 200
+        if continuation_token is not None:
+            offset, count = continuation_token.token, continuation_token.count
+        else:
+            offset = 0
+        self.page_sizes.append(count)
+        page = len(self.page_sizes) - 1
         if page in self.fail_pages:
             self.fail_pages.discard(page)
             return [], Token(None)  # what the real library does on errors
-        end = min(offset + 200, self.total)
+        end = min(offset + count, self.total)
         raw = [
             {
                 "reviewId": f"r{i}", "userName": f"user{i}", "content": f"review {i}",
@@ -52,7 +59,7 @@ class FakeStore:
             }
             for i in range(offset, end)
         ]
-        return raw, Token(end if end < self.total else None)
+        return raw, Token(end if end < self.total else None, count)
 
 
 @pytest.fixture
@@ -65,7 +72,8 @@ def store(monkeypatch):
 
 @pytest.fixture
 def scraper():
-    return GooglePlayReviewScraper(delay=0, max_retries=1, empty_page_retries=2)
+    # small pages so tests exercise pagination
+    return GooglePlayReviewScraper(batch_size=200, delay=0, max_retries=1, empty_page_retries=2)
 
 
 @pytest.fixture(autouse=True)
@@ -111,6 +119,18 @@ def test_collects_everything(store, scraper):
     assert len({r.review_id for r in result.reviews}) == 450
     assert isinstance(result.reviews[0], Review)
     assert result.reviews[0].at == "2026-10-01T00:00:00"
+
+
+def test_default_batch_size_keeps_requests_low(store):
+    store.total = 4500
+    result = GooglePlayReviewScraper(delay=0).scrape("com.my.app")
+    assert len(result.reviews) == 4500
+    assert store.calls == 5 and store.page_sizes[0] == 1000
+
+
+def test_small_max_requests_only_what_it_needs(store):
+    GooglePlayReviewScraper(delay=0).scrape("com.my.app", max_reviews=50)
+    assert store.page_sizes == [50]
 
 
 def test_max_reviews(store, scraper):
@@ -189,9 +209,30 @@ def test_save_all_formats(store, scraper, tmp_path):
     assert payload["collection_info"]["total_reviews"] == 30
     assert payload["reviews"][0]["review_id"] == "r0"
 
-    import pandas as pd
-    assert len(pd.read_csv(files["csv"])) == 30
-    assert len(pd.read_excel(files["xlsx"])) == 30
+    import csv
+
+    from openpyxl import load_workbook
+    with open(files["csv"], encoding="utf-8-sig", newline="") as fh:
+        csv_rows = list(csv.DictReader(fh))
+    assert len(csv_rows) == 30 and csv_rows[0]["review_id"] == "r0"
+    assert files["csv"].read_bytes().startswith(b"\xef\xbb\xbf")  # BOM for Excel
+    ws = load_workbook(files["xlsx"]).active
+    assert ws.max_row == 31 and ws["A1"].value == "review_id" and ws["A1"].font.bold
+    assert ws["D2"].value == 1  # score stays numeric
+
+
+def test_save_handles_messy_text(scraper, tmp_path):
+    rows = [{"review_id": "1", "content": 'ótimo, "app"\nlinha 2 \x07🎉', "score": 5},
+            {"review_id": "2", "score": 3, "extra": "x"}]  # ragged rows
+    files = scraper.save_reviews(rows, {"title": "X"}, output_dir=tmp_path, formats=["csv", "xlsx"])
+    import csv
+
+    from openpyxl import load_workbook
+    with open(files["csv"], encoding="utf-8-sig", newline="") as fh:
+        back = list(csv.DictReader(fh))
+    assert back[0]["content"] == 'ótimo, "app"\nlinha 2 \x07🎉' and back[1]["extra"] == "x"
+    ws = load_workbook(files["xlsx"]).active
+    assert ws["B2"].value == 'ótimo, "app"\nlinha 2 🎉'  # control char stripped for Excel
 
 
 def test_save_creates_folder_and_rejects_unknown_format(scraper, tmp_path):

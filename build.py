@@ -40,9 +40,10 @@ def build_app() -> Path:
         "--collect-data", "customtkinter",
         # CTkImage -> PIL.ImageTk needs this and PyInstaller can't see it
         "--hidden-import", "PIL._tkinter_finder",
-        # pandas pulls these in but the app never uses them
+        # never needed at runtime; keeps the bundle small even if installed
+        "--exclude-module", "pandas",
+        "--exclude-module", "numpy",
         "--exclude-module", "matplotlib",
-        "--exclude-module", "IPython",
         "--exclude-module", "pytest",
     ]
     # One file on Windows/Linux; macOS gets a proper .app bundle instead.

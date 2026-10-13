@@ -1,5 +1,4 @@
 google-play-scraper>=1.2.7
-pandas>=1.5
 openpyxl>=3.1        # Excel export
 customtkinter>=5.2,<7
 pillow>=9.0          # logo in the desktop app

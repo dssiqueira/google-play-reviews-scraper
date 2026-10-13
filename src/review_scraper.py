@@ -14,6 +14,7 @@ Run it with no arguments for an interactive prompt.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import logging
 import re
@@ -163,7 +164,7 @@ class GooglePlayReviewScraper:
         country: str = "br",
         lang: str = "pt",
         *,
-        batch_size: int = 200,
+        batch_size: int = 1000,
         delay: float = 0.3,
         max_retries: int = 4,
         empty_page_retries: int = 2,
@@ -362,19 +363,21 @@ class GooglePlayReviewScraper:
         base = out / filename_prefix
         written: dict[str, Path] = {}
 
-        if "csv" in formats or "xlsx" in formats:
-            import pandas as pd  # heavy import, only when needed
+        columns = list(dict.fromkeys(key for row in rows for key in row))
 
-            df = pd.DataFrame(rows)
-            if "csv" in formats:
-                path = base.with_suffix(".csv")
-                # utf-8-sig so Excel opens accents correctly
-                df.to_csv(path, index=False, encoding="utf-8-sig")
-                written["csv"] = path
-            if "xlsx" in formats:
-                path = base.with_suffix(".xlsx")
-                df.to_excel(path, index=False, sheet_name="reviews")
-                written["xlsx"] = path
+        if "csv" in formats:
+            path = base.with_suffix(".csv")
+            # utf-8-sig so Excel opens accents correctly
+            with open(path, "w", encoding="utf-8-sig", newline="") as fh:
+                writer = csv.DictWriter(fh, fieldnames=columns, restval="")
+                writer.writeheader()
+                writer.writerows(rows)
+            written["csv"] = path
+
+        if "xlsx" in formats:
+            path = base.with_suffix(".xlsx")
+            _write_xlsx(path, columns, rows)
+            written["xlsx"] = path
 
         if "json" in formats:
             path = base.with_suffix(".json")
@@ -412,6 +415,46 @@ class GooglePlayReviewScraper:
 
 class _Cancelled(Exception):
     pass
+
+
+# Characters Excel refuses inside a cell (control chars other than \t \n \r).
+_XLSX_ILLEGAL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
+_XLSX_WIDTHS = {"content": 80, "reply_content": 60, "user_name": 24, "review_id": 24,
+                "at": 20, "reply_at": 20, "app_version": 14}
+
+
+def _write_xlsx(path: Path, columns: list[str], rows: list[dict]) -> None:
+    """Stream rows into an .xlsx with openpyxl's write-only mode (low memory)."""
+    from openpyxl import Workbook
+    from openpyxl.cell import WriteOnlyCell
+    from openpyxl.styles import Font
+    from openpyxl.utils import get_column_letter
+
+    wb = Workbook(write_only=True)
+    ws = wb.create_sheet("reviews")
+    ws.freeze_panes = "A2"
+    for i, col in enumerate(columns, start=1):
+        ws.column_dimensions[get_column_letter(i)].width = _XLSX_WIDTHS.get(col, 12)
+
+    bold = Font(bold=True)
+    header = []
+    for col in columns:
+        cell = WriteOnlyCell(ws, value=col)
+        cell.font = bold
+        header.append(cell)
+    ws.append(header)
+
+    for row in rows:
+        values = []
+        for col in columns:
+            value = row.get(col, "")
+            if isinstance(value, str):
+                value = _XLSX_ILLEGAL.sub("", value)
+            elif not isinstance(value, (int, float, type(None))):
+                value = str(value)
+            values.append(value)
+        ws.append(values)
+    wb.save(path)
 
 
 # --------------------------------------------------------------------------- #
