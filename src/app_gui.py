@@ -1,1816 +1,893 @@
-"""Graphical user interface for the Google Play Reviews Scraper."""
+"""Desktop app for Google Play Reviews Scraper (Windows, macOS and Linux).
 
-import tkinter as tk
-from tkinter import messagebox, filedialog
-import threading
+Threading model: scraping runs in a worker thread that never touches Tk.
+It posts events to a queue that the UI thread drains every few ms, and it
+is stopped through a ``threading.Event`` checked between every batch.
+"""
+
+from __future__ import annotations
+
+import logging
 import os
-import time
-from review_scraper import GooglePlayReviewScraper
-from translations import translator
-from time_stats import time_stats
+import queue
+import subprocess
+import sys
+import threading
+import webbrowser
+from dataclasses import dataclass, field
+from datetime import date
+from pathlib import Path
+from tkinter import filedialog, messagebox
+from typing import Optional
 
-class ReviewScraperApp:
-    """Main application window that manages the scraping workflow."""
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Google Play Reviews Scraper")
-        
-        # Oculta a janela inicialmente para evitar o "pulo"
-        self.root.withdraw()
-        
-        # Define tamanho e propriedades
-        self.root.geometry("800x700")
-        self.root.resizable(True, True)
-        self.root.minsize(700, 600)
-        
-        # Configure application icon
-        self.setup_icon()
-        
-        # Force icon in Windows taskbar
-        self.setup_taskbar_icon()
-        
-        # Light theme with vibrant and contrasting colors
-        self.colors = {
-            # Main vibrant and contrasting colors
-            'primary': '#4F46E5',        # Intense indigo blue
-            'secondary': '#7C3AED',      # Vibrant violet purple
-            'accent': '#EC4899',         # Vibrant magenta pink
-            'error': '#DC2626',          # Intense red
-            'warning': '#D97706',        # Contrasting orange
-            'info': '#0891B2',           # Dark cyan
-            'success': '#059669',        # Intense green
-            
-            # Specific colors for contrasting buttons
-            'btn_blue': '#2563EB',       # Vibrant royal blue
-            'btn_purple': '#9333EA',     # Vibrant purple
-            'btn_pink': '#DB2777',       # Intense pink
-            'btn_red': '#DC2626',        # Intense red
-            'btn_orange': '#EA580C',     # Vibrant orange
-            'btn_cyan': '#0891B2',       # Intense cyan
-            'btn_green': '#16A34A',      # Vibrant green
-            'btn_indigo': '#4338CA',     # Deep indigo
-            
-            # Interface colors
-            'background': '#F8FAFC',     # Slate 50 (main background)
-            'surface': '#FFFFFF',        # White (cards)
-            'surface_light': '#F1F5F9',  # Slate 100 (soft hover)
-            'surface_dark': '#E2E8F0',   # Slate 200 (borders)
-            'on_surface': '#1E293B',     # Slate 800 (dark text)
-            'on_background': '#334155',  # Slate 700 (medium text)
-            'disabled': '#94A3B8',       # Slate 400 (disabled)
-            'divider': '#E2E8F0',        # Slate 200 (dividers)
-            'input_bg': '#F8FAFC',       # Slate 50 (inputs)
-            'input_border': '#D1D5DB',   # Gray 300 (input borders)
-            'hover': '#F1F5F9',          # Slate 100 (hover)
-            'border': '#E5E7EB',         # Gray 200 (soft borders)
-            'shadow': '#0000001A'        # Subtle shadow (10% opacity)
-        }
-        
-        # Configure style
-        self.setup_styles()
-        
-        # Variables
-        self.country_var = tk.StringVar(value="br")
-        self.lang_var = tk.StringVar(value="pt")
-        self.output_dir_var = tk.StringVar(value=os.getcwd())
-        
-        # State
-        self.scraper = GooglePlayReviewScraper()  # Initialize scraper
-        self.is_running = False
-        self.csv_path = None
-        self.json_path = None
+import customtkinter as ctk
 
-        self.create_interface()
-        
-        # Show centered window after everything is ready
-        self.show_window_centered()
+from appdata import TimeStats, format_duration, load_settings, resource_path
+from review_scraper import (
+    GooglePlayReviewScraper,
+    ScrapeResult,
+    parse_app_id,
+)
+from translations import LANGUAGES, Translator, code_from_choice, detect_language
 
-        # Bind events (removed - now uses on_urls_change)
+__version__ = "2.0.0"
+REPO_URL = "https://github.com/dssiqueira/google-play-reviews-scraper"
 
-    def center_window(self, window, width=None, height=None):
-        """Centraliza uma janela definindo opcionalmente o tamanho."""
-        window.update_idletasks()
-        w = width or window.winfo_width()
-        h = height or window.winfo_height()
-        x = (window.winfo_screenwidth() // 2) - (w // 2)
-        y = (window.winfo_screenheight() // 2) - (h // 2)
-        geom = f"{w}x{h}+{x}+{y}" if width and height else f"+{x}+{y}"
-        window.geometry(geom)
-    
-    def show_window_centered(self):
-        """Shows the centered window without 'jump' effect."""
-        # Update all elements to calculate correct sizes
-        self.root.update_idletasks()
-        
-        # Center the window
-        self.center_window(self.root, 800, 700)
-        
-        # Show the window
-        self.root.deiconify()
-        
-        # Force focus on window
-        self.root.lift()
-        self.root.focus_force()
+THEME_FILE = resource_path("assets", "theme.json")
+ctk.set_default_color_theme(str(THEME_FILE))
+APP_COLORS = ctk.ThemeManager.theme["_app"]
+MUTED = APP_COLORS["muted"]
 
-    def create_language_selector(self, parent):
-        """Creates custom language selector with PNG flags"""
-        # Load flag images
-        self.load_flag_images()
-        
-        # Frame for selector
-        lang_frame = tk.Frame(parent, bg=self.colors['background'])
-        lang_frame.pack(side=tk.LEFT, padx=(0, 5))
-        
-        # Current button with flag (using get_flag_code to map correctly)
-        current_flag = self.get_flag_code(translator.current_language)
-        self.current_lang_display = tk.Button(lang_frame,
-                                            image=self.flag_images.get(current_flag),
-                                            text=f" {translator.current_language.upper()}",
-                                            compound=tk.LEFT,
-                                            font=('Segoe UI', 9, 'bold'),
-                                            bg=self.colors['background'],
-                                            fg=self.colors['on_background'],
-                                            relief='solid',
-                                            bd=1,
-                                            padx=8,
-                                            pady=4,
-                                            cursor='hand2',
-                                            command=self.toggle_language_menu)
-        self.current_lang_display.pack()
-        
-        # Dropdown menu (initially hidden)
-        self.lang_menu = tk.Frame(self.root, bg=self.colors['surface'], relief='solid', bd=1)
-        self.lang_menu_visible = False
-        
-        # Language options with flags
-        languages = [
-            ('pt', 'Português'),
-            ('en', 'English'),
-            ('es', 'Español'),
-            ('fr', 'Français'),
-            ('de', 'Deutsch'),
-            ('it', 'Italiano')
-        ]
-        
-        for code, display in languages:
-            flag_code = self.get_flag_code(code)
-            flag_img = self.flag_images.get(flag_code)
-            
-            btn = tk.Button(self.lang_menu,
-                          image=flag_img,
-                          text=f"  {display}",
-                          compound=tk.LEFT,
-                          font=('Segoe UI', 9),
-                          bg=self.colors['surface'],
-                          fg=self.colors['on_surface'],
-                          relief='flat',
-                          bd=0,
-                          anchor='w',
-                          padx=10,
-                          pady=6,
-                          cursor='hand2',
-                          command=lambda c=code: self.select_language(c))
-            btn.pack(fill=tk.X)
-            
-            # Hover effect
-            def on_enter(e, button=btn):
-                button.config(bg=self.colors['divider'])
-            def on_leave(e, button=btn):
-                button.config(bg=self.colors['surface'])
-            btn.bind('<Enter>', on_enter)
-            btn.bind('<Leave>', on_leave)
-        
-        # Bind to close menu when clicking outside
-        self.root.bind('<Button-1>', self.hide_language_menu)
-
-    def load_flag_images(self):
-        """Loads flag images (24x24px)"""
-        self.flag_images = {}
-        
-        # Language to flag file mapping
-        flag_files = {
-            'pt': 'br.png',    # Portuguese -> Brazil
-            'en': 'en.png',    # English -> England/USA
-            'es': 'es.png',    # Spanish -> Spain
-            'fr': 'fr.png',    # French -> France
-            'de': 'de.png',    # German -> Germany
-            'it': 'it.png',    # Italian -> Italy
-            'br': 'br.png',    # Brazil
-            'de': 'de.png'     # Germany
-        }
-        
-        for code, filename in flag_files.items():
-            try:
-                flag_path = os.path.join("assets", "flags", filename)
-                if os.path.exists(flag_path):
-                    # Load image without resizing (already 24x24px)
-                    flag_img = tk.PhotoImage(file=flag_path)
-                    self.flag_images[code] = flag_img
-                else:
-                    print(f"Flag not found: {flag_path}")
-            except Exception as e:
-                print(f"Error loading flag {filename}: {e}")
-        
-        # If no images could be loaded, create placeholders
-        if not self.flag_images:
-            print("No flags loaded, using placeholders")
-            for code in ['pt', 'en', 'es', 'fr', 'de', 'it', 'br']:
-                # Create a 24x24 placeholder image
-                placeholder = tk.PhotoImage(width=24, height=24)
-                placeholder.put("#CCCCCC", to=(0, 0, 24, 24))
-                self.flag_images[code] = placeholder
-
-    def get_flag_code(self, lang_code):
-        """Returns the flag code for the language"""
-        flag_mapping = {
-            'pt': 'br',    # Portuguese -> Brazil
-            'en': 'en',    # English -> England
-            'es': 'es',    # Spanish -> Spain
-            'fr': 'fr',    # French -> France
-            'de': 'de',    # German -> Germany
-            'it': 'it'     # Italian -> Italy
-        }
-        return flag_mapping.get(lang_code, 'br')
-
-    def toggle_language_menu(self):
-        """Shows/hides the language menu"""
-        if self.lang_menu_visible:
-            self.hide_language_menu()
-        else:
-            self.show_language_menu()
-
-    def show_language_menu(self):
-        """Shows the language menu"""
-        # Update position before showing
-        self.root.update_idletasks()
-        
-        # Position menu below selector (coordinates relative to main window)
-        button_x = self.current_lang_display.winfo_x()
-        button_y = self.current_lang_display.winfo_y()
-        button_height = self.current_lang_display.winfo_height()
-        
-        # Find parent frame to calculate correct position
-        parent = self.current_lang_display.master
-        while parent != self.root:
-            button_x += parent.winfo_x()
-            button_y += parent.winfo_y()
-            parent = parent.master
-        
-        # Position the menu
-        menu_x = button_x
-        menu_y = button_y + button_height + 2
-        
-        self.lang_menu.place(x=menu_x, y=menu_y)
-        self.lang_menu_visible = True
-
-    def hide_language_menu(self, event=None):
-        """Hides the language menu"""
-        if hasattr(self, 'lang_menu') and self.lang_menu_visible:
-            # Check if click was inside menu or button
-            if event:
-                widget = event.widget
-                # If clicked on selector button or menu, don't close
-                if (widget == self.current_lang_display or 
-                    widget == self.lang_menu or 
-                    widget in self.lang_menu.winfo_children()):
-                    return
-            
-            self.lang_menu.place_forget()
-            self.lang_menu_visible = False
-
-    def select_language(self, lang_code):
-        """Selects a language"""
-        if translator.set_language(lang_code):
-            # Update button with new flag
-            flag_code = self.get_flag_code(lang_code)
-            if hasattr(self, 'flag_images') and flag_code in self.flag_images:
-                self.current_lang_display.config(
-                    image=self.flag_images[flag_code],
-                    text=f" {lang_code.upper()}"
-                )
-            self.hide_language_menu()
-            self.update_ui_texts()
+FORMAT_LABELS = {"csv": "CSV", "json": "JSON", "xlsx": "Excel"}
+APPEARANCES = ("system", "light", "dark")
+POLL_MS = 60
 
 
+def open_path(path: Path | str) -> None:
+    """Open a file or folder with the OS default handler."""
+    path = str(path)
+    if sys.platform == "win32":
+        os.startfile(path)  # noqa: S606 - local file chosen by the user
+    elif sys.platform == "darwin":
+        subprocess.Popen(["open", path])
+    else:
+        subprocess.Popen(["xdg-open", path])
 
-    def update_ui_texts(self):
-        """Updates all interface texts"""
-        # Window title
-        self.root.title(translator.get('window_title'))
-        
-        # Update custom language selector
-        if hasattr(self, 'current_lang_display') and hasattr(self, 'flag_images'):
-            flag_code = self.get_flag_code(translator.current_language)
-            if flag_code in self.flag_images:
-                self.current_lang_display.config(
-                    image=self.flag_images[flag_code],
-                    text=f" {translator.current_language.upper()}"
-                )
-        
-        # Header
-        if hasattr(self, 'title_label'):
-            self.title_label.config(text=translator.get('window_title'))
-        if hasattr(self, 'subtitle_label'):
-            self.subtitle_label.config(text=translator.get('window_subtitle'))
-        
-        # Section titles
-        if hasattr(self, 'url_section_title'):
-            self.url_section_title.config(text=translator.get('url_section'))
-        if hasattr(self, 'config_section_title'):
-            self.config_section_title.config(text=translator.get('config_section'))
-        if hasattr(self, 'progress_section_title'):
-            self.progress_section_title.config(text=translator.get('progress_section'))
-        if hasattr(self, 'log_section_title'):
-            self.log_section_title.config(text=translator.get('log_section'))
-        
-        # Section labels
-        if hasattr(self, 'country_label'):
-            self.country_label.config(text=translator.get('country_label'))
-        if hasattr(self, 'language_label'):
-            self.language_label.config(text=translator.get('language_label'))
-        if hasattr(self, 'folder_text_label'):
-            self.folder_text_label.config(text=translator.get('folder_label'))
-        
-        # Buttons
-        if hasattr(self, 'paste_btn'):
-            self.paste_btn.config(text=translator.get('paste_button'))
-        if hasattr(self, 'add_btn'):
-            self.add_btn.config(text=translator.get('add_button'))
-        if hasattr(self, 'choose_btn'):
-            self.choose_btn.config(text=translator.get('choose_button'))
-        if hasattr(self, 'clear_btn'):
-            self.clear_btn.config(text=translator.get('clear_button'))
-        if hasattr(self, 'csv_btn'):
-            self.csv_btn.config(text=translator.get('csv_button'))
-        if hasattr(self, 'json_btn'):
-            self.json_btn.config(text=translator.get('json_button'))
-        if hasattr(self, 'folder_btn'):
-            self.folder_btn.config(text=translator.get('folder_button'))
-        
-        # Main button
-        if hasattr(self, 'main_button'):
-            if hasattr(self, 'is_running') and self.is_running:
-                self.main_button.config(text=translator.get('stop_button'))
-            else:
-                self.main_button.config(text=translator.get('start_button'))
-        
-        # Log toggle button
-        if hasattr(self, 'toggle_log_btn'):
-            if hasattr(self, 'log_visible') and self.log_visible:
-                self.toggle_log_btn.config(text=translator.get('hide_log_button'))
-            else:
-                self.toggle_log_btn.config(text=translator.get('show_log_button'))
-        
-        # URL placeholder
-        self.setup_placeholder()
-        
-        # Status
-        if hasattr(self, 'status_label'):
-            self.status_label.config(text=translator.get('ready_status'))
-        
-        if hasattr(self, 'status_var'):
-            self.status_var.set(translator.get('ready_status_bar'))
-        
-        # Initial log
-        if hasattr(self, 'log_text'):
-            self.log_text.delete(1.0, tk.END)
-            self.log(translator.get('scraper_started'))
-    
-    def setup_styles(self):
-        """Configure basic styles"""
-        # Minimum necessary configuration
-        self.root.configure(bg=self.colors['background'])
 
-    def setup_icon(self):
-        """Configure application icon (adapted from working Mac version)"""
-        try:
-            # Use PNG like Mac version (more reliable)
-            png_path = os.path.join("assets", "icons", "google-play.png")
-            
-            if os.path.exists(png_path):
-                try:
-                    from PIL import Image, ImageTk
-                    icon_image = Image.open(png_path)
-                    # Resize to 64x64 like Mac version
-                    icon_image = icon_image.resize((64, 64), Image.Resampling.LANCZOS)
-                    self.icon_photo = ImageTk.PhotoImage(icon_image)
-                    
-                    # Simple method that works on Mac - just iconphoto(True)
-                    self.root.iconphoto(True, self.icon_photo)
-                    return
-                    
-                except ImportError:
-                    # Fallback without PIL
-                    try:
-                        self.icon_photo = tk.PhotoImage(file=png_path)
-                        self.root.iconphoto(True, self.icon_photo)
-                        return
-                    except Exception:
-                        pass
-                        
-                except Exception:
-                    pass
-            
-            # Fallback to .ico if PNG fails
-            ico_path = os.path.join("assets", "icons", "google-play.ico")
-            if os.path.exists(ico_path):
-                try:
-                    self.root.iconbitmap(ico_path)
-                    return
-                except Exception:
-                    pass
-                    
-        except Exception:
-            pass
+def font(size: int = 13, weight: str = "normal") -> ctk.CTkFont:
+    return ctk.CTkFont(size=size, weight=weight)
 
-    def setup_taskbar_icon(self):
-        """Simplified method - iconphoto(True) already handles taskbar"""
-        # Like Mac version, no extra needed!
-        # iconphoto(True) already handles window + taskbar
-        pass
 
-    def create_interface(self):
-        """Cria a interface principal"""
-        self.setup_styles()
-        
-        # Container principal com scrollbar
-        self.create_scrollable_frame()
-        
-        # Componentes
-        self.create_header(self.scrollable_frame)
-        self.create_url_section(self.scrollable_frame)
-        self.create_config_section(self.scrollable_frame)
-        self.create_progress_section(self.scrollable_frame)
-        self.create_main_action_button(self.scrollable_frame)
-        self.create_log_section(self.scrollable_frame)
-        self.create_status_bar()
+# --------------------------------------------------------------------------- #
+# Queue model
+# --------------------------------------------------------------------------- #
+@dataclass
+class QueueItem:
+    app_id: str
+    state: str = "pending"            # pending | running | done | partial | error | skipped
+    detail: str = ""
+    title: str = ""
+    files: dict[str, Path] = field(default_factory=dict)
+    result: Optional[ScrapeResult] = None
 
-    def create_scrollable_frame(self):
-        """Cria um frame com barra de rolagem"""
-        # Container principal
-        main_container = tk.Frame(self.root, bg=self.colors['background'])
-        main_container.pack(fill=tk.BOTH, expand=True)
-        
-        # Canvas para scroll
-        self.canvas = tk.Canvas(main_container, bg=self.colors['background'], 
-                               highlightthickness=0, bd=0)
-        
-        # Scrollbar vertical (estilizada)
-        scrollbar = tk.Scrollbar(main_container, orient="vertical", command=self.canvas.yview,
-                               bg=self.colors['background'], troughcolor=self.colors['divider'],
-                               activebackground=self.colors['primary'])
-        
-        # Scrollable frame inside canvas
-        self.scrollable_frame = tk.Frame(self.canvas, bg=self.colors['background'])
-        
-        # Configura o scroll
-        self.scrollable_frame.bind(
-            "<Configure>",
-            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+class QueueRow(ctk.CTkFrame):
+    DOT = {
+        "pending": MUTED, "running": APP_COLORS["warning"], "done": APP_COLORS["accent"],
+        "partial": APP_COLORS["warning"], "error": APP_COLORS["danger"], "skipped": MUTED,
+    }
+
+    def __init__(self, master, app: App, item: QueueItem):
+        super().__init__(master, fg_color=APP_COLORS["inset"], corner_radius=8)
+        self.app, self.item = app, item
+        self.grid_columnconfigure(1, weight=1)
+
+        self.dot = ctk.CTkLabel(self, text="●", width=18, font=font(14))
+        self.dot.grid(row=0, column=0, rowspan=2, padx=(10, 4), pady=6)
+        self.name = ctk.CTkLabel(self, text="", anchor="w", font=font(13, "bold"))
+        self.name.grid(row=0, column=1, sticky="ew", pady=(6, 0))
+        self.sub = ctk.CTkLabel(self, text="", anchor="w", font=font(12), text_color=MUTED)
+        self.sub.grid(row=1, column=1, sticky="ew", pady=(0, 6))
+
+        self.open_btn = ctk.CTkButton(
+            self, width=64, height=26, font=font(12),
+            command=lambda: self.app.open_result(self.item),
         )
-        
-        # Cria janela no canvas
-        self.canvas_window = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-        
-        # Configura o canvas
-        self.canvas.configure(yscrollcommand=scrollbar.set)
-        
-        # Pack dos elementos
-        self.canvas.pack(side="left", fill="both", expand=True, padx=20, pady=20)
-        scrollbar.pack(side="right", fill="y")
-        
-        # Bind para redimensionamento
-        self.canvas.bind('<Configure>', self.on_canvas_configure)
-        
-        # Bind para scroll com mouse wheel
-        self.bind_mousewheel()
-
-    def on_canvas_configure(self, event):
-        """Adjusts internal frame size when canvas is resized"""
-        canvas_width = event.width
-        self.canvas.itemconfig(self.canvas_window, width=canvas_width)
-
-    def bind_mousewheel(self):
-        """Configura scroll com roda do mouse"""
-        def _on_mousewheel(event):
-            self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        
-        def bind_to_mousewheel(event):
-            self.canvas.bind_all("<MouseWheel>", _on_mousewheel)
-        
-        def unbind_from_mousewheel(event):
-            self.canvas.unbind_all("<MouseWheel>")
-        
-        # Bind quando mouse entra na janela
-        self.root.bind('<Enter>', bind_to_mousewheel)
-        self.root.bind('<Leave>', unbind_from_mousewheel)
-        
-        # Suporte para scroll com teclado
-        def on_key_press(event):
-            if event.keysym == 'Up':
-                self.canvas.yview_scroll(-1, "units")
-            elif event.keysym == 'Down':
-                self.canvas.yview_scroll(1, "units")
-            elif event.keysym == 'Page_Up':
-                self.canvas.yview_scroll(-1, "pages")
-            elif event.keysym == 'Page_Down':
-                self.canvas.yview_scroll(1, "pages")
-            elif event.keysym == 'Home':
-                self.canvas.yview_moveto(0)
-            elif event.keysym == 'End':
-                self.canvas.yview_moveto(1)
-        
-        self.root.bind('<Key>', on_key_press)
-        self.root.focus_set()
-
-    def create_header(self, parent):
-        """Creates modern header with Google Play icon"""
-        header = tk.Frame(parent, bg=self.colors['background'])
-        header.pack(fill=tk.X, pady=(0, 30))
-        
-        # Container principal do header
-        header_container = tk.Frame(header, bg=self.colors['background'])
-        header_container.pack(fill=tk.X)
-        
-        # Container para ícone e título (lado esquerdo)
-        title_container = tk.Frame(header_container, bg=self.colors['background'])
-        title_container.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        
-        # Ícone do Google Play (se disponível)
-        try:
-            icon_path = os.path.join("assets", "icons", "google-play.png")
-            if os.path.exists(icon_path):
-                icon_img = tk.PhotoImage(file=icon_path)
-                # Redimensiona para 48x48
-                icon_img = icon_img.subsample(2, 2)  # Ajuste conforme necessário
-                icon_label = tk.Label(title_container, image=icon_img, bg=self.colors['background'])
-                icon_label.image = icon_img  # Mantém referência
-                icon_label.pack(side=tk.LEFT, padx=(0, 15))
-        except:
-            pass
-        
-        # Container para textos do título
-        text_container = tk.Frame(title_container, bg=self.colors['background'])
-        text_container.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        
-        # Título principal
-        self.title_label = tk.Label(text_container, text="Google Play Reviews Scraper",
-                font=('Segoe UI', 24, 'bold'), fg=self.colors['on_background'],
-                bg=self.colors['background'])
-        self.title_label.pack(anchor=tk.W)
-        
-        # Subtítulo
-        self.subtitle_label = tk.Label(text_container, text="Coleta reviews de apps do Google Play Store",
-                font=('Segoe UI', 12), fg=self.colors['disabled'],
-                bg=self.colors['background'])
-        self.subtitle_label.pack(anchor=tk.W, pady=(2, 0))
-        
-        # Container para controles do canto superior direito
-        controls_frame = tk.Frame(header_container, bg=self.colors['background'])
-        controls_frame.pack(side=tk.RIGHT, anchor=tk.NE, padx=(10, 0))
-        
-        # Container horizontal para alinhar seletor e botão de configurações
-        controls_horizontal = tk.Frame(controls_frame, bg=self.colors['background'])
-        controls_horizontal.pack()
-        
-        # Seletor de idiomas com bandeiras (lado esquerdo)
-        self.create_language_selector(controls_horizontal)
-        
-        # Espaçamento horizontal entre seletor e botão de configurações
-        spacer = tk.Frame(controls_horizontal, bg=self.colors['background'], width=15)
-        spacer.pack(side=tk.LEFT, padx=5)
-        
-        # Botão de configurações (ícone de engrenagem) - lado direito
-        settings_btn = tk.Button(controls_horizontal, text="⚙", font=('Segoe UI', 16),
-                               bg=self.colors['surface'], fg=self.colors['disabled'], 
-                               relief='flat', bd=0, width=3, height=1, cursor='hand2',
-                               command=self.show_about)
-        settings_btn.pack(side=tk.LEFT)
-        
-        # Hover effect para o botão de configurações
-        def on_enter(e):
-            settings_btn.config(fg=self.colors['on_surface'], bg=self.colors['surface_light'])
-        def on_leave(e):
-            settings_btn.config(fg=self.colors['disabled'], bg=self.colors['surface'])
-        settings_btn.bind("<Enter>", on_enter)
-        settings_btn.bind("<Leave>", on_leave)
-        
-    def create_url_section(self, parent):
-        """Cria a seção de URLs com design moderno"""
-        # Card principal com sombra simulada
-        shadow_frame = tk.Frame(parent, bg=self.colors['border'], relief='flat', bd=0)
-        shadow_frame.pack(fill=tk.X, pady=(0, 20), padx=20)
-        
-        card = tk.Frame(shadow_frame, bg=self.colors['surface'], relief='flat', bd=0)
-        card.pack(fill=tk.X, padx=1, pady=1)
-        
-        # Padding interno
-        section = tk.Frame(card, bg=self.colors['surface'])
-        section.pack(fill=tk.X, padx=20, pady=20)
-        
-        # Título da seção
-        self.url_section_title = tk.Label(section, text="Adicionar Apps",
-                                         font=('Segoe UI', 16, 'bold'), 
-                                         fg=self.colors['on_surface'],
-                                         bg=self.colors['surface'])
-        self.url_section_title.pack(anchor=tk.W, pady=(0, 15))
-        
-        # Campo de entrada com design moderno
-        input_container = tk.Frame(section, bg=self.colors['surface'])
-        input_container.pack(fill=tk.X, pady=(0, 15))
-        
-        # Entry com bordas arredondadas e tema claro
-        entry_frame = tk.Frame(input_container, bg=self.colors['input_border'], relief='flat', bd=0)
-        entry_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 10))
-        
-        entry_inner = tk.Frame(entry_frame, bg=self.colors['surface'], relief='flat', bd=0)
-        entry_inner.pack(fill=tk.X, padx=1, pady=1)
-        
-        self.url_entry = tk.Entry(entry_inner, font=('Segoe UI', 12),
-                                 bg=self.colors['surface'], fg=self.colors['on_surface'],
-                                 relief='flat', bd=0, insertbackground=self.colors['primary'])
-        self.url_entry.pack(fill=tk.X, padx=15, pady=10)
-        
-        # Container para botões
-        buttons_container = tk.Frame(input_container, bg=self.colors['surface'])
-        buttons_container.pack(side=tk.RIGHT, padx=(10, 0))
-        
-        # Botão Colar arredondado com cor contrastante
-        paste_btn_container, self.paste_btn = self.create_rounded_button(buttons_container, "Colar", 
-                                                        self.paste_url, self.colors['btn_pink'], 
-                                                        width=70, height=35)
-        paste_btn_container.pack(side=tk.LEFT, padx=(0, 8))
-        
-        # Botão Adicionar arredondado com cor contrastante
-        add_btn_container, self.add_btn = self.create_rounded_button(buttons_container, "Adicionar", 
-                                                      self.add_url, self.colors['btn_blue'], 
-                                                      width=90, height=35)
-        add_btn_container.pack(side=tk.LEFT)
-        
-        # Seção Apps na fila
-        queue_section = tk.Frame(section, bg=self.colors['surface'])
-        queue_section.pack(fill=tk.X, pady=(15, 0))
-        
-        # Título Apps na fila
-        queue_title = tk.Label(queue_section, text="Apps na fila",
-                              font=('Segoe UI', 14, 'bold'),
-                              fg=self.colors['on_surface'],
-                              bg=self.colors['surface'])
-        queue_title.pack(anchor=tk.W, pady=(0, 10))
-        
-        # Container da lista com bordas arredondadas para tema claro
-        list_outer = tk.Frame(queue_section, bg=self.colors['input_border'], relief='flat', bd=0)
-        list_outer.pack(fill=tk.X, pady=(0, 15))
-        
-        list_container = tk.Frame(list_outer, bg=self.colors['input_bg'], 
-                                 relief='flat', bd=0, height=120)
-        list_container.pack(fill=tk.X, padx=1, pady=1)
-        list_container.pack_propagate(False)
-        
-        # Canvas para scroll
-        self.list_canvas = tk.Canvas(list_container, bg=self.colors['background'],
-                                    highlightthickness=0, bd=0)
-        self.list_scrollbar = tk.Scrollbar(list_container, orient="vertical", 
-                                          command=self.list_canvas.yview,
-                                          bg=self.colors['surface'])
-        self.list_canvas.configure(yscrollcommand=self.list_scrollbar.set)
-        
-        # Frame scrollável
-        self.list_scrollable_frame = tk.Frame(self.list_canvas, bg=self.colors['background'])
-        self.list_canvas.create_window((0, 0), window=self.list_scrollable_frame, anchor="nw")
-        
-        self.list_canvas.pack(side="left", fill="both", expand=True, padx=10, pady=10)
-        self.list_scrollbar.pack(side="right", fill="y")
-        
-        # Bind para scroll
-        self.list_scrollable_frame.bind("<Configure>", 
-                                       lambda e: self.list_canvas.configure(scrollregion=self.list_canvas.bbox("all")))
-        
-        # Botão Limpar Todos arredondado com cor contrastante
-        clear_btn_container, self.clear_btn = self.create_rounded_button(queue_section, "Limpar Todos", 
-                                                        self.clear_all_urls, self.colors['btn_red'], 
-                                                        width=120, height=32)
-        clear_btn_container.pack(anchor=tk.W, pady=(5, 0))
-        
-        # Status da lista
-        self.urls_status_label = tk.Label(queue_section, text="Nenhum app adicionado",
-                                         font=('Segoe UI', 10), fg=self.colors['disabled'],
-                                         bg=self.colors['surface'])
-        self.urls_status_label.pack(anchor=tk.W, pady=(8, 0))
-        
-        # Lista para armazenar URLs
-        self.urls_list = []
-        
-        self.setup_placeholder()
-        
-    def create_config_section(self, parent):
-        """Cria a seção de configurações com design moderno"""
-        # Card principal com sombra simulada
-        shadow_frame = tk.Frame(parent, bg=self.colors['border'], relief='flat', bd=0)
-        shadow_frame.pack(fill=tk.X, pady=(0, 20), padx=20)
-        
-        card = tk.Frame(shadow_frame, bg=self.colors['surface'], relief='flat', bd=0)
-        card.pack(fill=tk.X, padx=1, pady=1)
-        
-        # Padding interno
-        section = tk.Frame(card, bg=self.colors['surface'])
-        section.pack(fill=tk.X, padx=20, pady=20)
-        
-        # Título da seção
-        self.config_section_title = tk.Label(section, text="Configurações",
-                                            font=('Segoe UI', 16, 'bold'),
-                                            fg=self.colors['on_surface'],
-                                            bg=self.colors['surface'])
-        self.config_section_title.pack(anchor=tk.W, pady=(0, 15))
-        
-        # Container para País e Idioma
-        config_row = tk.Frame(section, bg=self.colors['surface'])
-        config_row.pack(fill=tk.X, pady=(0, 15))
-        
-        # País
-        country_container = tk.Frame(config_row, bg=self.colors['surface'])
-        country_container.pack(side=tk.LEFT, padx=(0, 30))
-        
-        self.country_label = tk.Label(country_container, text="País:",
-                                     font=('Segoe UI', 12, 'bold'),
-                                     fg=self.colors['on_surface'],
-                                     bg=self.colors['surface'])
-        self.country_label.pack(anchor=tk.W)
-        
-        from tkinter import ttk
-        # Estilo customizado para combobox
-        style = ttk.Style()
-        style.theme_use('clam')
-        style.configure('Custom.TCombobox',
-                       fieldbackground=self.colors['input_bg'],
-                       background=self.colors['input_bg'],
-                       foreground=self.colors['on_surface'],
-                       borderwidth=0,
-                       relief='flat')
-        
-        country_combo = ttk.Combobox(country_container, textvariable=self.country_var,
-                                   values=["br", "us", "uk", "ca", "au", "de", "fr", "es", "it"],
-                                   width=6, state="readonly", style='Custom.TCombobox')
-        country_combo.pack(pady=(5, 0))
-        
-        # Idioma
-        lang_container = tk.Frame(config_row, bg=self.colors['surface'])
-        lang_container.pack(side=tk.LEFT)
-        
-        self.language_label = tk.Label(lang_container, text="Idioma:",
-                                      font=('Segoe UI', 12, 'bold'),
-                                      fg=self.colors['on_surface'],
-                                      bg=self.colors['surface'])
-        self.language_label.pack(anchor=tk.W)
-        
-        lang_combo = ttk.Combobox(lang_container, textvariable=self.lang_var,
-                                values=["pt", "en", "es", "fr", "de", "it"],
-                                width=6, state="readonly", style='Custom.TCombobox')
-        lang_combo.pack(pady=(5, 0))
-        
-        # Pasta de destino
-        folder_container = tk.Frame(section, bg=self.colors['surface'])
-        folder_container.pack(fill=tk.X)
-        
-        # Label da pasta
-        folder_label_text = tk.Label(folder_container, text="Pasta de destino:",
-                                    font=('Segoe UI', 12, 'bold'),
-                                    fg=self.colors['on_surface'],
-                                    bg=self.colors['surface'])
-        folder_label_text.pack(anchor=tk.W, pady=(0, 5))
-        
-        # Container para caminho e botão
-        folder_row = tk.Frame(folder_container, bg=self.colors['surface'])
-        folder_row.pack(fill=tk.X)
-        
-        # Caminho da pasta (clicável)
-        self.folder_label = tk.Label(folder_row, text=self.output_dir_var.get(),
-                                   font=('Segoe UI', 10), fg=self.colors['info'],
-                                   bg=self.colors['surface'], cursor='hand2',
-                                   anchor='w', justify='left')
-        self.folder_label.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 10))
-        self.folder_label.bind("<Button-1>", lambda e: self.open_folder())
-        
-        # Botão Escolher arredondado com cor contrastante
-        choose_btn_container, self.choose_btn = self.create_rounded_button(folder_row, "Escolher", 
-                                                         self.choose_folder, self.colors['btn_cyan'], 
-                                                         width=100, height=32)
-        choose_btn_container.pack(side=tk.RIGHT)
-        
-    def create_progress_section(self, parent):
-        """Cria a seção de progresso com design moderno"""
-        # Card principal com sombra simulada
-        shadow_frame = tk.Frame(parent, bg=self.colors['border'], relief='flat', bd=0)
-        shadow_frame.pack(fill=tk.X, pady=(0, 20), padx=20)
-        
-        card = tk.Frame(shadow_frame, bg=self.colors['surface'], relief='flat', bd=0)
-        card.pack(fill=tk.X, padx=1, pady=1)
-        
-        # Padding interno
-        section = tk.Frame(card, bg=self.colors['surface'])
-        section.pack(fill=tk.X, padx=20, pady=20)
-        
-        # Título da seção
-        self.progress_section_title = tk.Label(section, text="Progresso",
-                                             font=('Segoe UI', 16, 'bold'),
-                                             fg=self.colors['on_surface'],
-                                             bg=self.colors['surface'])
-        self.progress_section_title.pack(anchor=tk.W, pady=(0, 15))
-        
-        # Status atual
-        self.status_label = tk.Label(section, text="Pronto para iniciar",
-                                   font=('Segoe UI', 12),
-                                   fg=self.colors['disabled'],
-                                   bg=self.colors['surface'])
-        self.status_label.pack(anchor=tk.W, pady=(0, 10))
-        
-        # Container para botões de resultado
-        self.result_buttons_frame = tk.Frame(section, bg=self.colors['surface'])
-        self.result_buttons_frame.pack(fill=tk.X, pady=(10, 0))
-        
-        # Botões de resultado arredondados com cores contrastantes
-        self.csv_btn_container, self.csv_btn = self.create_rounded_button(self.result_buttons_frame, "CSV", 
-                                                           self.open_csv_files, self.colors['btn_green'], 
-                                                           width=80, height=35)
-        self.csv_btn_container.pack(side=tk.LEFT, padx=(0, 10))
-        
-        self.json_btn_container, self.json_btn = self.create_rounded_button(self.result_buttons_frame, "JSON", 
-                                                            self.open_json_files, self.colors['btn_blue'], 
-                                                            width=80, height=35)
-        self.json_btn_container.pack(side=tk.LEFT, padx=(0, 10))
-        
-        self.folder_btn_container, self.folder_btn = self.create_rounded_button(self.result_buttons_frame, "Pasta", 
-                                                              self.open_folder, self.colors['btn_orange'], 
-                                                              width=80, height=35)
-        self.folder_btn_container.pack(side=tk.LEFT)
-        
-        # Barra de progresso simples (mantida para compatibilidade)
-        self.progress_var = tk.DoubleVar()
-        progress_bg = tk.Frame(section, bg=self.colors['divider'], height=6)
-        progress_bg.pack(fill=tk.X, pady=(15, 0))
-        
-        self.progress_canvas = tk.Canvas(progress_bg, height=6, bg=self.colors['divider'], 
-                                        highlightthickness=0, bd=0)
-        self.progress_canvas.pack(fill=tk.X)
-        self.progress_bar_id = self.progress_canvas.create_rectangle(0, 0, 0, 6, 
-                                                                    fill=self.colors['primary'], outline="")
-    
-    def create_main_action_button(self, parent):
-        """Cria o botão principal grande com gradiente"""
-        # Container para o botão principal
-        button_container = tk.Frame(parent, bg=self.colors['background'])
-        button_container.pack(fill=tk.X, pady=30, padx=20)
-        
-        # Botão principal grande arredondado com gradiente
-        self.main_start_btn_container = self.create_main_gradient_button(button_container, 
-                                                                        "Pronto para iniciar", 
-                                                                        self.start_scraping)
-        self.main_start_btn_container.pack(fill=tk.X, pady=(0, 10))
-
-        
-    def create_log_section(self, parent):
-        """Cria a seção de log com design moderno (oculta por padrão)"""
-        # Card principal (inicialmente oculto)
-        self.log_card = tk.Frame(parent, bg=self.colors['surface'], relief='flat', bd=0)
-        
-        # Padding interno
-        section = tk.Frame(self.log_card, bg=self.colors['surface'])
-        section.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
-        
-        # Cabeçalho com título e botão de toggle
-        header = tk.Frame(section, bg=self.colors['surface'])
-        header.pack(fill=tk.X, pady=(0, 10))
-        
-        self.log_section_title = tk.Label(header, text="Log de Atividades",
-                                         font=('Segoe UI', 16, 'bold'),
-                                         fg=self.colors['on_surface'],
-                                         bg=self.colors['surface'])
-        self.log_section_title.pack(side=tk.LEFT)
-        
-        # Botão para mostrar/ocultar log
-        self.toggle_log_btn = tk.Button(header, text="▼ Mostrar",
-                                       font=('Segoe UI', 10),
-                                       bg=self.colors['surface'], fg=self.colors['disabled'],
-                                       relief='flat', bd=0, cursor='hand2',
-                                       command=self.toggle_log_visibility)
-        self.toggle_log_btn.pack(side=tk.RIGHT)
-        
-        # Container do log (inicialmente oculto)
-        self.log_container = tk.Frame(section, bg=self.colors['surface'])
-        
-        # Text com scrollbar
-        log_frame = tk.Frame(self.log_container, bg=self.colors['surface'])
-        log_frame.pack(fill=tk.BOTH, expand=True)
-        
-        scrollbar = tk.Scrollbar(log_frame, bg=self.colors['surface'])
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        
-        self.log_text = tk.Text(log_frame, wrap=tk.WORD, font=('Consolas', 10),
-                               bg=self.colors['background'], fg=self.colors['on_background'],
-                               relief='flat', bd=0, padx=15, pady=15, height=8,
-                               yscrollcommand=scrollbar.set, insertbackground=self.colors['on_background'])
-        self.log_text.pack(fill=tk.BOTH, expand=True)
-        scrollbar.config(command=self.log_text.yview)
-        
-        # Estado inicial: log oculto
-        self.log_visible = False
-        
-        # Log inicial
-        self.log("Sistema iniciado - Pronto para coletar reviews!")
-    
-    def toggle_log_visibility(self):
-        """Mostra/oculta a seção de log"""
-        if self.log_visible:
-            # Ocultar log
-            self.log_container.pack_forget()
-            self.log_card.pack_forget()
-            self.toggle_log_btn.config(text="▼ Mostrar Log")
-            self.log_visible = False
-        else:
-            # Mostrar log
-            self.log_card.pack(fill=tk.X, pady=(0, 20), padx=20)
-            self.log_container.pack(fill=tk.BOTH, expand=True, pady=(10, 0))
-            self.toggle_log_btn.config(text="▲ Ocultar Log")
-            self.log_visible = True
-
-    def create_status_bar(self):
-        """Cria a barra de status moderna"""
-        status_frame = tk.Frame(self.root, bg=self.colors['surface'], height=30)
-        status_frame.pack(side=tk.BOTTOM, fill=tk.X)
-        status_frame.pack_propagate(False)
-        
-        self.status_var = tk.StringVar(value="Pronto para iniciar")
-        status_label = tk.Label(status_frame, textvariable=self.status_var, anchor=tk.W,
-                               font=('Segoe UI', 10), bg=self.colors['surface'],
-                               fg=self.colors['disabled'], padx=20, pady=8)
-        status_label.pack(side=tk.LEFT, fill=tk.X, expand=True)
-
-    def create_card(self, parent, title, expand=False):
-        """Cria um card simples"""
-        container = tk.Frame(parent, bg=self.colors['background'])
-        if expand:
-            container.pack(fill=tk.BOTH, expand=True, pady=(0, 15))
-        else:
-            container.pack(fill=tk.X, pady=(0, 15))
-        
-        title_label = tk.Label(container, text=title, font=('Segoe UI', 11, 'bold'),
-                fg=self.colors['on_background'], bg=self.colors['background'])
-        title_label.pack(anchor=tk.W, pady=(0, 8))
-        
-        card = tk.Frame(container, bg=self.colors['surface'], relief='solid', bd=1)
-        if expand:
-            card.pack(fill=tk.BOTH, expand=True)
-        else:
-            card.pack(fill=tk.X)
-        
-        inner = tk.Frame(card, bg=self.colors['surface'])
-        if expand:
-            inner.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
-        else:
-            inner.pack(fill=tk.X, padx=15, pady=15)
-        
-        return inner, title_label
-    
-    def create_rounded_button(self, parent, text, command, bg_color, width=120, height=35, font_size=11, text_color='white'):
-        """Cria um botão estilizado com aparência arredondada usando frames aninhados"""
-        # Container principal com padding para simular bordas arredondadas
-        btn_outer = tk.Frame(parent, bg=self.colors['border'], relief='flat', bd=0)
-        
-        # Frame interno com a cor do botão
-        btn_inner = tk.Frame(btn_outer, bg=bg_color, relief='flat', bd=0)
-        btn_inner.pack(padx=1, pady=1, fill=tk.BOTH, expand=True)
-        
-        # Botão real dentro do frame interno
-        btn = tk.Button(btn_inner, text=text, command=command,
-                       bg=bg_color, fg=text_color,
-                       font=('Segoe UI', font_size, 'bold'),
-                       relief='flat', bd=0, cursor='hand2',
-                       activebackground=self.lighten_color(bg_color),
-                       activeforeground=text_color)
-        
-        # Calcula padding baseado no tamanho desejado
-        pad_x = max(1, (width - len(text) * font_size) // 4)
-        pad_y = max(1, (height - font_size) // 4)
-        
-        btn.pack(padx=pad_x, pady=pad_y, fill=tk.BOTH, expand=True)
-        
-        # Hover effects mais suaves
-        hover_color = self.lighten_color(bg_color)
-        
-        def on_enter(event):
-            btn.config(bg=hover_color)
-            btn_inner.config(bg=hover_color)
-        
-        def on_leave(event):
-            btn.config(bg=bg_color)
-            btn_inner.config(bg=bg_color)
-        
-        # Bind eventos para hover
-        btn.bind("<Enter>", on_enter)
-        btn.bind("<Leave>", on_leave)
-        btn_inner.bind("<Enter>", on_enter)
-        btn_inner.bind("<Leave>", on_leave)
-        
-        # Configura tamanho mínimo
-        btn_outer.config(width=width, height=height)
-        btn_outer.pack_propagate(False)
-        
-        return btn_outer, btn
-    
-    def lighten_color(self, color):
-        """Clareia uma cor para hover effect no tema claro"""
-        color_map = {
-            # Cores principais
-            self.colors['primary']: '#6366F1',      # Azul mais claro
-            self.colors['secondary']: '#8B5CF6',    # Roxo mais claro
-            self.colors['accent']: '#F472B6',       # Rosa mais claro
-            self.colors['error']: '#EF4444',        # Vermelho mais claro
-            self.colors['warning']: '#F59E0B',      # Laranja mais claro
-            self.colors['info']: '#06B6D4',         # Ciano mais claro
-            self.colors['success']: '#10B981',      # Verde mais claro
-            
-            # Cores específicas dos botões
-            self.colors['btn_blue']: '#3B82F6',     # Azul hover
-            self.colors['btn_purple']: '#A855F7',   # Roxo hover
-            self.colors['btn_pink']: '#EC4899',     # Rosa hover
-            self.colors['btn_red']: '#EF4444',      # Vermelho hover
-            self.colors['btn_orange']: '#F97316',   # Laranja hover
-            self.colors['btn_cyan']: '#06B6D4',     # Ciano hover
-            self.colors['btn_green']: '#22C55E',    # Verde hover
-            self.colors['btn_indigo']: '#6366F1',   # Índigo hover
-        }
-        return color_map.get(color, color)
-    
-    def create_main_gradient_button(self, parent, text, command):
-        """Cria o botão principal com gradiente simulado usando frames"""
-        # Container principal
-        btn_container = tk.Frame(parent, bg=parent['bg'])
-        
-        # Frame externo para sombra
-        shadow_frame = tk.Frame(btn_container, bg=self.colors['border'], relief='flat', bd=0)
-        shadow_frame.pack(fill=tk.X, padx=2, pady=2)
-        
-        # Frame do gradiente (simula com cor intermediária)
-        gradient_color = self.colors['btn_indigo']  # Cor principal
-        gradient_frame = tk.Frame(shadow_frame, bg=gradient_color, relief='flat', bd=0)
-        gradient_frame.pack(fill=tk.X, padx=1, pady=1)
-        
-        # Botão principal
-        main_btn = tk.Button(gradient_frame, text=text, command=command,
-                           bg=gradient_color, fg='white',
-                           font=('Segoe UI', 16, 'bold'),
-                           relief='flat', bd=0, cursor='hand2',
-                           activebackground=self.colors['btn_purple'],
-                           activeforeground='white')
-        main_btn.pack(fill=tk.X, padx=8, pady=12)
-        
-        # Hover effects
-        def on_enter(event):
-            hover_color = self.colors['btn_purple']
-            main_btn.config(bg=hover_color)
-            gradient_frame.config(bg=hover_color)
-        
-        def on_leave(event):
-            main_btn.config(bg=gradient_color)
-            gradient_frame.config(bg=gradient_color)
-        
-        # Bind eventos
-        main_btn.bind("<Enter>", on_enter)
-        main_btn.bind("<Leave>", on_leave)
-        gradient_frame.bind("<Enter>", on_enter)
-        gradient_frame.bind("<Leave>", on_leave)
-        
-        # Salva referência para poder alterar o texto depois
-        self.main_button = main_btn
-        self.main_button_text = text
-        
-        return btn_container
-    
-    def create_button(self, parent, text, command, bg, primary=False, state=tk.NORMAL):
-        """Cria um botão padronizado com bordas arredondadas"""
-        # Usa o novo método de botão arredondado
-        if primary:
-            return self.create_rounded_button(parent, text, command, bg, width=150, height=40, font_size=12)
-        else:
-            return self.create_rounded_button(parent, text, command, bg, width=100, height=32, font_size=10)
-    
-    def darken_color(self, color):
-        """Escurece uma cor para hover effect"""
-        color_map = {
-            self.colors['primary']: '#1565C0',      # Azul mais escuro
-            self.colors['secondary']: '#1B5E20',    # Verde mais escuro
-            self.colors['error']: '#B71C1C',        # Vermelho mais escuro
-            self.colors['warning']: '#BF360C',      # Laranja mais escuro
-            self.colors['info']: '#01579B',         # Azul claro mais escuro
-            self.colors['disabled']: '#616161'      # Cinza mais escuro
-        }
-        return color_map.get(color, color)
-
-    def setup_placeholder(self):
-        """Configura placeholder para URL única"""
-        placeholder = translator.get('url_placeholder')
-        
-        def on_focus_in(e):
-            current_placeholder = translator.get('url_placeholder')
-            if self.url_entry.get() == current_placeholder:
-                self.url_entry.delete(0, tk.END)
-                self.url_entry.config(fg=self.colors['on_surface'])
-        
-        def on_focus_out(e):
-            if not self.url_entry.get():
-                current_placeholder = translator.get('url_placeholder')
-                self.url_entry.insert(0, current_placeholder)
-                self.url_entry.config(fg=self.colors['disabled'])
-        
-        # Limpa o campo primeiro
-        self.url_entry.delete(0, tk.END)
-        self.url_entry.insert(0, placeholder)
-        self.url_entry.config(fg=self.colors['disabled'])
-        
-        # Remove bindings antigos e adiciona novos
-        self.url_entry.unbind('<FocusIn>')
-        self.url_entry.unbind('<FocusOut>')
-        self.url_entry.unbind('<Return>')
-        
-        self.url_entry.bind('<FocusIn>', on_focus_in)
-        self.url_entry.bind('<FocusOut>', on_focus_out)
-        
-        # Bind Enter para adicionar URL
-        self.url_entry.bind('<Return>', lambda e: self.add_url())
-
-    def paste_url(self):
-        """Cola URL da área de transferência"""
-        try:
-            clipboard_content = self.root.clipboard_get()
-            placeholder = translator.get('url_placeholder')
-            
-            if self.url_entry.get() == placeholder:
-                self.url_entry.delete(0, tk.END)
-                self.url_entry.config(fg=self.colors['on_surface'])
-            
-            self.url_entry.delete(0, tk.END)
-            self.url_entry.insert(0, clipboard_content.strip())
-            self.url_entry.config(fg=self.colors['on_surface'])
-            self.log(translator.get('url_pasted'))
-        except tk.TclError:
-            messagebox.showerror(translator.get('error_title'), translator.get('error_clipboard'))
-    
-    def add_url(self):
-        """Adiciona URL à lista"""
-        url = self.url_entry.get().strip()
-        placeholder = "Cole a URL do app do Google Play Store..."
-        
-        if not url or url == placeholder:
-            messagebox.showwarning("Aviso", "Por favor, insira uma URL")
-            return
-        
-        if 'play.google.com/store/apps/details' not in url:
-            messagebox.showerror("Erro", "URL deve ser do Google Play Store")
-            return
-        
-        try:
-            # Extrai app_id
-            app_id = self.scraper.extract_app_id_from_url(url)
-            
-            # Verifica se já existe
-            for existing in self.urls_list:
-                if existing['app_id'] == app_id:
-                    messagebox.showwarning("Aviso", f"App {app_id} já está na lista")
-                    return
-            
-            # Adiciona à lista
-            self.urls_list.append({'url': url, 'app_id': app_id})
-            
-            # Limpa campo de entrada
-            self.url_entry.delete(0, tk.END)
-            self.setup_placeholder()
-            
-            # Atualiza lista visual
-            self.update_urls_list()
-            self.log(f"App adicionado: {app_id}")
-            
-        except Exception as e:
-            messagebox.showerror("Erro", f"URL inválida: {str(e)}")
-    
-    def remove_url(self, app_id):
-        """Remove URL da lista"""
-        self.urls_list = [item for item in self.urls_list if item['app_id'] != app_id]
-        self.update_urls_list()
-        self.log(f"App removido: {app_id}")
-    
-    def clear_all_urls(self):
-        """Limpa toda a lista"""
-        if not self.urls_list:
-            return
-        
-        if messagebox.askyesno("Confirmar", "Deseja remover todos os apps da lista?"):
-            self.urls_list = []
-            self.update_urls_list()
-            self.log("Lista de apps limpa")
-    
-    def update_urls_list(self):
-        """Atualiza a lista visual de URLs"""
-        # Limpa lista atual
-        for widget in self.list_scrollable_frame.winfo_children():
-            widget.destroy()
-        
-        if not self.urls_list:
-            # Mostra mensagem vazia para tema claro
-            empty_label = tk.Label(self.list_scrollable_frame, text="Nenhum app adicionado ainda",
-                                  font=('Segoe UI', 11), fg=self.colors['disabled'],
-                                  bg=self.colors['input_bg'])
-            empty_label.pack(pady=30)
-            # Atualiza status
-            self.urls_status_label.config(text="Nenhum app adicionado", fg=self.colors['disabled'])
-        else:
-            # Mostra lista de apps com design claro
-            for i, url_data in enumerate(self.urls_list):
-                app_id = url_data['app_id']
-                
-                # Frame do item com bordas suaves
-                item_outer = tk.Frame(self.list_scrollable_frame, bg=self.colors['border'])
-                item_outer.pack(fill=tk.X, padx=8, pady=3)
-                
-                item_frame = tk.Frame(item_outer, bg=self.colors['surface'])
-                item_frame.pack(fill=tk.X, padx=1, pady=1)
-                
-                # Número e App ID
-                info_label = tk.Label(item_frame, text=f"✓ {i+1}. {app_id}",
-                                     font=('Segoe UI', 10), fg=self.colors['on_surface'],
-                                     bg=self.colors['surface'])
-                info_label.pack(side=tk.LEFT, padx=12, pady=8)
-                
-                # Botão remover arredondado com cor contrastante
-                remove_btn_container, remove_btn = self.create_rounded_button(item_frame, "✕", 
-                                                                lambda aid=app_id: self.remove_url(aid), 
-                                                                self.colors['btn_red'], 
-                                                                width=25, height=25, font_size=10)
-                remove_btn_container.pack(side=tk.RIGHT, padx=8, pady=4)
-            
-            # Atualiza status
-            count = len(self.urls_list)
-            if count == 1:
-                self.urls_status_label.config(text="1 app na fila", fg=self.colors['primary'])
-            else:
-                self.urls_status_label.config(text=f"{count} apps na fila", fg=self.colors['primary'])
-        
-        # Atualiza scroll region
-        self.list_scrollable_frame.update_idletasks()
-        self.list_canvas.configure(scrollregion=self.list_canvas.bbox("all"))
-
-    def update_progress(self, value):
-        """Atualiza barra de progresso"""
-        self.progress_var.set(value)
-        
-        # Atualiza barra visual
-        canvas_width = self.progress_canvas.winfo_width()
-        if canvas_width > 1:
-            progress_width = (value / 100) * canvas_width
-            self.progress_canvas.coords(self.progress_bar_id, 0, 0, progress_width, 20)
-    
-
-    
-    def choose_folder(self):
-        """Escolhe pasta de destino"""
-        folder = filedialog.askdirectory(initialdir=self.output_dir_var.get())
-        if folder:
-            self.output_dir_var.set(folder)
-            self.folder_label.config(text=folder)
-            self.log(f"Pasta alterada para: {folder}")
-    
-    def open_folder(self):
-        """Abre a pasta de saída"""
-        folder = self.output_dir_var.get()
-        if os.path.exists(folder):
-            try:
-                os.startfile(folder)
-            except AttributeError:
-                import subprocess
-                if os.name == 'posix':
-                    subprocess.call(['open', folder])
-                else:
-                    subprocess.call(['xdg-open', folder])
-    
-    def start_scraping(self):
-        """Inicia o scraping (suporta múltiplas URLs)"""
-        # Verifica se há URLs na lista
-        if not self.urls_list:
-            messagebox.showerror("Erro", "Por favor, adicione pelo menos um app à lista")
-            return
-        
-        # Atualiza interface
-        self.is_running = True
-        self.update_main_button_text("Processando...")
-        self.disable_result_buttons()
-        self.progress_var.set(0)
-        self.update_progress(0)
-        
-        if len(self.urls_list) == 1:
-            self.status_label.config(text="Iniciando coleta...")
-        else:
-            self.status_label.config(text=f"Iniciando coleta em lote ({len(self.urls_list)} apps)...")
-        
-        self.status_var.set("Executando...")
-        
-        # Limpa log
-        self.log_text.delete(1.0, tk.END)
-        
-        # Cria scraper
-        self.scraper = GooglePlayReviewScraper(
-            country=self.country_var.get(),
-            lang=self.lang_var.get()
+        self.remove_btn = ctk.CTkButton(
+            self, text="✕", width=28, height=26, font=font(12),
+            fg_color="transparent", hover_color=APP_COLORS["neutral_hover"], text_color=MUTED,
+            text_color_disabled=APP_COLORS["faint"],
+            command=lambda: self.app.remove_app(self.item.app_id),
         )
-        
-        # Inicia thread
-        thread = threading.Thread(target=self.scraping_worker, daemon=True)
-        thread.start()
-    
-    def scraping_worker(self):
-        """Worker thread para scraping em lote"""
-        total_reviews = 0
-        processed_apps = 0
-        
-        try:
-            total_apps = len(self.urls_list)
-            output_dir = self.output_dir_var.get()
-            
-            for i, url_data in enumerate(self.urls_list, 1):
-                if not self.is_running:
-                    break
-                
-                url = url_data['url']
-                app_id = url_data['app_id']
-                
-                # Atualiza status
-                self.root.after(0, lambda i=i, total=total_apps, app=app_id: self.status_label.config(
-                    text=f"App {i}/{total}: {app}"
-                ))
-                
-                self.log(f"[{i}/{total_apps}] Processando: {app_id}")
-                
-                try:
-                    # Extrai reviews
-                    reviews_data, app_info = self.scraper.extract_all_reviews(app_id)
-                    
-                    if reviews_data:
-                        # Muda para diretório de saída
-                        original_dir = os.getcwd()
-                        os.chdir(output_dir)
-                        
-                        try:
-                            self.scraper.save_reviews(reviews_data, app_info)
-                            total_reviews += len(reviews_data)
-                            processed_apps += 1
-                            
-                            self.log(f"✅ {len(reviews_data)} reviews coletadas")
-                        finally:
-                            os.chdir(original_dir)
-                    else:
-                        self.log("⚠️ Nenhuma review encontrada")
-                
-                except Exception as e:
-                    self.log(f"❌ Erro: {e}")
-                
-                # Atualiza progresso
-                progress = (i / total_apps) * 100
-                self.root.after(0, lambda p=progress: self.update_progress(p))
-            
-            # Finaliza processamento
-            if self.is_running and total_reviews > 0:
-                # Habilita botões de resultado
-                self.root.after(0, self.enable_result_buttons)
-                
-                # Mostra modal de tempo economizado
-                self.root.after(500, lambda: self.show_time_saved_modal(total_reviews))
-                
-                # Atualiza status final
-                if processed_apps == 1:
-                    final_status = f"Concluído: {total_reviews} reviews coletadas"
-                else:
-                    final_status = f"Concluído: {total_reviews} reviews de {processed_apps} apps"
-                
-                self.root.after(0, lambda: self.status_label.config(text=final_status))
-                self.log(f"🎉 {final_status}")
-            
-        except Exception as e:
-            self.log(f"❌ Erro geral: {e}")
-        finally:
-            self.root.after(0, self.reset_ui)
-    
-    def stop_scraping(self):
-        """Para o scraping"""
-        self.is_running = False
-        self.log("Parando coleta...")
-        self.status_label.config(text="Parando...")
-    
-    def reset_ui(self):
-        """Reseta a interface"""
-        self.is_running = False
-        self.update_main_button_text("Pronto para iniciar")
-        self.status_var.set("Pronto para iniciar")
-    
-    def enable_result_buttons(self):
-        """Habilita botões de resultado"""
-        # Como os botões são canvas, eles já estão sempre habilitados
-        # Apenas mostra o frame se estiver oculto
-        if hasattr(self, 'result_buttons_frame'):
-            self.result_buttons_frame.pack(fill=tk.X, pady=(10, 0))
-    
-    def disable_result_buttons(self):
-        """Desabilita botões de resultado"""
-        # Para botões canvas, podemos ocultar temporariamente
-        pass  # Os botões canvas não precisam ser desabilitados
-    
-    def update_main_button_text(self, text):
-        """Atualiza o texto do botão principal"""
-        if hasattr(self, 'main_button'):
-            self.main_button.config(text=text)
-    
-    def show_statistics(self, reviews_data):
-        """Mostra estatísticas"""
-        if not reviews_data:
-            return
-        
-        self.log(f"\nEstatísticas:")
-        self.log(f"Total de reviews: {len(reviews_data)}")
-        
-        scores = [r['score'] for r in reviews_data if r['score']]
-        if scores:
-            avg_score = sum(scores) / len(scores)
-            self.log(f"Rating médio: {avg_score:.2f}")
-            
-            for rating in range(1, 6):
-                count = scores.count(rating)
-                percentage = (count/len(scores))*100
-                self.log(f"  {rating} estrelas: {count} ({percentage:.1f}%)")
-    
-    def open_file(self, filepath):
-        """Abre um arquivo"""
-        if filepath and os.path.exists(filepath):
-            try:
-                os.startfile(filepath)
-            except AttributeError:
-                import subprocess
-                if os.name == 'posix':
-                    subprocess.call(['open', filepath])
-                else:
-                    subprocess.call(['xdg-open', filepath])
+        self.remove_btn.grid(row=0, column=3, rowspan=2, padx=(4, 8))
+        self.refresh()
+
+    def refresh(self) -> None:
+        t, it = self.app.t, self.item
+        self.name.configure(text=it.title or it.app_id)
+        sub = {
+            "pending": t("status_pending"),
+            "running": it.detail or t("status_running"),
+            "done": it.detail,
+            "partial": it.detail,
+            "error": t("status_error", it.detail),
+            "skipped": t("status_skipped"),
+        }[it.state]
+        if it.title and it.title != it.app_id:
+            sub = f"{it.app_id} · {sub}"
+        self.sub.configure(text=sub)
+        self.dot.configure(text_color=self.DOT[it.state])
+
+        self.open_btn.configure(text=t("open"))
+        if it.files:
+            self.open_btn.grid(row=0, column=2, rowspan=2, padx=(4, 0))
         else:
-            messagebox.showerror("Erro", "Arquivo não encontrado")
-    
-    def open_csv_files(self):
-        """Abre pasta com arquivos CSV"""
-        output_dir = self.output_dir_var.get()
-        try:
-            # Procura por arquivos CSV na pasta de saída
-            csv_files = [f for f in os.listdir(output_dir) if f.endswith('.csv')]
-            if csv_files:
-                # Abre o primeiro arquivo CSV encontrado
-                self.open_file(os.path.join(output_dir, csv_files[-1]))  # Último criado
-            else:
-                messagebox.showinfo("Info", "Nenhum arquivo CSV encontrado")
-        except Exception as e:
-            messagebox.showerror("Erro", f"Erro ao abrir arquivo CSV: {e}")
-    
-    def open_json_files(self):
-        """Abre pasta com arquivos JSON"""
-        output_dir = self.output_dir_var.get()
-        try:
-            # Procura por arquivos JSON na pasta de saída
-            json_files = [f for f in os.listdir(output_dir) if f.endswith('.json')]
-            if json_files:
-                # Abre o primeiro arquivo JSON encontrado
-                self.open_file(os.path.join(output_dir, json_files[-1]))  # Último criado
-            else:
-                messagebox.showinfo("Info", "Nenhum arquivo JSON encontrado")
-        except Exception as e:
-            messagebox.showerror("Erro", f"Erro ao abrir arquivo JSON: {e}")
-    
-    def clear_log(self):
-        """Limpa o log"""
-        self.log_text.delete(1.0, tk.END)
-        self.log("Log limpo")
+            self.open_btn.grid_remove()
+        self.remove_btn.configure(state="disabled" if self.app.running else "normal")
 
-    def show_about(self):
-        """Mostra a janela Sobre"""
-        # Cria a janela já na posição correta
-        about_window = tk.Toplevel(self.root)
-        about_window.title(translator.get('about_title'))
-        self.center_window(about_window, 650, 570)  # Máximo para alemão
-        about_window.resizable(False, False)
-        about_window.configure(bg=self.colors['background'])
-        
-        # Configura propriedades da janela
-        about_window.transient(self.root)
-        about_window.grab_set()
-        
-        # Configura o ícone da janela
+
+# --------------------------------------------------------------------------- #
+# Main window
+# --------------------------------------------------------------------------- #
+class App(ctk.CTk):
+    def __init__(self) -> None:
+        self.settings = load_settings()
+        self.stats = TimeStats()
+        self.t = Translator(self.settings.get("ui_language") or detect_language())
+        ctk.set_appearance_mode(self.settings.get("appearance", "system"))
+
+        super().__init__()
+        self.title("Google Play Reviews Scraper")
+        self.geometry("1000x740")
+        self.minsize(880, 720)
+        self._set_icon()
+
+        self.items: list[QueueItem] = []
+        self.rows: dict[str, QueueRow] = {}
+        self.running = False
+        self.cancel_event = threading.Event()
+        self.events: queue.Queue[tuple] = queue.Queue()
+        self.log_visible = bool(self.settings.get("show_log"))
+
+        self.grid_columnconfigure(0, weight=3, uniform="cols")
+        self.grid_columnconfigure(1, weight=2, uniform="cols")
+        self.grid_rowconfigure(1, weight=1)
+
+        self._build_header()
+        self._build_apps_card()
+        self._build_options_card()
+        self._build_progress_card()
+        self._attach_library_logs()
+        self.apply_texts()
+        self._render_queue()
+
+        self.bind("<Return>", lambda e: self.add_from_entry())
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
+        self.after(POLL_MS, self._drain_events)
+
+    # -- setup ------------------------------------------------------------ #
+    def _set_icon(self) -> None:
         try:
-            ico_path = os.path.join("assets", "icons", "google-play.ico")
-            if os.path.exists(ico_path):
-                about_window.iconbitmap(ico_path)
-        except:
+            if sys.platform == "win32":
+                self.iconbitmap(str(resource_path("assets", "icons", "google-play.ico")))
+            else:
+                from tkinter import PhotoImage
+                self._icon = PhotoImage(file=str(resource_path("assets", "icons", "google-play.png")))
+                self.iconphoto(True, self._icon)
+        except Exception:  # noqa: BLE001 - a missing icon is not fatal
             pass
-        
-        # Container principal
-        main_frame = tk.Frame(about_window, bg=self.colors['background'])
-        main_frame.pack(fill=tk.BOTH, expand=True, padx=30, pady=30)
-        
-        # Título centralizado
-        tk.Label(main_frame, text=translator.get('window_title'),
-                font=('Segoe UI', 16, 'bold'), fg=self.colors['on_background'],
-                bg=self.colors['background']).pack(pady=(0, 15))
-        
-        # Descrição do projeto centralizada
-        tk.Label(main_frame, text=translator.get('about_description'), font=('Segoe UI', 10),
-                fg=self.colors['on_background'], bg=self.colors['background'],
-                justify=tk.CENTER, wraplength=590).pack(pady=(0, 20))
-        
-        # Ferramenta externa centralizada
-        tk.Label(main_frame, text=translator.get('about_external_tool'),
-                font=('Segoe UI', 11, 'bold'), fg=self.colors['primary'],
-                bg=self.colors['background']).pack(pady=(0, 5))
-        
-        # Link da ferramenta externa centralizado
-        link_frame = tk.Frame(main_frame, bg=self.colors['background'])
-        link_frame.pack(pady=(0, 20))
-        
-        external_link = tk.Label(link_frame, text=translator.get('about_external_link'),
-                               font=('Segoe UI', 10, 'underline'), fg=self.colors['info'],
-                               bg=self.colors['background'], cursor='hand2')
-        external_link.pack()
-        external_link.bind("<Button-1>", lambda e: self.open_url("https://review-stats-pro.lovable.app/"))
-        
-        # Seção de estatísticas de tempo economizado
-        stats_summary = time_stats.get_stats_summary()
-        
-        # Separador antes das estatísticas
-        separator1 = tk.Frame(main_frame, height=1, bg=self.colors['divider'])
-        separator1.pack(fill=tk.X, pady=(20, 15))
-        
-        # Título das estatísticas
-        tk.Label(main_frame, text=f"📊 {translator.get('usage_statistics')}",
-                font=('Segoe UI', 12, 'bold'), fg=self.colors['primary'],
-                bg=self.colors['background']).pack(pady=(0, 10))
-        
-        if stats_summary['total_reviews'] > 0:
-            # Card com estatísticas
-            stats_frame = tk.Frame(main_frame, bg=self.colors['surface'], relief='solid', bd=1)
-            stats_frame.pack(fill=tk.X, pady=(0, 15))
-            
-            # Estatísticas principais
-            stats_content = tk.Frame(stats_frame, bg=self.colors['surface'])
-            stats_content.pack(fill=tk.X, padx=20, pady=(20, 25))
-            
-            # Destaques principais em duas colunas
-            highlights_frame = tk.Frame(stats_content, bg=self.colors['surface'])
-            highlights_frame.pack(fill=tk.X, pady=(0, 15))
-            
-            # Coluna 1: Total de Reviews
-            reviews_highlight = tk.Frame(highlights_frame, bg=self.colors['surface'])
-            reviews_highlight.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 10))
-            
-            tk.Label(reviews_highlight, text=f"📈 {translator.get('reviews_collected')}",
-                    font=('Segoe UI', 10, 'bold'), fg=self.colors['primary'],
-                    bg=self.colors['surface']).pack()
-            
-            tk.Label(reviews_highlight, text=f"{stats_summary['total_reviews']:,}",
-                    font=('Segoe UI', 16, 'bold'), fg=self.colors['info'],
-                    bg=self.colors['surface']).pack()
-            
-            # Coluna 2: Tempo Economizado
-            time_highlight = tk.Frame(highlights_frame, bg=self.colors['surface'])
-            time_highlight.pack(side=tk.RIGHT, fill=tk.X, expand=True, padx=(10, 0))
-            
-            tk.Label(time_highlight, text=f"⏱️ {translator.get('total_time_saved')}",
-                    font=('Segoe UI', 10, 'bold'), fg=self.colors['primary'],
-                    bg=self.colors['surface']).pack()
-            
-            tk.Label(time_highlight, text=stats_summary['total_time_saved_formatted'],
-                    font=('Segoe UI', 16, 'bold'), fg=self.colors['secondary'],
-                    bg=self.colors['surface']).pack()
-            
-            # Separador sutil
-            separator_stats = tk.Frame(stats_content, height=1, bg=self.colors['divider'])
-            separator_stats.pack(fill=tk.X, pady=(5, 10))
-            
-            # Outras estatísticas - layout especial para alemão
-            other_stats = tk.Frame(stats_content, bg=self.colors['surface'])
-            other_stats.pack(fill=tk.X, pady=(5, 0))
-            
-            # Layout específico para alemão
-            if translator.current_language == 'de':
-                # Para alemão: layout mais compacto e limpo
-                stats_compact = tk.Frame(other_stats, bg=self.colors['surface'])
-                stats_compact.pack(fill=tk.X, pady=(0, 5))
-                
-                # Apenas Sessions
-                sessions_text = f"🔄 {translator.get('usage_sessions')}: {stats_summary['total_sessions']:,}"
-                tk.Label(stats_compact, text=sessions_text,
-                        font=('Segoe UI', 9), fg=self.colors['on_surface'],
-                        bg=self.colors['surface'], anchor='w').pack(fill=tk.X)
-            else:
-                # Para outros idiomas: layout limpo
-                # Apenas sessões de uso
-                sessions_frame = tk.Frame(other_stats, bg=self.colors['surface'])
-                sessions_frame.pack(fill=tk.X)
-                
-                sessions_text = f"🔄 {translator.get('usage_sessions')}: {stats_summary['total_sessions']:,}"
-                tk.Label(sessions_frame, text=sessions_text,
-                        font=('Segoe UI', 9), fg=self.colors['on_surface'],
-                        bg=self.colors['surface'], anchor='w', wraplength=580).pack(fill=tk.X)
-        else:
-            # Mensagem quando não há estatísticas
-            no_stats_frame = tk.Frame(main_frame, bg=self.colors['surface'], relief='solid', bd=1)
-            no_stats_frame.pack(fill=tk.X, pady=(0, 15))
-            
-            tk.Label(no_stats_frame, text=translator.get('no_stats_message'),
-                    font=('Segoe UI', 10), fg=self.colors['on_surface'],
-                    bg=self.colors['surface'], justify=tk.CENTER).pack(pady=20)
-        
-        # Separador
-        separator = tk.Frame(main_frame, height=1, bg=self.colors['divider'])
-        separator.pack(fill=tk.X, pady=20)
-        
-        # Desenvolvido por (centralizado)
-        dev_frame = tk.Frame(main_frame, bg=self.colors['background'])
-        dev_frame.pack()
-        
-        tk.Label(dev_frame, text=translator.get('about_developed_with'), font=('Segoe UI', 10),
-                fg=self.colors['on_background'], bg=self.colors['background']).pack(side=tk.LEFT)
-        
-        tk.Label(dev_frame, text="♥", font=('Segoe UI', 12), fg='#E91E63',
-                bg=self.colors['background']).pack(side=tk.LEFT, padx=(5, 5))
-        
-        tk.Label(dev_frame, text=translator.get('about_developed_by'), font=('Segoe UI', 10),
-                fg=self.colors['on_background'], bg=self.colors['background']).pack(side=tk.LEFT)
-        
-        # Link do desenvolvedor
-        dev_link = tk.Label(dev_frame, text=translator.get('about_developer'), font=('Segoe UI', 10, 'bold', 'underline'),
-                          fg=self.colors['primary'], bg=self.colors['background'], cursor='hand2')
-        dev_link.pack(side=tk.LEFT, padx=(5, 0))
-        dev_link.bind("<Button-1>", lambda e: self.open_url("https://dsiqueira.com/"))
-        
-        # Botão Fechar
-        close_btn = tk.Button(main_frame, text=translator.get('close_button'), command=about_window.destroy,
-                            bg=self.colors['primary'], fg='white', font=('Segoe UI', 10, 'bold'),
-                            relief='flat', bd=0, cursor='hand2', width=10, height=2)
-        close_btn.pack(pady=(30, 0))
-        
-        # Hover effect para o botão fechar
-        def on_enter(e):
-            close_btn.config(bg=self.darken_color(self.colors['primary']))
-        def on_leave(e):
-            close_btn.config(bg=self.colors['primary'])
-        close_btn.bind("<Enter>", on_enter)
-        close_btn.bind("<Leave>", on_leave)
 
-    def open_url(self, url):
-        """Abre URL no navegador padrão"""
-        import webbrowser
-        webbrowser.open(url)
-    
-    def show_time_saved_modal(self, reviews_count):
-        """Mostra modal com tempo economizado"""
-        if reviews_count <= 0:
-            return
-        
-        # Salva a sessão e obtém tempo economizado
-        time_saved_seconds = time_stats.add_session(reviews_count)
-        
-        # Obtém estatísticas totais
-        stats_summary = time_stats.get_stats_summary()
-        
-        time_saved_formatted = time_stats.format_time(time_saved_seconds)
-        manual_time_formatted = time_stats.format_time(reviews_count * 30)  # Mesmo valor, mas para contexto
-        
-        # Calcula posição central
-        window_width = 500
-        window_height = 350
-
-        # Cria a janela modal
-        modal = tk.Toplevel(self.root)
-        modal.title(translator.get('time_saved_title'))
-        self.center_window(modal, window_width, window_height)
-        modal.resizable(False, False)
-        modal.configure(bg=self.colors['background'])
-        
-        # Configura propriedades da janela
-        modal.transient(self.root)
-        modal.grab_set()
-        
-        # Configura o ícone da janela
+    def _logo(self) -> Optional[ctk.CTkImage]:
         try:
-            ico_path = os.path.join("assets", "icons", "google-play.ico")
-            if os.path.exists(ico_path):
-                modal.iconbitmap(ico_path)
-        except:
-            pass
-        
-        # Container principal
-        main_frame = tk.Frame(modal, bg=self.colors['background'])
-        main_frame.pack(fill=tk.BOTH, expand=True, padx=30, pady=30)
-        
-        # Ícone e título
-        title_frame = tk.Frame(main_frame, bg=self.colors['background'])
-        title_frame.pack(pady=(0, 20))
-        
-        tk.Label(title_frame, text="🎉", font=('Segoe UI', 24),
-                bg=self.colors['background']).pack(side=tk.LEFT, padx=(0, 10))
-        
-        tk.Label(title_frame, text=translator.get('time_saved_title'), font=('Segoe UI', 18, 'bold'),
-                fg=self.colors['primary'], bg=self.colors['background']).pack(side=tk.LEFT)
-        
-        # Mensagem principal mais concisa
-        message_text = f"{translator.get('collection_completed')}\n{translator.get('reviews_processed').format(reviews_count)}"
-        
-        tk.Label(main_frame, text=message_text, font=('Segoe UI', 12),
-                fg=self.colors['on_background'], bg=self.colors['background'],
-                wraplength=440, justify=tk.CENTER).pack(pady=(0, 20))
-        
-        # Card com destaque - layout em duas colunas
-        highlight_frame = tk.Frame(main_frame, bg=self.colors['surface'], relief='solid', bd=1)
-        highlight_frame.pack(fill=tk.X, pady=(0, 20))
-        
-        highlight_content = tk.Frame(highlight_frame, bg=self.colors['surface'])
-        highlight_content.pack(fill=tk.X, padx=20, pady=15)
-        
-        # Coluna 1: Reviews processadas
-        reviews_col = tk.Frame(highlight_content, bg=self.colors['surface'])
-        reviews_col.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        
-        tk.Label(reviews_col, text=f"📈 {translator.get('reviews_label')}", font=('Segoe UI', 10, 'bold'),
-                fg=self.colors['primary'], bg=self.colors['surface']).pack()
-        
-        tk.Label(reviews_col, text=f"{reviews_count:,}", font=('Segoe UI', 18, 'bold'),
-                fg=self.colors['info'], bg=self.colors['surface']).pack()
-        
-        # Coluna 2: Tempo economizado
-        time_col = tk.Frame(highlight_content, bg=self.colors['surface'])
-        time_col.pack(side=tk.RIGHT, fill=tk.X, expand=True)
-        
-        tk.Label(time_col, text=f"⏱️ {translator.get('time_saved_label')}", font=('Segoe UI', 10, 'bold'),
-                fg=self.colors['primary'], bg=self.colors['surface']).pack()
-        
-        tk.Label(time_col, text=time_saved_formatted, font=('Segoe UI', 18, 'bold'),
-                fg=self.colors['secondary'], bg=self.colors['surface']).pack()
-        
-        # Explicação sutil
-        explanation = tk.Label(highlight_frame, text=translator.get('manual_comparison'),
-                              font=('Segoe UI', 8), fg=self.colors['disabled'],
-                              bg=self.colors['surface'])
-        explanation.pack(pady=(0, 10))
-        
-        # Estatísticas totais (mais compactas)
-        if stats_summary['total_sessions'] > 1:  # Só mostra se não é a primeira sessão
-            total_frame = tk.Frame(main_frame, bg=self.colors['background'])
-            total_frame.pack(fill=tk.X, pady=(0, 15))
-            
-            tk.Label(total_frame, text=f"📊 {translator.get('accumulated_totals')}", font=('Segoe UI', 10, 'bold'),
-                    fg=self.colors['primary'], bg=self.colors['background']).pack(pady=(0, 5))
-            
-            total_text = translator.get('total_summary').format(
-                f"{stats_summary['total_reviews']:,}",
-                stats_summary['total_time_saved_formatted'],
-                f"{stats_summary['total_sessions']:,}"
+            from PIL import Image
+            img = Image.open(resource_path("assets", "icons", "google-play.png"))
+            return ctk.CTkImage(light_image=img, dark_image=img, size=(40, 40))
+        except Exception:  # noqa: BLE001
+            return None
+
+    def _build_header(self) -> None:
+        bar = ctk.CTkFrame(self, fg_color="transparent")
+        bar.grid(row=0, column=0, columnspan=2, sticky="ew", padx=20, pady=(16, 10))
+        bar.grid_columnconfigure(1, weight=1)
+
+        logo = self._logo()
+        ctk.CTkLabel(bar, text="", image=logo, width=40).grid(row=0, column=0, rowspan=2, padx=(0, 12))
+        ctk.CTkLabel(bar, text="Google Play Reviews Scraper", font=font(21, "bold"), anchor="w").grid(
+            row=0, column=1, sticky="w")
+        self.subtitle = ctk.CTkLabel(bar, text="", font=font(13), text_color=MUTED, anchor="w")
+        self.subtitle.grid(row=1, column=1, sticky="w")
+
+        tools = ctk.CTkFrame(bar, fg_color="transparent")
+        tools.grid(row=0, column=2, rowspan=2, sticky="e")
+
+        self.lang_menu = ctk.CTkOptionMenu(
+            tools, values=list(LANGUAGES.values()), width=124, command=self.on_language,
+        )
+        self.lang_menu.set(LANGUAGES[self.t.language])
+        self.lang_menu.pack(side="left", padx=(0, 8))
+
+        self.theme_seg = ctk.CTkSegmentedButton(tools, command=self.on_appearance)
+        self.theme_seg.pack(side="left", padx=(0, 8))
+
+        self.about_btn = ctk.CTkButton(
+            tools, width=36, text="?", font=font(14, "bold"),
+            fg_color=APP_COLORS["neutral"], hover_color=APP_COLORS["neutral_hover"],
+            text_color=ctk.ThemeManager.theme["CTkLabel"]["text_color"],
+            command=self.show_about,
+        )
+        self.about_btn.pack(side="left")
+
+    def _card(self, row: int, column: int, **grid) -> ctk.CTkFrame:
+        card = ctk.CTkFrame(self)
+        card.grid(row=row, column=column, sticky="nsew", **grid)
+        return card
+
+    def _build_apps_card(self) -> None:
+        card = self._card(1, 0, padx=(20, 8), pady=(0, 12))
+        card.grid_columnconfigure(0, weight=1)
+        card.grid_rowconfigure(3, weight=1)
+
+        self.apps_title = ctk.CTkLabel(card, text="", font=font(15, "bold"), anchor="w")
+        self.apps_title.grid(row=0, column=0, columnspan=2, sticky="w", padx=16, pady=(14, 8))
+
+        self.entry = ctk.CTkEntry(card, height=36)
+        self.entry.grid(row=1, column=0, sticky="ew", padx=(16, 8))
+        self.entry.bind("<<Paste>>", self._on_paste)
+        self.add_btn = ctk.CTkButton(card, height=36, width=100, command=self.add_from_entry)
+        self.add_btn.grid(row=1, column=1, padx=(0, 16))
+
+        self.hint = ctk.CTkLabel(card, text="", font=font(12), text_color=MUTED, anchor="w",
+                                 justify="left", wraplength=520)
+        self.hint.grid(row=2, column=0, columnspan=2, sticky="ew", padx=18, pady=(4, 6))
+
+        self.queue_frame = ctk.CTkScrollableFrame(card, fg_color="transparent")
+        self.queue_frame.grid(row=3, column=0, columnspan=2, sticky="nsew", padx=8)
+        self.queue_frame.grid_columnconfigure(0, weight=1)
+        self.empty_label = ctk.CTkLabel(self.queue_frame, text="", font=font(13), text_color=MUTED)
+
+        self.log_box = ctk.CTkTextbox(card, font=ctk.CTkFont(family="Courier", size=12), wrap="word")
+        self.log_box.configure(state="disabled")
+        self._place_log()
+
+        foot = ctk.CTkFrame(card, fg_color="transparent")
+        foot.grid(row=4, column=0, columnspan=2, sticky="ew", padx=16, pady=(6, 12))
+        foot.grid_columnconfigure(0, weight=1)
+        self.queue_count = ctk.CTkLabel(foot, text="", font=font(12), text_color=MUTED, anchor="w")
+        self.queue_count.grid(row=0, column=0, sticky="w")
+        self.clear_btn = ctk.CTkButton(
+            foot, height=26, width=10, font=font(12), fg_color="transparent",
+            hover_color=APP_COLORS["neutral_hover"], text_color=MUTED,
+            text_color_disabled=APP_COLORS["faint"], command=self.clear_queue,
+        )
+        self.clear_btn.grid(row=0, column=1, sticky="e")
+
+    def _field_label(self, parent, row: int) -> ctk.CTkLabel:
+        label = ctk.CTkLabel(parent, text="", font=font(12, "bold"), text_color=MUTED, anchor="w")
+        label.grid(row=row, column=0, columnspan=2, sticky="w", padx=16, pady=(10, 2))
+        return label
+
+    def _build_options_card(self) -> None:
+        card = self._card(1, 1, padx=(8, 20), pady=(0, 12))
+        card.grid_columnconfigure((0, 1), weight=1)
+        s = self.settings
+
+        self.options_title = ctk.CTkLabel(card, text="", font=font(15, "bold"), anchor="w")
+        self.options_title.grid(row=0, column=0, columnspan=2, sticky="w", padx=16, pady=(14, 0))
+
+        self.country_label = self._field_label(card, 1)
+        self.country_box = ctk.CTkComboBox(card, height=34, command=lambda _: self._save_options())
+        self.country_box.grid(row=2, column=0, columnspan=2, sticky="ew", padx=16)
+
+        self.rlang_label = self._field_label(card, 3)
+        self.rlang_box = ctk.CTkComboBox(
+            card, height=34, values=self.t.review_language_choices(),
+            command=lambda _: self._save_options(),
+        )
+        self.rlang_box.set(self.t.review_language_label(s["review_language"]))
+        self.rlang_box.grid(row=4, column=0, columnspan=2, sticky="ew", padx=16)
+
+        self.limit_label = ctk.CTkLabel(card, text="", font=font(12, "bold"), text_color=MUTED, anchor="w")
+        self.limit_label.grid(row=5, column=0, sticky="w", padx=(16, 4), pady=(10, 2))
+        self.since_label = ctk.CTkLabel(card, text="", font=font(12, "bold"), text_color=MUTED, anchor="w")
+        self.since_label.grid(row=5, column=1, sticky="w", padx=(4, 16), pady=(10, 2))
+        self.limit_entry = ctk.CTkEntry(card, height=34)
+        self.limit_entry.grid(row=6, column=0, sticky="ew", padx=(16, 4))
+        self.since_entry = ctk.CTkEntry(card, height=34)
+        self.since_entry.grid(row=6, column=1, sticky="ew", padx=(4, 16))
+
+        self.formats_label = self._field_label(card, 7)
+        fmt_row = ctk.CTkFrame(card, fg_color="transparent")
+        fmt_row.grid(row=8, column=0, columnspan=2, sticky="w", padx=16)
+        self.format_vars: dict[str, ctk.BooleanVar] = {}
+        for fmt, label in FORMAT_LABELS.items():
+            var = ctk.BooleanVar(value=fmt in s["formats"])
+            ctk.CTkCheckBox(
+                fmt_row, text=label, variable=var, width=80, checkbox_width=20, checkbox_height=20,
+                command=self._save_options,
+            ).pack(side="left", padx=(0, 6))
+            self.format_vars[fmt] = var
+
+        self.folder_label = self._field_label(card, 9)
+        self.folder_value = ctk.CTkLabel(
+            card, text="", anchor="w", justify="left", font=font(12), fg_color=APP_COLORS["inset"],
+            corner_radius=8, height=34, wraplength=330,
+        )
+        self.folder_value.grid(row=10, column=0, columnspan=2, sticky="ew", padx=16)
+        btns = ctk.CTkFrame(card, fg_color="transparent")
+        btns.grid(row=11, column=0, columnspan=2, sticky="ew", padx=16, pady=(8, 16))
+        btns.grid_columnconfigure((0, 1), weight=1)
+        neutral = dict(fg_color=APP_COLORS["neutral"], hover_color=APP_COLORS["neutral_hover"],
+                       text_color=ctk.ThemeManager.theme["CTkLabel"]["text_color"],
+                       text_color_disabled=APP_COLORS["faint"], height=32)
+        self.choose_btn = ctk.CTkButton(btns, command=self.choose_folder, **neutral)
+        self.choose_btn.grid(row=0, column=0, sticky="ew", padx=(0, 4))
+        self.open_folder_btn = ctk.CTkButton(
+            btns, command=lambda: self.open_output_dir(), **neutral)
+        self.open_folder_btn.grid(row=0, column=1, sticky="ew", padx=(4, 0))
+        self._show_folder()
+
+        card.grid_rowconfigure(12, weight=1)  # push content to the top
+
+    def _build_progress_card(self) -> None:
+        card = self._card(2, 0, columnspan=2, padx=20, pady=(0, 20))
+        card.grid_columnconfigure(0, weight=1)
+        self.progress_card = card
+
+        self.status = ctk.CTkLabel(card, text="", font=font(14, "bold"), anchor="w")
+        self.status.grid(row=0, column=0, sticky="ew", padx=(18, 8), pady=(14, 0))
+        self.counter = ctk.CTkLabel(card, text="", font=font(13), text_color=MUTED, anchor="e")
+        self.counter.grid(row=0, column=1, sticky="e", padx=(8, 18), pady=(14, 0))
+
+        self.bar = ctk.CTkProgressBar(card, height=10)
+        self.bar.grid(row=1, column=0, columnspan=2, sticky="ew", padx=18, pady=(10, 12))
+        self._bar_value(0)
+
+        actions = ctk.CTkFrame(card, fg_color="transparent")
+        actions.grid(row=2, column=0, columnspan=2, sticky="ew", padx=18, pady=(0, 14))
+        actions.grid_columnconfigure(0, weight=1)
+        self.log_toggle = ctk.CTkButton(
+            actions, width=10, height=30, font=font(12), fg_color="transparent",
+            hover_color=APP_COLORS["neutral_hover"], text_color=MUTED, command=self.toggle_log,
+        )
+        self.log_toggle.grid(row=0, column=0, sticky="w")
+        self.main_btn = ctk.CTkButton(
+            actions, height=42, width=220, font=font(15, "bold"), command=self.on_main_button,
+        )
+        self.main_btn.grid(row=0, column=1, sticky="e")
+
+
+    def _attach_library_logs(self) -> None:
+        """Forward the scraper's warnings (retries, failures) to the log panel."""
+        app = self
+
+        class Handler(logging.Handler):
+            def emit(self, record: logging.LogRecord) -> None:
+                app.events.put(("log", record.getMessage()))
+
+        handler = Handler(level=logging.WARNING)
+        logger = logging.getLogger("gplay_reviews")
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+
+    # -- texts ------------------------------------------------------------ #
+    def apply_texts(self) -> None:
+        t = self.t
+        self.subtitle.configure(text=t("subtitle"))
+        self.theme_seg.configure(values=[t("theme_system"), t("theme_light"), t("theme_dark")])
+        self.theme_seg.set(t(f"theme_{self.settings.get('appearance', 'system')}"))
+        self.apps_title.configure(text=t("apps_title"))
+        self.entry.configure(placeholder_text=t("url_placeholder"))
+        self.add_btn.configure(text=t("add"))
+        self._hint(t("paste_hint"))
+        self.empty_label.configure(text=t("queue_empty"))
+        self.clear_btn.configure(text=t("clear"))
+        self.options_title.configure(text=t("options_title"))
+        self.country_label.configure(text=t("country"))
+        self.country_box.configure(values=t.country_choices())
+        self.country_box.set(t.country_label(self.settings["country"]))
+        self.rlang_label.configure(text=t("review_language"))
+        self.limit_label.configure(text=t("limit"))
+        self.since_label.configure(text=t("since"))
+        self.limit_entry.configure(placeholder_text=t("limit_placeholder"))
+        self.since_entry.configure(placeholder_text=t("since_placeholder"))
+        self.formats_label.configure(text=t("formats"))
+        self.folder_label.configure(text=t("folder"))
+        self.choose_btn.configure(text=t("choose"))
+        self.open_folder_btn.configure(text=t("open_folder"))
+        self.log_toggle.configure(text=("▾ " + t("hide_log")) if self.log_visible else ("▸ " + t("show_log")))
+        self._style_main_button()
+        if not self.running:
+            self.status.configure(text=t("ready"))
+        self._update_queue_count()
+        for row in self.rows.values():
+            row.refresh()
+
+    def _style_main_button(self) -> None:
+        if self.running:
+            stopping = self.cancel_event.is_set()
+            self.main_btn.configure(
+                text=self.t("stopping") if stopping else self.t("stop"),
+                fg_color=APP_COLORS["danger"], hover_color=APP_COLORS["danger_hover"],
+                state="disabled" if stopping else "normal",
             )
-            
-            tk.Label(total_frame, text=total_text, font=('Segoe UI', 9),
-                    fg=self.colors['on_surface'], bg=self.colors['background'],
-                    justify=tk.CENTER).pack()
-        
-        # Botão fechar
-        close_btn = tk.Button(main_frame, text=translator.get('close_button'), command=modal.destroy,
-                            bg=self.colors['primary'], fg='white', font=('Segoe UI', 11, 'bold'),
-                            relief='flat', bd=0, cursor='hand2', width=12, height=2)
-        close_btn.pack(pady=(10, 0))
-        
-        # Hover effect para o botão
-        def on_enter(e):
-            close_btn.config(bg=self.darken_color(self.colors['primary']))
-        def on_leave(e):
-            close_btn.config(bg=self.colors['primary'])
-        close_btn.bind("<Enter>", on_enter)
-        close_btn.bind("<Leave>", on_leave)
-        
-        # Foco no botão para permitir fechar com Enter
-        close_btn.focus_set()
-        modal.bind('<Return>', lambda e: modal.destroy())
-        modal.bind('<Escape>', lambda e: modal.destroy())
-    
-    def log(self, message):
-        """Adiciona mensagem ao log"""
-        timestamp = time.strftime("%H:%M:%S")
-        self.log_text.insert(tk.END, f"[{timestamp}] {message}\n")
-        self.log_text.see(tk.END)
-        self.root.update_idletasks()
+        else:
+            theme = ctk.ThemeManager.theme["CTkButton"]
+            self.main_btn.configure(
+                text=self.t("start"), fg_color=theme["fg_color"],
+                hover_color=theme["hover_color"], state="normal",
+            )
 
-def main():
-    """Função principal"""
-    root = tk.Tk()
-    app = ReviewScraperApp(root)
-    
-    root.mainloop()
+    def _hint(self, text: str, error: bool = False) -> None:
+        self.hint.configure(text=text, text_color=APP_COLORS["danger"] if error else MUTED)
+
+    # -- header actions --------------------------------------------------- #
+    def on_language(self, name: str) -> None:
+        code = next(c for c, n in LANGUAGES.items() if n == name)
+        self.lang_menu.set(name)
+        self.t.set_language(code)
+        self.settings.update(ui_language=code)
+        self.apply_texts()
+
+    def on_appearance(self, label: str) -> None:
+        mode = next(m for m in APPEARANCES if self.t(f"theme_{m}") == label)
+        ctk.set_appearance_mode(mode)
+        self.settings.update(appearance=mode)
+
+    # -- queue ------------------------------------------------------------ #
+    def _on_paste(self, _event) -> str:
+        try:
+            text = self.clipboard_get()
+        except Exception:  # noqa: BLE001 - empty / non-text clipboard
+            return ""
+        if "\n" in text.strip():
+            self.add_inputs(text.splitlines())
+            return "break"
+        return ""
+
+    def add_from_entry(self) -> None:
+        text = self.entry.get()
+        if text.strip():
+            self.add_inputs(text.split())
+
+    def add_inputs(self, lines: list[str]) -> None:
+        added, problems = 0, []
+        known = {it.app_id for it in self.items}
+        for line in (ln.strip() for ln in lines):
+            if not line:
+                continue
+            try:
+                app_id = parse_app_id(line)
+            except ValueError:
+                problems.append(self.t("invalid_input", line[:60]))
+                continue
+            if app_id in known:
+                problems.append(self.t("already_queued", app_id))
+                continue
+            known.add(app_id)
+            self.items.append(QueueItem(app_id))
+            added += 1
+
+        if added:
+            self.entry.delete(0, "end")
+            self._render_queue()
+        if problems:
+            more = f"  (+{len(problems) - 1})" if len(problems) > 1 else ""
+            self._hint(problems[0] + more, error=True)
+        else:
+            self._hint(self.t("paste_hint"))
+
+    def remove_app(self, app_id: str) -> None:
+        if self.running:
+            return
+        self.items = [it for it in self.items if it.app_id != app_id]
+        self._render_queue()
+
+    def clear_queue(self) -> None:
+        if self.running:
+            return
+        self.items.clear()
+        self._render_queue()
+
+    def _render_queue(self) -> None:
+        for app_id in list(self.rows):
+            if app_id not in {it.app_id for it in self.items}:
+                self.rows.pop(app_id).destroy()
+        for i, item in enumerate(self.items):
+            row = self.rows.get(item.app_id)
+            if row is None:
+                row = self.rows[item.app_id] = QueueRow(self.queue_frame, self, item)
+            row.grid(row=i, column=0, sticky="ew", padx=4, pady=3)
+        if self.items:
+            self.empty_label.grid_forget()
+        else:
+            self.empty_label.grid(row=0, column=0, pady=40)
+        self._update_queue_count()
+
+    def _update_queue_count(self) -> None:
+        n = len(self.items)
+        self.queue_count.configure(
+            text=self.t("queue_count_one") if n == 1 else self.t("queue_count_many", n) if n else "")
+        state = "disabled" if self.running or not n else "normal"
+        self.clear_btn.configure(state=state)
+
+    def _refresh_row(self, item: QueueItem) -> None:
+        row = self.rows.get(item.app_id)
+        if row:
+            row.refresh()
+
+    # -- options ---------------------------------------------------------- #
+    def _save_options(self) -> None:
+        self.settings.update(
+            country=code_from_choice(self.country_box.get()) or self.settings["country"],
+            review_language=code_from_choice(self.rlang_box.get()) or self.settings["review_language"],
+            formats=[f for f, v in self.format_vars.items() if v.get()],
+        )
+
+    def _show_folder(self) -> None:
+        self.folder_value.configure(text="  " + self.settings["output_dir"])
+
+    def choose_folder(self) -> None:
+        folder = filedialog.askdirectory(initialdir=self.settings["output_dir"])
+        if folder:
+            self.settings.update(output_dir=folder)
+            self._show_folder()
+
+    def open_output_dir(self) -> None:
+        folder = Path(self.settings["output_dir"])
+        folder.mkdir(parents=True, exist_ok=True)
+        open_path(folder)
+
+    def open_result(self, item: QueueItem) -> None:
+        for fmt in ("xlsx", "csv", "json"):
+            if fmt in item.files and item.files[fmt].exists():
+                open_path(item.files[fmt])
+                return
+
+    def _read_options(self) -> Optional[dict]:
+        """Validate the form; show an error and return None if invalid."""
+        t = self.t
+        if not self.items:
+            return self._error(t("err_no_apps"))
+
+        limit_raw = self.limit_entry.get().strip().replace(".", "").replace(",", "")
+        limit = None
+        if limit_raw:
+            if not limit_raw.isdigit() or int(limit_raw) <= 0:
+                return self._error(t("err_limit"))
+            limit = int(limit_raw)
+
+        since_raw = self.since_entry.get().strip()
+        since = None
+        if since_raw:
+            try:
+                since = date.fromisoformat(since_raw)
+            except ValueError:
+                return self._error(t("err_since"))
+
+        formats = [f for f, v in self.format_vars.items() if v.get()]
+        if not formats:
+            return self._error(t("err_no_format"))
+
+        out = Path(self.settings["output_dir"]).expanduser()
+        try:
+            out.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            return self._error(t("err_folder", exc))
+
+        self._save_options()
+        return {
+            "country": self.settings["country"],
+            "lang": self.settings["review_language"],
+            "max_reviews": limit,
+            "since": since,
+            "formats": formats,
+            "output_dir": out,
+        }
+
+    def _error(self, message: str) -> None:
+        messagebox.showerror(self.t("error_title"), message, parent=self)
+        return None
+
+    # -- run -------------------------------------------------------------- #
+    def on_main_button(self) -> None:
+        if self.running:
+            self.cancel_event.set()
+            self._style_main_button()
+            self.status.configure(text=self.t("stopping"))
+        else:
+            self.start()
+
+    def start(self) -> None:
+        opts = self._read_options()
+        if not opts:
+            return
+        for it in self.items:
+            it.state, it.detail, it.files, it.result = "pending", "", {}, None
+        self.running = True
+        self.cancel_event.clear()
+        self._set_inputs_enabled(False)
+        self._style_main_button()
+        self._bar_value(0)
+        self.counter.configure(text="")
+        self._clear_log()
+        for row in self.rows.values():
+            row.refresh()
+
+        app_ids = [it.app_id for it in self.items]
+        threading.Thread(target=self._worker, args=(app_ids, opts), daemon=True).start()
+
+    def _worker(self, app_ids: list[str], opts: dict) -> None:
+        """Runs off the UI thread. Talks to the UI only through self.events."""
+        post = self.events.put
+        scraper = GooglePlayReviewScraper(country=opts["country"], lang=opts["lang"])
+        for index, app_id in enumerate(app_ids):
+            if self.cancel_event.is_set():
+                post(("skipped", index))
+                continue
+            post(("app_start", index))
+            try:
+                result = scraper.scrape(
+                    app_id,
+                    max_reviews=opts["max_reviews"],
+                    since=opts["since"],
+                    cancel_event=self.cancel_event,
+                    on_progress=lambda done, total, i=index: post(("progress", i, done, total)),
+                )
+                files = {}
+                if result.reviews:
+                    files = scraper.save_reviews(
+                        result.reviews, result.app_info,
+                        output_dir=opts["output_dir"], formats=opts["formats"],
+                    )
+                post(("app_done", index, result, files))
+            except Exception as exc:  # noqa: BLE001 - report and move on
+                post(("app_failed", index, str(exc)))
+        post(("finished",))
+
+    def _drain_events(self) -> None:
+        try:
+            while True:
+                event = self.events.get_nowait()
+                getattr(self, f"_on_{event[0]}")(*event[1:])
+        except queue.Empty:
+            pass
+        self.after(POLL_MS, self._drain_events)
+
+    # event handlers (UI thread) ----------------------------------------- #
+    def _on_log(self, message: str) -> None:
+        self._log(message)
+
+    def _on_app_start(self, index: int) -> None:
+        item = self.items[index]
+        item.state = "running"
+        self._refresh_row(item)
+        self.status.configure(text=self.t("app_progress", index + 1, len(self.items), item.title or item.app_id))
+        self._log(self.t("log_start", item.app_id, self.settings["country"], self.settings["review_language"]))
+        self._set_bar(index, 0.0)
+
+    def _on_progress(self, index: int, done: int, total: Optional[int]) -> None:
+        t, item = self.t, self.items[index]
+        text = t("count_progress_total", t.num(done), t.num(total)) if total else t("count_progress", t.num(done))
+        self.counter.configure(text=text)
+        item.detail = text
+        self._refresh_row(item)
+        self._set_bar(index, min(done / total, 0.99) if total else 0.0)
+
+    def _on_app_done(self, index: int, result: ScrapeResult, files: dict) -> None:
+        t, item = self.t, self.items[index]
+        item.title = result.title
+        item.files = files
+        item.result = result
+        n = len(result.reviews)
+        if not n and result.error:
+            item.state, item.detail = "error", result.error[:80]
+            self._log(t("log_error", item.app_id, result.error))
+        elif result.complete:
+            item.state, item.detail = "done", t("status_done", t.num(n))
+            self._log(t("log_done", result.title, t.num(n)))
+        else:
+            reason = t("log_cancelled") if result.cancelled else (result.error or "")
+            item.state, item.detail = "partial", t("status_partial", t.num(n))
+            self._log(t("log_partial", result.title, reason))
+        for path in files.values():
+            self._log(t("log_saved", path))
+        self._refresh_row(item)
+        self.status.configure(text=self.t("app_progress", index + 1, len(self.items), item.title))
+        self._set_bar(index, 1.0)
+
+    def _on_app_failed(self, index: int, error: str) -> None:
+        item = self.items[index]
+        item.state, item.detail = "error", error[:80]
+        self._log(self.t("log_error", item.app_id, error))
+        self._refresh_row(item)
+        self._set_bar(index, 1.0)
+
+    def _on_skipped(self, index: int) -> None:
+        item = self.items[index]
+        item.state = "skipped"
+        self._refresh_row(item)
+
+    def _on_finished(self) -> None:
+        t = self.t
+        cancelled = self.cancel_event.is_set()
+        results = [it.result for it in self.items if it.files and it.result]
+        total = sum(len(r.reviews) for r in results)
+
+        self.running = False
+        self.cancel_event.clear()
+        self._set_inputs_enabled(True)
+        self._style_main_button()
+        for row in self.rows.values():
+            row.refresh()
+
+        if not total:
+            self.status.configure(text=t("finished_nothing"))
+            self._bar_value(0)
+            return
+        if cancelled:
+            self.status.configure(text=t("finished_cancelled", t.num(total)))
+        else:
+            self.status.configure(text=t("finished", t.num(total), len(results)))
+            self._bar_value(1)
+        saved = self.stats.add_session(total)
+        self.after(250, lambda: SummaryDialog(self, results, total, saved))
+
+    # -- helpers ---------------------------------------------------------- #
+    def _set_bar(self, index: int, fraction: float) -> None:
+        n = max(len(self.items), 1)
+        self._bar_value((index + fraction) / n)
+
+    def _bar_value(self, value: float) -> None:
+        # CTkProgressBar draws a dot at 0; paint the fill like the track instead
+        color = APP_COLORS["neutral"] if value <= 0 else APP_COLORS["accent"]
+        self.bar.configure(progress_color=color)
+        self.bar.set(value)
+
+    def _set_inputs_enabled(self, enabled: bool) -> None:
+        state = "normal" if enabled else "disabled"
+        for w in (self.entry, self.add_btn, self.country_box, self.rlang_box, self.limit_entry,
+                  self.since_entry, self.choose_btn, self.lang_menu):
+            w.configure(state=state)
+        self._update_queue_count()
+
+    def toggle_log(self) -> None:
+        self.log_visible = not self.log_visible
+        self._place_log()
+        self.settings.update(show_log=self.log_visible)
+        self.apply_texts()
+
+    def _place_log(self) -> None:
+        """The log takes the queue's spot in the Apps card while visible."""
+        if self.log_visible:
+            self.queue_frame.grid_remove()
+            self.log_box.grid(row=3, column=0, columnspan=2, sticky="nsew", padx=16, pady=(0, 4))
+        else:
+            self.log_box.grid_remove()
+            self.queue_frame.grid()
+
+    def _log(self, message: str) -> None:
+        from time import strftime
+        self.log_box.configure(state="normal")
+        self.log_box.insert("end", f"{strftime('%H:%M:%S')}  {message}\n")
+        self.log_box.see("end")
+        self.log_box.configure(state="disabled")
+
+    def _clear_log(self) -> None:
+        self.log_box.configure(state="normal")
+        self.log_box.delete("1.0", "end")
+        self.log_box.configure(state="disabled")
+
+    def show_about(self) -> None:
+        AboutDialog(self)
+
+    def on_close(self) -> None:
+        self.cancel_event.set()
+        self.destroy()
+
+
+# --------------------------------------------------------------------------- #
+# Dialogs
+# --------------------------------------------------------------------------- #
+class Dialog(ctk.CTkToplevel):
+    def __init__(self, app: App, title: str, width: int, height: int):
+        super().__init__(app)
+        self.app = app
+        self.title(title)
+        self.resizable(False, False)
+        app.update_idletasks()
+        x = app.winfo_rootx() + (app.winfo_width() - width) // 2
+        y = app.winfo_rooty() + (app.winfo_height() - height) // 3
+        self.geometry(f"{width}x{height}+{max(x, 0)}+{max(y, 0)}")
+        self.transient(app)
+        self.bind("<Escape>", lambda e: self.destroy())
+        self.after(50, self._grab)
+
+    def _grab(self) -> None:
+        try:
+            self.grab_set()
+            self.focus_force()
+        except Exception:  # noqa: BLE001 - window may not be viewable yet
+            pass
+
+
+class SummaryDialog(Dialog):
+    def __init__(self, app: App, results: list[ScrapeResult], total: int, saved_seconds: int):
+        t = app.t
+        super().__init__(app, t("done_title"), 460, 545)
+        stats = GooglePlayReviewScraper.statistics(r for res in results for r in res.reviews)
+
+        body = ctk.CTkFrame(self)
+        body.pack(fill="both", expand=True, padx=16, pady=16)
+
+        ctk.CTkLabel(body, text="✓", font=font(34, "bold"), text_color=APP_COLORS["accent"]).pack(pady=(18, 0))
+        ctk.CTkLabel(body, text=t("done_headline", t.num(total)), font=font(22, "bold")).pack()
+        ctk.CTkLabel(body, text=t("done_apps", len(results)), text_color=MUTED).pack()
+
+        rating = ctk.CTkFrame(body, fg_color=APP_COLORS["inset"])
+        rating.pack(fill="x", padx=20, pady=(16, 8))
+        head = ctk.CTkFrame(rating, fg_color="transparent")
+        head.pack(fill="x", padx=14, pady=(10, 2))
+        ctk.CTkLabel(head, text=t("avg_rating"), font=font(12, "bold"), text_color=MUTED).pack(side="left")
+        ctk.CTkLabel(head, text=f"{stats['average']:.2f} ★", font=font(20, "bold")).pack(side="right")
+        for star in range(5, 0, -1):
+            share = stats["distribution"][star] / stats["total"] if stats["total"] else 0
+            line = ctk.CTkFrame(rating, fg_color="transparent")
+            line.pack(fill="x", padx=14, pady=1)
+            ctk.CTkLabel(line, text=f"{star}★", width=30, anchor="w", font=font(12)).pack(side="left")
+            ctk.CTkLabel(line, text=f"{share * 100:.0f}%", width=40, anchor="e", font=font(12),
+                         text_color=MUTED).pack(side="right")
+            bar = ctk.CTkProgressBar(line, height=8,
+                                     progress_color=APP_COLORS["accent"] if share else APP_COLORS["neutral"])
+            bar.set(share)
+            bar.pack(side="left", fill="x", expand=True, padx=8)
+        ctk.CTkFrame(rating, height=10, fg_color="transparent").pack()
+
+        ctk.CTkLabel(body, text=t("done_time", format_duration(saved_seconds)), font=font(14, "bold")).pack(
+            pady=(8, 0))
+        ctk.CTkLabel(body, text=t("done_compare"), font=font(12), text_color=MUTED).pack()
+        st = app.stats
+        ctk.CTkLabel(
+            body, text=t("done_totals", t.num(st.total_reviews), format_duration(st.total_seconds),
+                         st.total_sessions),
+            font=font(11), text_color=MUTED, wraplength=380,
+        ).pack(pady=(6, 0))
+
+        row = ctk.CTkFrame(body, fg_color="transparent")
+        row.pack(side="bottom", fill="x", padx=20, pady=16)
+        row.grid_columnconfigure((0, 1), weight=1)
+        ctk.CTkButton(row, text=t("open_folder"), height=36, command=lambda: (app.open_output_dir(), self.destroy())
+                      ).grid(row=0, column=0, sticky="ew", padx=(0, 4))
+        ctk.CTkButton(row, text=t("close"), height=36, fg_color=APP_COLORS["neutral"],
+                      hover_color=APP_COLORS["neutral_hover"],
+                      text_color=ctk.ThemeManager.theme["CTkLabel"]["text_color"],
+                      command=self.destroy).grid(row=0, column=1, sticky="ew", padx=(4, 0))
+
+
+class AboutDialog(Dialog):
+    def __init__(self, app: App):
+        t = app.t
+        super().__init__(app, t("about"), 400, 330)
+        body = ctk.CTkFrame(self)
+        body.pack(fill="both", expand=True, padx=16, pady=16)
+        logo = app._logo()
+        ctk.CTkLabel(body, text="", image=logo).pack(pady=(22, 6))
+        ctk.CTkLabel(body, text="Google Play Reviews Scraper", font=font(17, "bold")).pack()
+        ctk.CTkLabel(body, text=f"v{__version__} · MIT", text_color=MUTED).pack()
+        ctk.CTkLabel(body, text=t("about_text"), wraplength=320, justify="center").pack(pady=(12, 4))
+        ctk.CTkLabel(body, text=t("about_author"), text_color=MUTED).pack()
+        ctk.CTkButton(body, text=t("about_github"), height=34,
+                      command=lambda: webbrowser.open(REPO_URL)).pack(pady=(14, 18))
+
+
+def main() -> None:
+    if sys.platform == "win32":
+        try:  # crisp icon in the taskbar instead of the generic Python one
+            import ctypes
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("dssiqueira.GooglePlayReviewsScraper")
+        except Exception:  # noqa: BLE001
+            pass
+    App().mainloop()
+
 
 if __name__ == "__main__":
     main()

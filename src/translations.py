@@ -1,840 +1,532 @@
-#!/usr/bin/env python3
-"""
-Sistema de traduções para Google Play Reviews Scraper
-"""
+"""UI strings for the desktop app (pt, en, es, fr, de, it)."""
 
-TRANSLATIONS = {
-    'pt': {
-        # Janela principal
-        'window_title': 'Google Play Reviews Scraper',
-        'window_subtitle': 'Colete reviews de apps do Google Play Store',
-        
-        # Sections
-        'url_section': 'URL do App',
-        'config_section': 'Configurações',
-        'progress_section': 'Progresso',
-        'log_section': 'Log',
-        
-        # Campos
-        'url_placeholder': 'Cole a URL do app do Google Play Store...',
-        'app_id_label': 'App ID: {}',
-        'country_label': 'País:',
-        'language_label': 'Idioma:',
-        'folder_label': 'Pasta:',
-        'folder_destination_label': 'Pasta de destino:',
-        'add_apps_title': 'Adicionar Apps',
-        'queue_title': 'Apps na fila',
-        'log_activities_title': 'Log de Atividades',
-        'no_apps_added': 'Nenhum app adicionado',
-        'no_apps_yet': 'Nenhum app adicionado ainda',
-        'apps_in_queue_single': '1 app na fila',
-        'apps_in_queue_multiple': '{} apps na fila',
-        'show_log': '▼ Mostrar Log',
-        'hide_log': '▲ Ocultar Log',
-        'ready_to_start': 'Pronto para iniciar',
-        
-        # Buttons
-        'paste_button': 'Colar',
-        'add_button': 'Adicionar',
-        'add_button': 'Adicionar',
-        'choose_button': 'Escolher',
-        'start_button': 'Iniciar Coleta',
-        'processing': 'Processando...',
-        'stop_button': 'Parar',
-        'clear_button': 'Limpar Todos',
-        'csv_button': 'CSV',
-        'json_button': 'JSON',
-        'folder_button': 'Pasta',
-        'close_button': 'Fechar',
-        'show_log_button': '▼ Mostrar Log',
-        'hide_log_button': '▲ Ocultar Log',
-        
-        # Modal de tempo economizado
-        'time_saved_title': 'Tempo Economizado!',
-        'collection_completed': 'Coleta concluída com sucesso!',
-        'reviews_processed': '{} reviews processadas automaticamente.',
-        'reviews_label': 'Reviews',
-        'time_saved_label': 'Tempo Economizado',
-        'manual_comparison': 'vs. coleta manual (30s por review)',
-        'accumulated_totals': 'Totais Acumulados',
-        'total_summary': '{} reviews • {} economizados • {} sessões',
-        
-        # "About" Modal - Statistics
-        'usage_statistics': 'Estatísticas de Uso',
-        'total_time_saved': 'Tempo Total Economizado',
-        'reviews_collected': 'Reviews Coletadas',
-        'usage_sessions': 'Sessões de Uso',
-        'no_stats_message': 'Nenhuma coleta realizada ainda.\nUse a ferramenta para ver suas estatísticas aqui!',
-        
-        # Status
-        'ready_status': 'Pronto para iniciar',
-        'starting_status': 'Iniciando coleta...',
-        'running_status': 'Executando...',
-        'stopping_status': 'Parando...',
-        'ready_status_bar': 'Pronto',
-        'completed_status': 'Concluído: {} reviews coletadas',
-        
-        # Log messages
-        'scraper_started': 'Scraper iniciado - Cole uma URL para começar',
-        'url_pasted': 'URL colada da área de transferência',
-        'folder_changed': 'Pasta alterada para: {}',
-        'processing_url': 'Processando URL: {}',
-        'app_id_extracted': 'App ID extraído: {}',
-        'stopping_collection': 'Parando coleta...',
-        'log_cleared': 'Log limpo',
-        'statistics_title': 'Estatísticas:',
-        'total_reviews': 'Total: {} reviews',
-        'average_rating': 'Rating médio: {:.2f}',
-        'rating_distribution': '{}★: {} ({:.1f}%)',
-        
-        # Mensagens de erro
-        'error_title': 'Erro',
-        'warning_title': 'Aviso',
-        'error_invalid_url': 'Por favor, insira uma URL válida',
-        'error_file_not_found': 'Arquivo não encontrado',
-        'error_folder_not_found': 'Não foi possível abrir a pasta',
-        'error_clipboard': 'Não foi possível colar da área de transferência',
-        'error_invalid_url_status': 'URL inválida',
-        'error_app_id_extraction': 'App ID extraído: {}',
-        
-        # Modal Sobre
-        'about_title': 'Sobre - Google Play Reviews Scraper',
-        'about_description': '''Ferramenta para extrair e analisar reviews de aplicativos do Google Play Store.
+from __future__ import annotations
 
-Funcionalidades:
-• Extração completa de reviews
-• Exportação em CSV e JSON
-• Análise de ratings e estatísticas
-• Interface intuitiva e fácil de usar''',
-        'about_external_tool': '🔗 Ferramenta para análise dos dados:',
-        'about_external_link': 'Review Stats Pro - Análise Avançada',
-        'about_developed_with': 'Desenvolvido com',
-        'about_developed_by': 'por',
-        'about_developer': 'DSiqueira',
-        
-        # Países
-        'countries': {
-            'br': 'Brasil',
-            'us': 'Estados Unidos',
-            'uk': 'Reino Unido',
-            'ca': 'Canadá',
-            'au': 'Austrália',
-            'de': 'Alemanha',
-            'fr': 'França',
-            'es': 'Espanha',
-            'it': 'Itália'
-        },
-        
-        # Idiomas
-        'languages': {
-            'pt': 'Português',
-            'en': 'English',
-            'es': 'Español',
-            'fr': 'Français',
-            'de': 'Deutsch',
-            'it': 'Italiano'
-        }
-    },
-    
-    'en': {
-        # Main window
-        'window_title': 'Google Play Reviews Scraper',
-        'window_subtitle': 'Collect app reviews from Google Play Store',
-        
-        # Sections
-        'url_section': 'App URL',
-        'config_section': 'Settings',
-        'progress_section': 'Progress',
-        'log_section': 'Log',
-        
-        # Fields
-        'url_placeholder': 'Paste the Google Play Store app URL...',
-        'app_id_label': 'App ID: {}',
-        'country_label': 'Country:',
-        'language_label': 'Language:',
-        'folder_label': 'Folder:',
-        'folder_destination_label': 'Destination folder:',
-        'add_apps_title': 'Add Apps',
-        'queue_title': 'Apps in queue',
-        'log_activities_title': 'Activity Log',
-        'no_apps_added': 'No apps added',
-        'no_apps_yet': 'No apps added yet',
-        'apps_in_queue_single': '1 app in queue',
-        'apps_in_queue_multiple': '{} apps in queue',
-        'show_log': '▼ Show Log',
-        'hide_log': '▲ Hide Log',
-        'ready_to_start': 'Ready to start',
-        
-        # Buttons
-        'paste_button': 'Paste',
-        'add_button': 'Add',
-        'add_button': 'Add',
-        'choose_button': 'Choose',
-        'start_button': 'Start Collection',
-        'processing': 'Processing...',
-        'stop_button': 'Stop',
-        'clear_button': 'Clear All',
-        'csv_button': 'CSV',
-        'json_button': 'JSON',
-        'folder_button': 'Folder',
-        'close_button': 'Close',
-        'show_log_button': '▼ Show Log',
-        'hide_log_button': '▲ Hide Log',
-        
-        # Time saved modal
-        'time_saved_title': 'Time Saved!',
-        'collection_completed': 'Collection completed successfully!',
-        'reviews_processed': '{} reviews processed automatically.',
-        'reviews_label': 'Reviews',
-        'time_saved_label': 'Time Saved',
-        'manual_comparison': 'vs. manual collection (30s per review)',
-        'accumulated_totals': 'Accumulated Totals',
-        'total_summary': '{} reviews • {} saved • {} sessions',
-        
-        # "About" modal - Statistics
-        'usage_statistics': 'Usage Statistics',
-        'total_time_saved': 'Total Time Saved',
-        'reviews_collected': 'Reviews Collected',
-        'usage_sessions': 'Usage Sessions',
-        'no_stats_message': 'No collections performed yet.\nUse the tool to see your statistics here!',
-        
-        # Status
-        'ready_status': 'Ready to start',
-        'starting_status': 'Starting collection...',
-        'running_status': 'Running...',
-        'stopping_status': 'Stopping...',
-        'ready_status_bar': 'Ready',
-        'completed_status': 'Completed: {} reviews collected',
-        
-        # Log messages
-        'scraper_started': 'Scraper started - Paste a URL to begin',
-        'url_pasted': 'URL pasted from clipboard',
-        'folder_changed': 'Folder changed to: {}',
-        'processing_url': 'Processing URL: {}',
-        'app_id_extracted': 'App ID extracted: {}',
-        'stopping_collection': 'Stopping collection...',
-        'log_cleared': 'Log cleared',
-        'statistics_title': 'Statistics:',
-        'total_reviews': 'Total: {} reviews',
-        'average_rating': 'Average rating: {:.2f}',
-        'rating_distribution': '{}★: {} ({:.1f}%)',
-        
-        # Error messages
-        'error_title': 'Error',
-        'warning_title': 'Warning',
-        'error_invalid_url': 'Please enter a valid URL',
-        'error_file_not_found': 'File not found',
-        'error_folder_not_found': 'Could not open folder',
-        'error_clipboard': 'Could not paste from clipboard',
-        'error_invalid_url_status': 'Invalid URL',
-        'error_app_id_extraction': 'App ID extracted: {}',
-        
-        # About modal
-        'about_title': 'About - Google Play Reviews Scraper',
-        'about_description': '''Tool to extract and analyze app reviews from Google Play Store.
+import locale
+import re
 
-Features:
-• Complete review extraction
-• CSV and JSON export
-• Rating analysis and statistics
-• Intuitive and easy-to-use interface''',
-        'about_external_tool': '🔗 Tool for data analysis:',
-        'about_external_link': 'Review Stats Pro - Advanced Analysis',
-        'about_developed_with': 'Developed with',
-        'about_developed_by': 'by',
-        'about_developer': 'DSiqueira',
-        
-        # Countries
-        'countries': {
-            'br': 'Brazil',
-            'us': 'United States',
-            'uk': 'United Kingdom',
-            'ca': 'Canada',
-            'au': 'Australia',
-            'de': 'Germany',
-            'fr': 'France',
-            'es': 'Spain',
-            'it': 'Italy'
-        },
-        
-        # Languages
-        'languages': {
-            'pt': 'Português',
-            'en': 'English',
-            'es': 'Español',
-            'fr': 'Français',
-            'de': 'Deutsch',
-            'it': 'Italiano'
-        }
-    },
-    
-    'es': {
-        # Ventana principal
-        'window_title': 'Google Play Reviews Scraper',
-        'window_subtitle': 'Recopila reseñas de apps de Google Play Store',
-        
-        # Secciones
-        'url_section': 'URL de la App',
-        'config_section': 'Configuración',
-        'progress_section': 'Progreso',
-        'log_section': 'Registro',
-        
-        # Campos
-        'url_placeholder': 'Pega la URL de la app de Google Play Store...',
-        'app_id_label': 'ID de App: {}',
-        'country_label': 'País:',
-        'language_label': 'Idioma:',
-        'folder_label': 'Carpeta:',
-        'folder_destination_label': 'Carpeta de destino:',
-        'add_apps_title': 'Agregar Apps',
-        'queue_title': 'Apps en cola',
-        'log_activities_title': 'Registro de Actividades',
-        'no_apps_added': 'Ninguna app agregada',
-        'no_apps_yet': 'Ninguna app agregada aún',
-        'apps_in_queue_single': '1 app en cola',
-        'apps_in_queue_multiple': '{} apps en cola',
-        'show_log': '▼ Mostrar Registro',
-        'hide_log': '▲ Ocultar Registro',
-        'ready_to_start': 'Listo para comenzar',
-        
-        # Botones
-        'paste_button': 'Pegar',
-        'add_button': 'Añadir',
-        'choose_button': 'Elegir',
-        'start_button': 'Iniciar Colección',
-        'processing': 'Procesando...',
-        'stop_button': 'Parar',
-        'clear_button': 'Limpiar Todo',
-        'csv_button': 'CSV',
-        'json_button': 'JSON',
-        'folder_button': 'Carpeta',
-        'close_button': 'Cerrar',
-        'show_log_button': '▼ Mostrar Log',
-        'hide_log_button': '▲ Ocultar Log',
-        
-        # Modal de tiempo ahorrado
-        'time_saved_title': '¡Tiempo Ahorrado!',
-        'collection_completed': '¡Recopilación completada con éxito!',
-        'reviews_processed': '{} reseñas procesadas automáticamente.',
-        'reviews_label': 'Reseñas',
-        'time_saved_label': 'Tiempo Ahorrado',
-        'manual_comparison': 'vs. recopilación manual (30s por reseña)',
-        'accumulated_totals': 'Totales Acumulados',
-        'total_summary': '{} reseñas • {} ahorrados • {} sesiones',
-        
-        # "About" Modal - Statistics
-        'usage_statistics': 'Estadísticas de Uso',
-        'total_time_saved': 'Tiempo Total Ahorrado',
-        'reviews_collected': 'Reseñas Recopiladas',
-        'usage_sessions': 'Sesiones de Uso',
-        'no_stats_message': 'Aún no se han realizado recopilaciones.\n¡Usa la herramienta para ver tus estadísticas aquí!',
-        
-        # Estado
-        'ready_status': 'Listo para comenzar',
-        'starting_status': 'Iniciando recopilación...',
-        'running_status': 'Ejecutando...',
-        'stopping_status': 'Parando...',
-        'ready_status_bar': 'Listo',
-        'completed_status': 'Completado: {} reseñas recopiladas',
-        
-        # Mensajes de registro
-        'scraper_started': 'Scraper iniciado - Pega una URL para comenzar',
-        'url_pasted': 'URL pegada del portapapeles',
-        'folder_changed': 'Carpeta cambiada a: {}',
-        'processing_url': 'Procesando URL: {}',
-        'app_id_extracted': 'ID de App extraído: {}',
-        'stopping_collection': 'Parando recopilación...',
-        'log_cleared': 'Registro limpiado',
-        'statistics_title': 'Estadísticas:',
-        'total_reviews': 'Total: {} reseñas',
-        'average_rating': 'Calificación promedio: {:.2f}',
-        'rating_distribution': '{}★: {} ({:.1f}%)',
-        
-        # Mensajes de error
-        'error_title': 'Error',
-        'warning_title': 'Advertencia',
-        'error_invalid_url': 'Por favor, ingresa una URL válida',
-        'error_file_not_found': 'Archivo no encontrado',
-        'error_folder_not_found': 'No se pudo abrir la carpeta',
-        'error_clipboard': 'No se pudo pegar del portapapeles',
-        'error_invalid_url_status': 'URL inválida',
-        'error_app_id_extraction': 'ID de App extraído: {}',
-        
-        # Modal Acerca de
-        'about_title': 'Acerca de - Google Play Reviews Scraper',
-        'about_description': '''Herramienta para extraer y analizar reseñas de aplicaciones de Google Play Store.
-
-Características:
-• Extracción completa de reseñas
-• Exportación en CSV y JSON
-• Análisis de calificaciones y estadísticas
-• Interfaz intuitiva y fácil de usar''',
-        'about_external_tool': '🔗 Herramienta para análisis de datos:',
-        'about_external_link': 'Review Stats Pro - Análisis Avanzado',
-        'about_developed_with': 'Desarrollado con',
-        'about_developed_by': 'por',
-        'about_developer': 'DSiqueira',
-        
-        # Países
-        'countries': {
-            'br': 'Brasil',
-            'us': 'Estados Unidos',
-            'uk': 'Reino Unido',
-            'ca': 'Canadá',
-            'au': 'Australia',
-            'de': 'Alemania',
-            'fr': 'Francia',
-            'es': 'España',
-            'it': 'Italia'
-        },
-        
-        # Idiomas
-        'languages': {
-            'pt': 'Português',
-            'en': 'English',
-            'es': 'Español',
-            'fr': 'Français',
-            'de': 'Deutsch',
-            'it': 'Italiano'
-        }
-    },
-    
-    'fr': {
-        # Main window
-        'window_title': 'Google Play Reviews Scraper',
-        'window_subtitle': 'Collectez les avis d\'apps du Google Play Store',
-        
-        # Sections
-        'url_section': 'URL de l\'App',
-        'config_section': 'Paramètres',
-        'progress_section': 'Progrès',
-        'log_section': 'Journal',
-        
-        # Champs
-        'url_placeholder': 'Collez l\'URL de l\'app du Google Play Store...',
-        'app_id_label': 'ID App: {}',
-        'country_label': 'Pays:',
-        'language_label': 'Langue:',
-        'folder_label': 'Dossier:',
-        'folder_destination_label': 'Dossier de destination:',
-        'add_apps_title': 'Ajouter des Apps',
-        'queue_title': 'Apps en file',
-        'log_activities_title': 'Journal d\'Activités',
-        'no_apps_added': 'Aucune app ajoutée',
-        'no_apps_yet': 'Aucune app ajoutée encore',
-        'apps_in_queue_single': '1 app en file',
-        'apps_in_queue_multiple': '{} apps en file',
-        'show_log': '▼ Afficher Journal',
-        'hide_log': '▲ Masquer Journal',
-        'ready_to_start': 'Prêt à commencer',
-        
-        # Boutons
-        'paste_button': 'Coller',
-        'add_button': 'Ajouter',
-        'add_button': 'Ajouter',
-        'choose_button': 'Choisir',
-        'start_button': 'Démarrer Collection',
-        'processing': 'Traitement...',
-        'stop_button': 'Arrêter',
-        'clear_button': 'Effacer Tout',
-        'csv_button': 'CSV',
-        'json_button': 'JSON',
-        'folder_button': 'Dossier',
-        'close_button': 'Fermer',
-        'show_log_button': '▼ Afficher Log',
-        'hide_log_button': '▲ Masquer Log',
-        
-        # Time saved modal
-        'time_saved_title': 'Temps Économisé !',
-        'collection_completed': 'Collection terminée avec succès !',
-        'reviews_processed': '{} avis traités automatiquement.',
-        'reviews_label': 'Avis',
-        'time_saved_label': 'Temps Économisé',
-        'manual_comparison': 'vs. collecte manuelle (30s par avis)',
-        'accumulated_totals': 'Totaux Accumulés',
-        'total_summary': '{} avis • {} économisés • {} sessions',
-        
-        # "About" Modal - Statistics
-        'usage_statistics': 'Statistiques d\'Utilisation',
-        'total_time_saved': 'Temps Total Économisé',
-        'reviews_collected': 'Avis collectés',
-        'usage_sessions': 'Sessions d\'utilisation',
-        'no_stats_message': 'Aucune collecte effectuée pour le moment.\nUtilisez l\'outil pour voir vos statistiques ici !',
-        
-        # Status
-        'ready_status': 'Prêt à commencer',
-        'starting_status': 'Démarrage de la collection...',
-        'running_status': 'En cours...',
-        'stopping_status': 'Arrêt...',
-        'ready_status_bar': 'Prêt',
-        'completed_status': 'Terminé: {} avis collectés',
-        
-        # Messages du journal
-        'scraper_started': 'Scraper démarré - Collez une URL pour commencer',
-        'url_pasted': 'URL collée du presse-papiers',
-        'folder_changed': 'Dossier changé vers: {}',
-        'processing_url': 'Traitement de l\'URL: {}',
-        'app_id_extracted': 'ID App extrait: {}',
-        'stopping_collection': 'Arrêt de la collection...',
-        'log_cleared': 'Journal effacé',
-        'statistics_title': 'Statistiques:',
-        'total_reviews': 'Total: {} avis',
-        'average_rating': 'Note moyenne: {:.2f}',
-        'rating_distribution': '{}★: {} ({:.1f}%)',
-        
-        # Messages d'erreur
-        'error_title': 'Erreur',
-        'warning_title': 'Avertissement',
-        'error_invalid_url': 'Veuillez saisir une URL valide',
-        'error_file_not_found': 'Fichier non trouvé',
-        'error_folder_not_found': 'Impossible d\'ouvrir le dossier',
-        'error_clipboard': 'Impossible de coller du presse-papiers',
-        'error_invalid_url_status': 'URL invalide',
-        'error_app_id_extraction': 'ID App extrait: {}',
-        
-        # About modal
-        'about_title': 'À propos - Google Play Reviews Scraper',
-        'about_description': '''Outil pour extraire et analyser les avis d\'applications du Google Play Store.
-
-Fonctionnalités:
-• Extraction complète des avis
-• Export en CSV et JSON
-• Analyse des notes et statistiques
-• Interface intuitive et facile à utiliser''',
-        'about_external_tool': '🔗 Outil pour l\'analyse des données:',
-        'about_external_link': 'Review Stats Pro - Analyse Avancée',
-        'about_developed_with': 'Développé avec',
-        'about_developed_by': 'par',
-        'about_developer': 'DSiqueira',
-        
-        # Pays
-        'countries': {
-            'br': 'Brésil',
-            'us': 'États-Unis',
-            'uk': 'Royaume-Uni',
-            'ca': 'Canada',
-            'au': 'Australie',
-            'de': 'Allemagne',
-            'fr': 'France',
-            'es': 'Espagne',
-            'it': 'Italie'
-        },
-        
-        # Langues
-        'languages': {
-            'pt': 'Português',
-            'en': 'English',
-            'es': 'Español',
-            'fr': 'Français',
-            'de': 'Deutsch',
-            'it': 'Italiano'
-        }
-    },
-    
-    'de': {
-        # Hauptfenster
-        'window_title': 'Google Play Reviews Scraper',
-        'window_subtitle': 'Sammeln Sie App-Bewertungen aus dem Google Play Store',
-        
-        # Abschnitte
-        'url_section': 'App-URL',
-        'config_section': 'Einstellungen',
-        'progress_section': 'Fortschritt',
-        'log_section': 'Protokoll',
-        
-        # Felder
-        'url_placeholder': 'Google Play Store App-URL einfügen...',
-        'app_id_label': 'App-ID: {}',
-        'country_label': 'Land:',
-        'language_label': 'Sprache:',
-        'folder_label': 'Ordner:',
-        'folder_destination_label': 'Zielordner:',
-        'add_apps_title': 'Apps Hinzufügen',
-        'queue_title': 'Apps in Warteschlange',
-        'log_activities_title': 'Aktivitätsprotokoll',
-        'no_apps_added': 'Keine Apps hinzugefügt',
-        'no_apps_yet': 'Noch keine Apps hinzugefügt',
-        'apps_in_queue_single': '1 App in Warteschlange',
-        'apps_in_queue_multiple': '{} Apps in Warteschlange',
-        'show_log': '▼ Protokoll Anzeigen',
-        'hide_log': '▲ Protokoll Ausblenden',
-        'ready_to_start': 'Bereit zum Starten',
-        
-        # Schaltflächen
-        'paste_button': 'Einfügen',
-        'add_button': 'Hinzufügen',
-        'add_button': 'Hinzufügen',
-        'choose_button': 'Wählen',
-        'start_button': 'Sammlung Starten',
-        'processing': 'Verarbeitung...',
-        'stop_button': 'Stoppen',
-        'clear_button': 'Alle Löschen',
-        'csv_button': 'CSV',
-        'json_button': 'JSON',
-        'folder_button': 'Ordner',
-        'close_button': 'Schließen',
-        'show_log_button': '▼ Log Anzeigen',
-        'hide_log_button': '▲ Log Ausblenden',
-        
-        # Modal für gesparte Zeit
-        'time_saved_title': 'Zeit Gespart!',
-        'collection_completed': 'Sammlung erfolgreich abgeschlossen!',
-        'reviews_processed': '{} Bewertungen automatisch verarbeitet.',
-        'reviews_label': 'Bewertungen',
-        'time_saved_label': 'Zeit Gespart',
-        'manual_comparison': 'vs. manuelle Sammlung (30s pro Bewertung)',
-        'accumulated_totals': 'Gesamtsummen',
-        'total_summary': '{} Bewertungen • {} gespart • {} Sitzungen',
-        
-        # "Über" Modal - Statistiken
-        'usage_statistics': 'Statistiken',
-        'total_time_saved': 'Zeit Gespart',
-        'reviews_collected': 'Reviews',
-        'usage_sessions': 'Sessions',
-        'no_stats_message': 'Noch keine Sammlungen durchgeführt.\nVerwenden Sie das Tool, um Ihre Statistiken hier zu sehen!',
-        
-        # Status
-        'ready_status': 'Bereit zum Starten',
-        'starting_status': 'Sammlung wird gestartet...',
-        'running_status': 'Läuft...',
-        'stopping_status': 'Wird gestoppt...',
-        'ready_status_bar': 'Bereit',
-        'completed_status': 'Abgeschlossen: {} Bewertungen gesammelt',
-        
-        # Protokollnachrichten
-        'scraper_started': 'Scraper gestartet - URL einfügen zum Beginnen',
-        'url_pasted': 'URL aus Zwischenablage eingefügt',
-        'folder_changed': 'Ordner geändert zu: {}',
-        'processing_url': 'URL wird verarbeitet: {}',
-        'app_id_extracted': 'App-ID extrahiert: {}',
-        'stopping_collection': 'Sammlung wird gestoppt...',
-        'log_cleared': 'Protokoll gelöscht',
-        'statistics_title': 'Statistiken:',
-        'total_reviews': 'Gesamt: {} Bewertungen',
-        'average_rating': 'Durchschnittsbewertung: {:.2f}',
-        'rating_distribution': '{}★: {} ({:.1f}%)',
-        
-        # Fehlermeldungen
-        'error_title': 'Fehler',
-        'warning_title': 'Warnung',
-        'error_invalid_url': 'Bitte geben Sie eine gültige URL ein',
-        'error_file_not_found': 'Datei nicht gefunden',
-        'error_folder_not_found': 'Ordner konnte nicht geöffnet werden',
-        'error_clipboard': 'Konnte nicht aus Zwischenablage einfügen',
-        'error_invalid_url_status': 'Ungültige URL',
-        'error_app_id_extraction': 'App-ID extrahiert: {}',
-        
-        # Über-Dialog
-        'about_title': 'Über - Google Play Reviews Scraper',
-        'about_description': '''Tool zum Extrahieren und Analysieren von App-Bewertungen aus dem Google Play Store.
-
-Funktionen:
-• Vollständige Bewertungsextraktion
-• Export in CSV und JSON
-• Bewertungsanalyse und Statistiken
-• Intuitive und benutzerfreundliche Oberfläche''',
-        'about_external_tool': '🔗 Tool für Datenanalyse:',
-        'about_external_link': 'Review Stats Pro - Erweiterte Analyse',
-        'about_developed_with': 'Entwickelt mit',
-        'about_developed_by': 'von',
-        'about_developer': 'DSiqueira',
-        
-        # Länder
-        'countries': {
-            'br': 'Brasilien',
-            'us': 'Vereinigte Staaten',
-            'uk': 'Vereinigtes Königreich',
-            'ca': 'Kanada',
-            'au': 'Australien',
-            'de': 'Deutschland',
-            'fr': 'Frankreich',
-            'es': 'Spanien',
-            'it': 'Italien'
-        },
-        
-        # Sprachen
-        'languages': {
-            'pt': 'Português',
-            'en': 'English',
-            'es': 'Español',
-            'fr': 'Français',
-            'de': 'Deutsch',
-            'it': 'Italiano'
-        }
-    },
-    
-    'it': {
-        # Finestra principale
-        'window_title': 'Google Play Reviews Scraper',
-        'window_subtitle': 'Raccogli recensioni di app dal Google Play Store',
-        
-        # Sezioni
-        'url_section': 'URL dell\'App',
-        'config_section': 'Impostazioni',
-        'progress_section': 'Progresso',
-        'log_section': 'Registro',
-        
-        # Campi
-        'url_placeholder': 'Incolla l\'URL dell\'app del Google Play Store...',
-        'app_id_label': 'ID App: {}',
-        'country_label': 'Paese:',
-        'language_label': 'Lingua:',
-        'folder_label': 'Cartella:',
-        'folder_destination_label': 'Cartella di destinazione:',
-        'add_apps_title': 'Aggiungi App',
-        'queue_title': 'App in coda',
-        'log_activities_title': 'Registro Attività',
-        'no_apps_added': 'Nessuna app aggiunta',
-        'no_apps_yet': 'Nessuna app aggiunta ancora',
-        'apps_in_queue_single': '1 app in coda',
-        'apps_in_queue_multiple': '{} app in coda',
-        'show_log': '▼ Mostra Registro',
-        'hide_log': '▲ Nascondi Registro',
-        'ready_to_start': 'Pronto per iniziare',
-        
-        # Pulsanti
-        'paste_button': 'Incolla',
-        'add_button': 'Aggiungi',
-        'choose_button': 'Scegli',
-        'start_button': 'Inizia Raccolta',
-        'processing': 'Elaborazione...',
-        'stop_button': 'Ferma',
-        'clear_button': 'Pulisci Tutto',
-        'csv_button': 'CSV',
-        'json_button': 'JSON',
-        'folder_button': 'Cartella',
-        'close_button': 'Chiudi',
-        'show_log_button': '▼ Mostra Log',
-        'hide_log_button': '▲ Nascondi Log',
-        
-        # Modal tempo risparmiato
-        'time_saved_title': 'Tempo Risparmiato!',
-        'collection_completed': 'Raccolta completata con successo!',
-        'reviews_processed': '{} recensioni elaborate automaticamente.',
-        'reviews_label': 'Recensioni',
-        'time_saved_label': 'Tempo Risparmiato',
-        'manual_comparison': 'vs. raccolta manuale (30s per recensione)',
-        'accumulated_totals': 'Totali Accumulati',
-        'total_summary': '{} recensioni • {} risparmiati • {} sessioni',
-        
-        # Modal "Informazioni" - Statistiche
-        'usage_statistics': 'Statistiche di Utilizzo',
-        'total_time_saved': 'Tempo Totale Risparmiato',
-        'reviews_collected': 'Recensioni raccolte',
-        'usage_sessions': 'Sessioni di utilizzo',
-        'no_stats_message': 'Nessuna raccolta eseguita ancora.\nUsa lo strumento per vedere le tue statistiche qui!',
-        
-        # Stato
-        'ready_status': 'Pronto per iniziare',
-        'starting_status': 'Avvio raccolta...',
-        'running_status': 'In esecuzione...',
-        'stopping_status': 'Fermando...',
-        'ready_status_bar': 'Pronto',
-        'completed_status': 'Completato: {} recensioni raccolte',
-        
-        # Messaggi del registro
-        'scraper_started': 'Scraper avviato - Incolla un URL per iniziare',
-        'url_pasted': 'URL incollato dagli appunti',
-        'folder_changed': 'Cartella cambiata in: {}',
-        'processing_url': 'Elaborazione URL: {}',
-        'app_id_extracted': 'ID App estratto: {}',
-        'stopping_collection': 'Fermando raccolta...',
-        'log_cleared': 'Registro pulito',
-        'statistics_title': 'Statistiche:',
-        'total_reviews': 'Totale: {} recensioni',
-        'average_rating': 'Valutazione media: {:.2f}',
-        'rating_distribution': '{}★: {} ({:.1f}%)',
-        
-        # Messaggi di errore
-        'error_title': 'Errore',
-        'warning_title': 'Avviso',
-        'error_invalid_url': 'Inserisci un URL valido',
-        'error_file_not_found': 'File non trovato',
-        'error_folder_not_found': 'Impossibile aprire la cartella',
-        'error_clipboard': 'Impossibile incollare dagli appunti',
-        'error_invalid_url_status': 'URL non valido',
-        'error_app_id_extraction': 'ID App estratto: {}',
-        
-        # Finestra Informazioni
-        'about_title': 'Informazioni - Google Play Reviews Scraper',
-        'about_description': '''Strumento per estrarre e analizzare recensioni di app dal Google Play Store.
-
-Caratteristiche:
-• Estrazione completa delle recensioni
-• Esportazione in CSV e JSON
-• Analisi delle valutazioni e statistiche
-• Interfaccia intuitiva e facile da usare''',
-        'about_external_tool': '🔗 Strumento per analisi dati:',
-        'about_external_link': 'Review Stats Pro - Analisi Avanzata',
-        'about_developed_with': 'Sviluppato con',
-        'about_developed_by': 'da',
-        'about_developer': 'DSiqueira',
-        
-        # Paesi
-        'countries': {
-            'br': 'Brasile',
-            'us': 'Stati Uniti',
-            'uk': 'Regno Unito',
-            'ca': 'Canada',
-            'au': 'Australia',
-            'de': 'Germania',
-            'fr': 'Francia',
-            'es': 'Spagna',
-            'it': 'Italia'
-        },
-        
-        # Lingue
-        'languages': {
-            'pt': 'Português',
-            'en': 'English',
-            'es': 'Español',
-            'fr': 'Français',
-            'de': 'Deutsch',
-            'it': 'Italiano'
-        }
-    }
+LANGUAGES = {
+    "pt": "Português",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "de": "Deutsch",
+    "it": "Italiano",
 }
 
+# Store countries: code -> names in (pt, en, es, fr, de, it).
+# Note: the United Kingdom is "gb" on Google Play, not "uk".
+_COUNTRIES = {
+    "br": ("Brasil", "Brazil", "Brasil", "Brésil", "Brasilien", "Brasile"),
+    "pt": ("Portugal", "Portugal", "Portugal", "Portugal", "Portugal", "Portogallo"),
+    "us": ("Estados Unidos", "United States", "Estados Unidos", "États-Unis", "USA", "Stati Uniti"),
+    "gb": ("Reino Unido", "United Kingdom", "Reino Unido", "Royaume-Uni", "Vereinigtes Königreich", "Regno Unito"),
+    "ca": ("Canadá", "Canada", "Canadá", "Canada", "Kanada", "Canada"),
+    "au": ("Austrália", "Australia", "Australia", "Australie", "Australien", "Australia"),
+    "in": ("Índia", "India", "India", "Inde", "Indien", "India"),
+    "mx": ("México", "Mexico", "México", "Mexique", "Mexiko", "Messico"),
+    "ar": ("Argentina", "Argentina", "Argentina", "Argentine", "Argentinien", "Argentina"),
+    "co": ("Colômbia", "Colombia", "Colombia", "Colombie", "Kolumbien", "Colombia"),
+    "cl": ("Chile", "Chile", "Chile", "Chili", "Chile", "Cile"),
+    "es": ("Espanha", "Spain", "España", "Espagne", "Spanien", "Spagna"),
+    "fr": ("França", "France", "Francia", "France", "Frankreich", "Francia"),
+    "de": ("Alemanha", "Germany", "Alemania", "Allemagne", "Deutschland", "Germania"),
+    "it": ("Itália", "Italy", "Italia", "Italie", "Italien", "Italia"),
+    "jp": ("Japão", "Japan", "Japón", "Japon", "Japan", "Giappone"),
+}
+
+# Review languages, shown by their own name.
+REVIEW_LANGUAGES = {
+    "pt": "Português", "en": "English", "es": "Español", "fr": "Français",
+    "de": "Deutsch", "it": "Italiano", "ja": "日本語", "ko": "한국어",
+    "zh": "中文", "ru": "Русский", "tr": "Türkçe", "nl": "Nederlands",
+    "pl": "Polski", "hi": "हिन्दी", "id": "Bahasa Indonesia", "ar": "العربية",
+}
+
+_ORDER = list(LANGUAGES)
+
+STRINGS: dict[str, dict[str, str]] = {
+    "pt": {
+        "subtitle": "Colete reviews de apps da Play Store em CSV, JSON ou Excel",
+        "apps_title": "Apps",
+        "url_placeholder": "Cole a URL da Play Store ou o ID do app (ex.: com.whatsapp)",
+        "add": "Adicionar",
+        "paste_hint": "Dica: dá pra colar várias URLs de uma vez, uma por linha.",
+        "invalid_input": "Não reconheci “{}” como URL ou ID de app.",
+        "already_queued": "{} já está na fila.",
+        "queue_empty": "Nenhum app na fila ainda",
+        "queue_count_one": "1 app na fila",
+        "queue_count_many": "{} apps na fila",
+        "clear": "Limpar fila",
+        "status_pending": "Na fila",
+        "status_running": "Coletando…",
+        "status_done": "{} reviews",
+        "status_partial": "{} reviews · parcial",
+        "status_error": "Erro: {}",
+        "status_skipped": "Não coletado",
+        "open": "Abrir",
+        "options_title": "Opções",
+        "country": "País da loja",
+        "review_language": "Idioma das reviews",
+        "limit": "Máximo por app",
+        "limit_placeholder": "Todas",
+        "since": "A partir de",
+        "since_placeholder": "AAAA-MM-DD",
+        "formats": "Salvar como",
+        "folder": "Pasta de destino",
+        "choose": "Escolher…",
+        "open_folder": "Abrir pasta",
+        "ready": "Pronto. Adicione apps e clique em Iniciar.",
+        "start": "Iniciar coleta",
+        "stop": "Parar",
+        "stopping": "Parando…",
+        "app_progress": "App {} de {} · {}",
+        "count_progress": "{} reviews",
+        "count_progress_total": "{} de ~{} reviews",
+        "finished": "Concluído: {} reviews de {} app(s).",
+        "finished_cancelled": "Coleta interrompida. {} reviews salvas.",
+        "finished_nothing": "Nenhuma review coletada.",
+        "show_log": "Mostrar log",
+        "hide_log": "Ocultar log",
+        "error_title": "Ops",
+        "err_no_apps": "Adicione pelo menos um app à fila.",
+        "err_limit": "O máximo por app precisa ser um número inteiro maior que zero.",
+        "err_since": "Use o formato AAAA-MM-DD na data (ex.: 2026-01-31).",
+        "err_no_format": "Escolha pelo menos um formato de arquivo.",
+        "err_folder": "Não consegui usar a pasta de destino:\n{}",
+        "log_start": "Coletando {} (loja {}, idioma {})",
+        "log_saved": "Salvo: {}",
+        "log_done": "{}: {} reviews",
+        "log_partial": "{}: coleta parcial ({})",
+        "log_cancelled": "interrompida",
+        "log_error": "{}: falhou — {}",
+        "done_title": "Coleta concluída",
+        "done_headline": "{} reviews coletadas",
+        "done_apps": "de {} app(s)",
+        "done_time": "Você economizou uns {}",
+        "done_compare": "comparado a copiar à mão (≈30s por review)",
+        "done_totals": "No total: {} reviews · {} economizados · coletas: {}",
+        "avg_rating": "Nota média",
+        "close": "Fechar",
+        "about": "Sobre",
+        "about_text": "Ferramenta open source para coletar e analisar reviews da Google Play Store.",
+        "about_author": "Feito por Douglas Siqueira",
+        "about_github": "Ver no GitHub",
+        "theme_system": "Automático",
+        "theme_light": "Claro",
+        "theme_dark": "Escuro",
+    },
+    "en": {
+        "subtitle": "Collect Play Store app reviews as CSV, JSON or Excel",
+        "apps_title": "Apps",
+        "url_placeholder": "Paste a Play Store URL or an app id (e.g. com.whatsapp)",
+        "add": "Add",
+        "paste_hint": "Tip: you can paste several URLs at once, one per line.",
+        "invalid_input": "“{}” doesn't look like a Play Store URL or app id.",
+        "already_queued": "{} is already in the queue.",
+        "queue_empty": "No apps in the queue yet",
+        "queue_count_one": "1 app in the queue",
+        "queue_count_many": "{} apps in the queue",
+        "clear": "Clear queue",
+        "status_pending": "Queued",
+        "status_running": "Collecting…",
+        "status_done": "{} reviews",
+        "status_partial": "{} reviews · partial",
+        "status_error": "Error: {}",
+        "status_skipped": "Not collected",
+        "open": "Open",
+        "options_title": "Options",
+        "country": "Store country",
+        "review_language": "Review language",
+        "limit": "Max per app",
+        "limit_placeholder": "All",
+        "since": "Since",
+        "since_placeholder": "YYYY-MM-DD",
+        "formats": "Save as",
+        "folder": "Output folder",
+        "choose": "Choose…",
+        "open_folder": "Open folder",
+        "ready": "Ready. Add some apps and hit Start.",
+        "start": "Start collecting",
+        "stop": "Stop",
+        "stopping": "Stopping…",
+        "app_progress": "App {} of {} · {}",
+        "count_progress": "{} reviews",
+        "count_progress_total": "{} of ~{} reviews",
+        "finished": "Done: {} reviews from {} app(s).",
+        "finished_cancelled": "Collection stopped. {} reviews saved.",
+        "finished_nothing": "No reviews collected.",
+        "show_log": "Show log",
+        "hide_log": "Hide log",
+        "error_title": "Oops",
+        "err_no_apps": "Add at least one app to the queue.",
+        "err_limit": "Max per app must be a whole number greater than zero.",
+        "err_since": "Use the YYYY-MM-DD format for the date (e.g. 2026-01-31).",
+        "err_no_format": "Pick at least one file format.",
+        "err_folder": "Couldn't use the output folder:\n{}",
+        "log_start": "Collecting {} (store {}, language {})",
+        "log_saved": "Saved: {}",
+        "log_done": "{}: {} reviews",
+        "log_partial": "{}: partial collection ({})",
+        "log_cancelled": "stopped",
+        "log_error": "{}: failed — {}",
+        "done_title": "Collection complete",
+        "done_headline": "{} reviews collected",
+        "done_apps": "from {} app(s)",
+        "done_time": "You saved about {}",
+        "done_compare": "compared to copying by hand (≈30s per review)",
+        "done_totals": "All time: {} reviews · {} saved · runs: {}",
+        "avg_rating": "Average rating",
+        "close": "Close",
+        "about": "About",
+        "about_text": "Open source tool to collect and analyze Google Play Store reviews.",
+        "about_author": "Made by Douglas Siqueira",
+        "about_github": "View on GitHub",
+        "theme_system": "System",
+        "theme_light": "Light",
+        "theme_dark": "Dark",
+    },
+    "es": {
+        "subtitle": "Recopila reseñas de apps de Play Store en CSV, JSON o Excel",
+        "apps_title": "Apps",
+        "url_placeholder": "Pega una URL de Play Store o el ID de la app (ej.: com.whatsapp)",
+        "add": "Añadir",
+        "paste_hint": "Consejo: puedes pegar varias URLs a la vez, una por línea.",
+        "invalid_input": "“{}” no parece una URL de Play Store ni un ID de app.",
+        "already_queued": "{} ya está en la cola.",
+        "queue_empty": "Todavía no hay apps en la cola",
+        "queue_count_one": "1 app en la cola",
+        "queue_count_many": "{} apps en la cola",
+        "clear": "Vaciar cola",
+        "status_pending": "En cola",
+        "status_running": "Recopilando…",
+        "status_done": "{} reseñas",
+        "status_partial": "{} reseñas · parcial",
+        "status_error": "Error: {}",
+        "status_skipped": "No recopilada",
+        "open": "Abrir",
+        "options_title": "Opciones",
+        "country": "País de la tienda",
+        "review_language": "Idioma de las reseñas",
+        "limit": "Máximo por app",
+        "limit_placeholder": "Todas",
+        "since": "Desde",
+        "since_placeholder": "AAAA-MM-DD",
+        "formats": "Guardar como",
+        "folder": "Carpeta de destino",
+        "choose": "Elegir…",
+        "open_folder": "Abrir carpeta",
+        "ready": "Listo. Añade apps y pulsa Iniciar.",
+        "start": "Iniciar recopilación",
+        "stop": "Detener",
+        "stopping": "Deteniendo…",
+        "app_progress": "App {} de {} · {}",
+        "count_progress": "{} reseñas",
+        "count_progress_total": "{} de ~{} reseñas",
+        "finished": "Listo: {} reseñas de {} app(s).",
+        "finished_cancelled": "Recopilación detenida. {} reseñas guardadas.",
+        "finished_nothing": "No se recopiló ninguna reseña.",
+        "show_log": "Mostrar registro",
+        "hide_log": "Ocultar registro",
+        "error_title": "Ups",
+        "err_no_apps": "Añade al menos una app a la cola.",
+        "err_limit": "El máximo por app debe ser un número entero mayor que cero.",
+        "err_since": "Usa el formato AAAA-MM-DD para la fecha (ej.: 2026-01-31).",
+        "err_no_format": "Elige al menos un formato de archivo.",
+        "err_folder": "No se pudo usar la carpeta de destino:\n{}",
+        "log_start": "Recopilando {} (tienda {}, idioma {})",
+        "log_saved": "Guardado: {}",
+        "log_done": "{}: {} reseñas",
+        "log_partial": "{}: recopilación parcial ({})",
+        "log_cancelled": "detenida",
+        "log_error": "{}: falló — {}",
+        "done_title": "Recopilación completa",
+        "done_headline": "{} reseñas recopiladas",
+        "done_apps": "de {} app(s)",
+        "done_time": "Ahorraste unos {}",
+        "done_compare": "frente a copiarlas a mano (≈30s por reseña)",
+        "done_totals": "En total: {} reseñas · {} ahorrados · sesiones: {}",
+        "avg_rating": "Valoración media",
+        "close": "Cerrar",
+        "about": "Acerca de",
+        "about_text": "Herramienta de código abierto para recopilar y analizar reseñas de Google Play Store.",
+        "about_author": "Hecho por Douglas Siqueira",
+        "about_github": "Ver en GitHub",
+        "theme_system": "Sistema",
+        "theme_light": "Claro",
+        "theme_dark": "Oscuro",
+    },
+    "fr": {
+        "subtitle": "Collectez les avis d'apps du Play Store en CSV, JSON ou Excel",
+        "apps_title": "Apps",
+        "url_placeholder": "Collez une URL du Play Store ou l'ID de l'app (ex. : com.whatsapp)",
+        "add": "Ajouter",
+        "paste_hint": "Astuce : vous pouvez coller plusieurs URL d'un coup, une par ligne.",
+        "invalid_input": "« {} » ne ressemble pas à une URL du Play Store ni à un ID d'app.",
+        "already_queued": "{} est déjà dans la file.",
+        "queue_empty": "Aucune app dans la file pour l'instant",
+        "queue_count_one": "1 app dans la file",
+        "queue_count_many": "{} apps dans la file",
+        "clear": "Vider la file",
+        "status_pending": "En attente",
+        "status_running": "Collecte…",
+        "status_done": "{} avis",
+        "status_partial": "{} avis · partiel",
+        "status_error": "Erreur : {}",
+        "status_skipped": "Non collectée",
+        "open": "Ouvrir",
+        "options_title": "Options",
+        "country": "Pays du store",
+        "review_language": "Langue des avis",
+        "limit": "Maximum par app",
+        "limit_placeholder": "Tous",
+        "since": "Depuis le",
+        "since_placeholder": "AAAA-MM-JJ",
+        "formats": "Enregistrer en",
+        "folder": "Dossier de destination",
+        "choose": "Choisir…",
+        "open_folder": "Ouvrir le dossier",
+        "ready": "Prêt. Ajoutez des apps et cliquez sur Démarrer.",
+        "start": "Démarrer la collecte",
+        "stop": "Arrêter",
+        "stopping": "Arrêt…",
+        "app_progress": "App {} sur {} · {}",
+        "count_progress": "{} avis",
+        "count_progress_total": "{} sur ~{} avis",
+        "finished": "Terminé : {} avis de {} app(s).",
+        "finished_cancelled": "Collecte interrompue. {} avis enregistrés.",
+        "finished_nothing": "Aucun avis collecté.",
+        "show_log": "Afficher le journal",
+        "hide_log": "Masquer le journal",
+        "error_title": "Oups",
+        "err_no_apps": "Ajoutez au moins une app à la file.",
+        "err_limit": "Le maximum par app doit être un nombre entier supérieur à zéro.",
+        "err_since": "Utilisez le format AAAA-MM-JJ pour la date (ex. : 2026-01-31).",
+        "err_no_format": "Choisissez au moins un format de fichier.",
+        "err_folder": "Impossible d'utiliser le dossier de destination :\n{}",
+        "log_start": "Collecte de {} (store {}, langue {})",
+        "log_saved": "Enregistré : {}",
+        "log_done": "{} : {} avis",
+        "log_partial": "{} : collecte partielle ({})",
+        "log_cancelled": "interrompue",
+        "log_error": "{} : échec — {}",
+        "done_title": "Collecte terminée",
+        "done_headline": "{} avis collectés",
+        "done_apps": "de {} app(s)",
+        "done_time": "Vous avez gagné environ {}",
+        "done_compare": "par rapport à une copie manuelle (≈30 s par avis)",
+        "done_totals": "Au total : {} avis · {} gagnés · sessions : {}",
+        "avg_rating": "Note moyenne",
+        "close": "Fermer",
+        "about": "À propos",
+        "about_text": "Outil open source pour collecter et analyser les avis du Google Play Store.",
+        "about_author": "Créé par Douglas Siqueira",
+        "about_github": "Voir sur GitHub",
+        "theme_system": "Système",
+        "theme_light": "Clair",
+        "theme_dark": "Sombre",
+    },
+    "de": {
+        "subtitle": "Play-Store-Bewertungen als CSV, JSON oder Excel sammeln",
+        "apps_title": "Apps",
+        "url_placeholder": "Play-Store-URL oder App-ID einfügen (z. B. com.whatsapp)",
+        "add": "Hinzufügen",
+        "paste_hint": "Tipp: Du kannst mehrere URLs auf einmal einfügen, eine pro Zeile.",
+        "invalid_input": "„{}“ sieht nicht nach einer Play-Store-URL oder App-ID aus.",
+        "already_queued": "{} ist bereits in der Warteschlange.",
+        "queue_empty": "Noch keine Apps in der Warteschlange",
+        "queue_count_one": "1 App in der Warteschlange",
+        "queue_count_many": "{} Apps in der Warteschlange",
+        "clear": "Warteschlange leeren",
+        "status_pending": "Wartet",
+        "status_running": "Sammle…",
+        "status_done": "{} Bewertungen",
+        "status_partial": "{} Bewertungen · unvollständig",
+        "status_error": "Fehler: {}",
+        "status_skipped": "Nicht gesammelt",
+        "open": "Öffnen",
+        "options_title": "Optionen",
+        "country": "Store-Land",
+        "review_language": "Sprache der Bewertungen",
+        "limit": "Maximum pro App",
+        "limit_placeholder": "Alle",
+        "since": "Seit",
+        "since_placeholder": "JJJJ-MM-TT",
+        "formats": "Speichern als",
+        "folder": "Zielordner",
+        "choose": "Auswählen…",
+        "open_folder": "Ordner öffnen",
+        "ready": "Bereit. Füge Apps hinzu und klicke auf Starten.",
+        "start": "Sammeln starten",
+        "stop": "Stopp",
+        "stopping": "Wird gestoppt…",
+        "app_progress": "App {} von {} · {}",
+        "count_progress": "{} Bewertungen",
+        "count_progress_total": "{} von ~{} Bewertungen",
+        "finished": "Fertig: {} Bewertungen aus {} App(s).",
+        "finished_cancelled": "Sammeln gestoppt. {} Bewertungen gespeichert.",
+        "finished_nothing": "Keine Bewertungen gesammelt.",
+        "show_log": "Protokoll anzeigen",
+        "hide_log": "Protokoll ausblenden",
+        "error_title": "Hoppla",
+        "err_no_apps": "Füge mindestens eine App zur Warteschlange hinzu.",
+        "err_limit": "Das Maximum pro App muss eine ganze Zahl größer als null sein.",
+        "err_since": "Verwende für das Datum das Format JJJJ-MM-TT (z. B. 2026-01-31).",
+        "err_no_format": "Wähle mindestens ein Dateiformat.",
+        "err_folder": "Der Zielordner kann nicht verwendet werden:\n{}",
+        "log_start": "Sammle {} (Store {}, Sprache {})",
+        "log_saved": "Gespeichert: {}",
+        "log_done": "{}: {} Bewertungen",
+        "log_partial": "{}: unvollständig ({})",
+        "log_cancelled": "gestoppt",
+        "log_error": "{}: fehlgeschlagen — {}",
+        "done_title": "Sammeln abgeschlossen",
+        "done_headline": "{} Bewertungen gesammelt",
+        "done_apps": "aus {} App(s)",
+        "done_time": "Du hast etwa {} gespart",
+        "done_compare": "im Vergleich zum Abtippen (≈30 s pro Bewertung)",
+        "done_totals": "Insgesamt: {} Bewertungen · {} gespart · Durchläufe: {}",
+        "avg_rating": "Durchschnitt",
+        "close": "Schließen",
+        "about": "Über",
+        "about_text": "Open-Source-Tool zum Sammeln und Auswerten von Google-Play-Store-Bewertungen.",
+        "about_author": "Erstellt von Douglas Siqueira",
+        "about_github": "Auf GitHub ansehen",
+        "theme_system": "System",
+        "theme_light": "Hell",
+        "theme_dark": "Dunkel",
+    },
+    "it": {
+        "subtitle": "Raccogli le recensioni del Play Store in CSV, JSON o Excel",
+        "apps_title": "App",
+        "url_placeholder": "Incolla un URL del Play Store o l'ID dell'app (es. com.whatsapp)",
+        "add": "Aggiungi",
+        "paste_hint": "Suggerimento: puoi incollare più URL insieme, uno per riga.",
+        "invalid_input": "“{}” non sembra un URL del Play Store né un ID di app.",
+        "already_queued": "{} è già in coda.",
+        "queue_empty": "Ancora nessuna app in coda",
+        "queue_count_one": "1 app in coda",
+        "queue_count_many": "{} app in coda",
+        "clear": "Svuota coda",
+        "status_pending": "In coda",
+        "status_running": "Raccolta…",
+        "status_done": "{} recensioni",
+        "status_partial": "{} recensioni · parziale",
+        "status_error": "Errore: {}",
+        "status_skipped": "Non raccolta",
+        "open": "Apri",
+        "options_title": "Opzioni",
+        "country": "Paese dello store",
+        "review_language": "Lingua delle recensioni",
+        "limit": "Massimo per app",
+        "limit_placeholder": "Tutte",
+        "since": "Dal",
+        "since_placeholder": "AAAA-MM-GG",
+        "formats": "Salva come",
+        "folder": "Cartella di destinazione",
+        "choose": "Scegli…",
+        "open_folder": "Apri cartella",
+        "ready": "Pronto. Aggiungi le app e premi Avvia.",
+        "start": "Avvia raccolta",
+        "stop": "Ferma",
+        "stopping": "Arresto…",
+        "app_progress": "App {} di {} · {}",
+        "count_progress": "{} recensioni",
+        "count_progress_total": "{} di ~{} recensioni",
+        "finished": "Fatto: {} recensioni da {} app.",
+        "finished_cancelled": "Raccolta interrotta. {} recensioni salvate.",
+        "finished_nothing": "Nessuna recensione raccolta.",
+        "show_log": "Mostra log",
+        "hide_log": "Nascondi log",
+        "error_title": "Ops",
+        "err_no_apps": "Aggiungi almeno un'app alla coda.",
+        "err_limit": "Il massimo per app deve essere un numero intero maggiore di zero.",
+        "err_since": "Usa il formato AAAA-MM-GG per la data (es. 2026-01-31).",
+        "err_no_format": "Scegli almeno un formato di file.",
+        "err_folder": "Impossibile usare la cartella di destinazione:\n{}",
+        "log_start": "Raccolta di {} (store {}, lingua {})",
+        "log_saved": "Salvato: {}",
+        "log_done": "{}: {} recensioni",
+        "log_partial": "{}: raccolta parziale ({})",
+        "log_cancelled": "interrotta",
+        "log_error": "{}: non riuscita — {}",
+        "done_title": "Raccolta completata",
+        "done_headline": "{} recensioni raccolte",
+        "done_apps": "da {} app",
+        "done_time": "Hai risparmiato circa {}",
+        "done_compare": "rispetto a copiarle a mano (≈30 s per recensione)",
+        "done_totals": "In totale: {} recensioni · {} risparmiati · sessioni: {}",
+        "avg_rating": "Voto medio",
+        "close": "Chiudi",
+        "about": "Info",
+        "about_text": "Strumento open source per raccogliere e analizzare le recensioni del Google Play Store.",
+        "about_author": "Creato da Douglas Siqueira",
+        "about_github": "Vedi su GitHub",
+        "theme_system": "Sistema",
+        "theme_light": "Chiaro",
+        "theme_dark": "Scuro",
+    },
+}
+
+
+def detect_language() -> str:
+    """Best guess of the OS UI language among the supported ones."""
+    try:
+        code = (locale.getlocale()[0] or "").lower()
+    except ValueError:
+        code = ""
+    for lang in LANGUAGES:
+        if code.startswith(lang) or code.startswith(LANGUAGES[lang].lower()):
+            return lang
+    return "en"
+
+
+def format_number(n: int, lang: str) -> str:
+    sep = "," if lang == "en" else "."
+    return f"{n:,}".replace(",", sep)
+
+
 class Translator:
-    def __init__(self, language='pt'):
-        self.current_language = language
-        self.translations = TRANSLATIONS
-    
-    def set_language(self, language):
-        """Define o idioma atual"""
-        if language in self.translations:
-            self.current_language = language
+    def __init__(self, language: str = "pt") -> None:
+        self.language = language if language in STRINGS else "en"
+
+    def set_language(self, language: str) -> bool:
+        if language in STRINGS:
+            self.language = language
             return True
         return False
-    
-    def get(self, key, *args):
-        """Gets a translation"""
-        try:
-            text = self.translations[self.current_language][key]
-            if args:
-                return text.format(*args)
-            return text
-        except KeyError:
-            # Fallback to Portuguese if key doesn't exist
-            try:
-                text = self.translations['pt'][key]
-                if args:
-                    return text.format(*args)
-                return text
-            except KeyError:
-                return f"[{key}]"  # Show key if translation not found
-    
-    def get_available_languages(self):
-        """Returns list of available languages"""
-        return list(self.translations.keys())
-    
-    def get_language_name(self, lang_code):
-        """Retorna o nome do idioma"""
-        return self.get('languages').get(lang_code, lang_code)
-    
-    def get_country_name(self, country_code):
-        """Returns the country name"""
-        return self.get('countries').get(country_code, country_code)
 
-# Global translator instance
-translator = Translator()
+    def get(self, key: str, *args: object) -> str:
+        text = STRINGS[self.language].get(key) or STRINGS["en"].get(key) or f"[{key}]"
+        return text.format(*args) if args else text
+
+    __call__ = get
+
+    def num(self, n: int) -> str:
+        return format_number(n, self.language)
+
+    # -- combobox helpers ------------------------------------------------- #
+    def country_choices(self) -> list[str]:
+        i = _ORDER.index(self.language)
+        return [f"{names[i]} ({code})" for code, names in _COUNTRIES.items()]
+
+    def country_label(self, code: str) -> str:
+        i = _ORDER.index(self.language)
+        names = _COUNTRIES.get(code)
+        return f"{names[i]} ({code})" if names else code
+
+    @staticmethod
+    def review_language_choices() -> list[str]:
+        return [f"{name} ({code})" for code, name in REVIEW_LANGUAGES.items()]
+
+    @staticmethod
+    def review_language_label(code: str) -> str:
+        name = REVIEW_LANGUAGES.get(code)
+        return f"{name} ({code})" if name else code
+
+
+def code_from_choice(text: str) -> str | None:
+    """'Brasil (br)' -> 'br'; also accepts a bare 2-letter code typed by hand."""
+    text = (text or "").strip()
+    match = re.search(r"\(([A-Za-z]{2})\)\s*$", text) or re.fullmatch(r"([A-Za-z]{2})", text)
+    return match.group(1).lower() if match else None

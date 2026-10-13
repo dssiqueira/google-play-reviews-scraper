@@ -30,8 +30,9 @@ env/
 *.json
 !examples/*.csv
 !examples/*.json
+!assets/theme.json
 
-# Time statistics
+# Legacy stats file (now stored in the user's app-data folder)
 src/time_stats.json
 
 # IDE
@@ -49,11 +50,10 @@ src/time_stats.json
 # PyInstaller
 *.manifest
 *.spec
-GooglePlayReviewsScraper_custom.spec
 build/
 dist/
-release/
 installer/
+.ruff_cache/
 
 # Unit test / coverage reports
 htmlcov/

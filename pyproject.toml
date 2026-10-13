@@ -1,0 +1,19 @@
+[project]
+name = "google-play-reviews-scraper"
+version = "2.0.0"
+description = "Collect Google Play Store reviews into CSV, JSON or Excel"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [{ name = "Douglas Siqueira" }]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "I", "UP"]
+ignore = ["E501", "UP007", "UP045"]  # keep Optional[...] readable on 3.9

@@ -9,9 +9,11 @@ Este programa permite extrair e analisar reviews de aplicativos da Google Play S
 CARACTERÍSTICAS:
 - Interface gráfica moderna e intuitiva
 - Suporte a 6 idiomas (Português, Inglês, Espanhol, Francês, Alemão, Italiano)
-- Exportação em CSV e JSON
-- Coleta ilimitada de reviews
-- Estatísticas detalhadas
+- Exportação em CSV, JSON e Excel
+- Coleta de vários apps de uma vez
+- Filtros por quantidade máxima e por data
+- Modo claro e escuro
+- Estatísticas de nota ao final de cada coleta
 
 REQUISITOS:
 - Windows 10 ou superior
@@ -31,7 +33,7 @@ APÓS A INSTALAÇÃO:
 2. Cole a URL de um app da Google Play Store
 3. Clique em "Iniciar Coleta"
 4. Aguarde a coleta finalizar
-5. Abra os arquivos CSV ou JSON gerados
+5. Clique em "Abrir" ao lado de cada app para ver o arquivo gerado
 
 SUPORTE:
 - GitHub: https://github.com/dssiqueira/google-play-reviews-scraper

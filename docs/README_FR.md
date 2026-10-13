@@ -1,292 +1,71 @@
 <div align="center">
 
-# 📱 Google Play Reviews Scraper
+<img src="../assets/icons/google-play.png" width="72" alt="">
 
-![Google Play Reviews Scraper](../assets/icons/google-play.png)
+# Google Play Reviews Scraper
 
-**🚀 Outil professionnel pour extraire et analyser les avis d'applications du Google Play Store**
+**Collectez les avis du Google Play Store en CSV, JSON ou Excel — depuis une app de bureau ou le terminal.**
 
-*Extrayez des milliers d'avis en quelques minutes avec une interface moderne et belle*
+[🇺🇸 English](../README.md) · [🇧🇷 Português](README_PT.md) · [🇪🇸 Español](README_ES.md) · [🇫🇷 Français](README_FR.md) · [🇩🇪 Deutsch](README_DE.md) · [🇮🇹 Italiano](README_IT.md)
 
----
-
-## 🌍 **Choisissez votre Langue / Choose Your Language**
-
-[![🇺🇸 English](https://img.shields.io/badge/🇺🇸-English-4285f4?style=for-the-badge&labelColor=white)](../README.md)
-[![🇧🇷 Português](https://img.shields.io/badge/🇧🇷-Português-00a86b?style=for-the-badge&labelColor=white)](README_PT.md)
-[![🇪🇸 Español](https://img.shields.io/badge/🇪🇸-Español-ea4335?style=for-the-badge&labelColor=white)](README_ES.md)
-[![🇫🇷 Français](https://img.shields.io/badge/🇫🇷-Français-4285f4?style=for-the-badge&labelColor=white)](README_FR.md)
-[![🇩🇪 Deutsch](https://img.shields.io/badge/🇩🇪-Deutsch-333333?style=for-the-badge&labelColor=white)](README_DE.md)
-[![🇮🇹 Italiano](https://img.shields.io/badge/🇮🇹-Italiano-00a86b?style=for-the-badge&labelColor=white)](README_IT.md)
-
----
-
-[![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](../LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Cross--Platform-lightgrey?style=for-the-badge)](https://github.com)
-[![GUI](https://img.shields.io/badge/Interface-GUI_Moderne-blue?style=for-the-badge)](../src/app_gui.py)
-
-**[🎬 Voir Démo](#-démo) • [⚡ Démarrage Rapide](#-démarrage-rapide) • [📖 Fonctionnalités](#-fonctionnalités) • [🛠️ Installation](#️-installation)**
-
----
+<img src="../assets/screenshots/app-light.png" width="720" alt="L'app en train de collecter les avis de quatre apps">
 
 </div>
 
-## 🎬 Démo
+## Fonctionnalités
+
+- **File de plusieurs apps** — collez des URL du Play Store ou des ID de paquet, même plusieurs d'un coup (un par ligne).
+- **Juste ce qu'il vous faut** — tout, les *N* derniers par app, ou seulement les avis depuis une date.
+- **CSV, JSON et Excel** — le CSV s'ouvre dans Excel avec les accents ; le JSON inclut les métadonnées de l'app.
+- **Arrêt immédiat** — ce qui a déjà été collecté est conservé.
+- **Robuste** — les erreurs réseau sont réessayées au lieu d'interrompre la collecte en silence.
+- **Résumé des notes** — moyenne et répartition de 1 à 5★ à la fin.
+- **Mode clair et sombre**, interface en 6 langues, mémorise vos réglages.
+- **La même app sur Windows, macOS et Linux**, plus une CLI et une API Python.
 
 <div align="center">
-
-### 🖥️ Interface Moderne
-*Interface belle et intuitive avec support multi-langues*
-
-![Aperçu Interface](../assets/screenshots/google-play-reviews-scraper.png)
-
-### ⚡ Application en Action
-*Voyez le scraper fonctionner avec progression en temps réel*
-
-![Démo de l'Application](../assets/screenshots/google-play-reviews-scraper.gif)
-
-### 📊 Interface en Ligne de Commande
-*Également disponible via terminal pour l'automatisation*
-
-![Démo du Terminal](../assets/screenshots/google-play-reviews-scraper-terminal.gif)
-
+<img src="../assets/screenshots/app-dark-summary.png" width="600" alt="">
 </div>
 
----
+## Démarrage
 
-## ⚡ Démarrage Rapide
+### Windows — sans Python
 
-### 🖥️ **Compatibilité des Plateformes**
+Téléchargez l'installateur ou le `.exe` dans les [Releases](https://github.com/dssiqueira/google-play-reviews-scraper/releases) et lancez-le.
 
-| Plateforme | Interface Graphique | Ligne de Commande | Notes |
-|:----------:|:-------------------:|:-----------------:|:------|
-| 🪟 **Windows** | ✅ Support Complet | ✅ Supporté | GUI moderne avec toutes les fonctionnalités |
-| 🍎 **macOS** | ✅ Interface Native | ✅ Supporté | Optimisée pour le design macOS |
-| 🐧 **Linux** | ⚠️ GUI Basique | ✅ Supporté | GUI disponible mais CLI recommandé |
-
-### 🎯 **Option 1: Application GUI (Recommandée)**
-
-#### **🚀 Installation en Une Commande**
-```bash
-git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
-cd google-play-reviews-scraper
-python install.py
-```
-
-#### **🔧 Installation Manuelle**
-```bash
-# Windows: python src/app_gui.py
-# macOS: python src/app_gui_mac.py  
-# Linux: python src/app_gui.py
-```
-
-### 🔧 **Option 2: Ligne de Commande**
-
-```bash
-# Extraire les avis d'une seule app
-python src/review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
-
-# Traitement par lots de plusieurs apps
-python src/review_scraper.py --batch liste_apps.txt --output resultats/
-```
-
-### 📦 **Option 3: Module Python**
-
-```python
-from src.review_scraper import GooglePlayReviewScraper
-
-scraper = GooglePlayReviewScraper()
-reviews = scraper.scrape_reviews("com.whatsapp")
-print(f"Extrait {len(reviews)} avis!")
-```
-
----
-
-## 📈 **Review Stats Pro - Analyse Professionnelle**
-
-Après avoir extrait les avis, analysez vos données avec notre plateforme professionnelle:
-
-**🔗 [Review Stats Pro](https://review-stats-pro.lovable.app/)**
-
-### ✨ **Fonctionnalités:**
-- 📊 **Analyse de Sentiment** - Comprendre les émotions des utilisateurs
-- 📈 **Détection de Tendances** - Identifier les modèles temporels
-- 🔍 **Extraction de Mots-clés** - Trouver les sujets les plus mentionnés
-- 📊 **Graphiques Interactifs** - Visualisations professionnelles
-
-### 💡 **Flux de travail:**
-1. Extraire les avis avec cet outil
-2. Télécharger le JSON vers Review Stats Pro
-3. Obtenir des analyses professionnelles instantanées
-
----
-
-## 📖 Fonctionnalités
-
-<div align="center">
-
-| 🎯 **Fonctionnalités Principales** | 🎨 **Interface** | 📊 **Sortie** | 🌍 **Multi-Langue** |
-|:---:|:---:|:---:|:---:|
-| Extrait **TOUS** les avis | GUI moderne avec thèmes | Export CSV et JSON | 6 langues supportées |
-| **Traitement par lots** | Progrès en temps réel | Analyses détaillées | Auto-détection de langue |
-| **Filtrage intelligent** | Glisser-déposer URLs | Statistiques de temps | Traductions personnalisées |
-| **Limitation de débit** | File d'attente multi-apps | Gestion d'erreurs | Support RTL |
-
-</div>
-
-### 🚀 **Qu'est-ce qui le rend spécial ?**
-
-- **🎯 Extraction Complète**: Obtient TOUS les avis disponibles, pas seulement les récents
-- **⚡ Super Rapide**: Scraping optimisé avec limitation intelligente de débit  
-- **🎨 Belle Interface**: GUI moderne avec thèmes clair/sombre
-- **📊 Analyses Riches**: Statistiques détaillées et suivi du temps
-- **🔄 Traitement par Lots**: Gère plusieurs apps simultanément
-- **🌍 Multi-Langue**: Interface disponible en 6 langues
-- **📱 Détection Intelligente**: Auto-détecte les infos de l'app et gère les erreurs élégamment
-- **💾 Formats Multiples**: Exporte en CSV, JSON avec champs personnalisables
-- **🛡️ Robuste**: Gère les problèmes réseau, limites de débit et cas extrêmes
-
----
-
-## 🛠️ Installation
-
-### 📋 **Prérequis**
-
-- **Python 3.7+** (3.9+ recommandé)
-- **Connexion internet** pour le scraping
-- **2GB RAM** minimum (4GB+ pour de gros datasets)
-
-### 📦 **Installation Rapide**
+### Depuis les sources
 
 ```bash
 git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
 cd google-play-reviews-scraper
 pip install -r requirements.txt
-python src/app_gui.py
+
+python src/app_gui.py         # app de bureau
+python src/review_scraper.py  # mode interactif dans le terminal
 ```
 
----
+> **Linux :** Tk est souvent un paquet séparé — `sudo apt install python3-tk` (Debian/Ubuntu).
 
-## 🎯 Cas d'Usage
-
-### 💼 **Parfait pour:**
-
-- **📊 Chercheurs de Marché** - Analyser les apps concurrentes et tendances du marché
-- **🎯 Product Managers** - Recueillir les retours utilisateurs pour la planification de fonctionnalités  
-- **🔍 Chercheurs UX** - Comprendre les points de douleur et préférences des utilisateurs
-- **📈 Développeurs d'Apps** - Surveiller les performances et satisfaction des utilisateurs
-- **🏢 Analystes Business** - Générer des insights pour les décisions stratégiques
-- **🎓 Étudiants et Académiques** - Collecter des données pour projets de recherche
-
----
-
-## 📄 Licence
-
-Ce projet est sous licence **MIT** - voir le fichier [LICENSE](../LICENSE) pour les détails.
-
----
-
-<div align="center">
-
-**🚀 Développé avec ❤️ pour la communauté**
-
-**Si ce projet vous a aidé, pensez à lui donner une ⭐!**
-
-[![GitHub stars](https://img.shields.io/github/stars/dssiqueira/google-play-reviews-scraper?style=social)](../../stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/dssiqueira/google-play-reviews-scraper?style=social)](../../network/members)
-
-</div>
-
-### Option 1 : Exécutable (Windows Uniquement)
-1. Téléchargez l'exécutable depuis la [page des releases](../../releases)
-2. Exécutez `GooglePlayReviewScraper.exe`
-3. Terminé ! Pas besoin d'installer Python
-
-### Option 2 : Interface Visuelle (Windows & macOS)
-```bash
-# 1. Cloner le dépôt
-git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
-cd google-play-reviews-scraper
-
-# 2. Installer les dépendances
-pip install -r requirements.txt
-
-# Windows : Exécutez l'interface graphique
-python app_gui.py
-
-# macOS : Exécutez l'interface native
-cd src && python3 app_gui_mac.py
-```
-
-### Option 3 : Ligne de Commande (Toutes Plateformes)
-```bash
-# Après avoir cloné et installé les dépendances
-python review_scraper.py --url "https://play.google.com/store/apps/details?id=com.whatsapp"
-```
-
-**🪟 Utilisateurs Windows** : L'interface s'ouvrira en Portugais. Utilisez le sélecteur de drapeaux dans le coin supérieur droit pour changer de langue !
-**🍎 Utilisateurs macOS** : Interface native avec 6 langues, polices SF Pro et intégration Finder !
-**🐧 Utilisateurs Linux** : Utilisez l'interface en ligne de commande avec les paramètres montrés ci-dessous.
-
----
-
-## 💻 **Interface Graphique Moderne**
-
-![Google Play Reviews Scraper Screenshot](../assets/screenshots/google-play-reviews-scraper.png)
-
-### 🎬 **Application en Action**
-![Google Play Reviews Scraper Demo](../assets/screenshots/google-play-reviews-scraper.gif)
-
-### ✨ Fonctionnalités de l'Interface :
-- 🎨 **Design Material Design** moderne et intuitif
-- 🌍 **Multi-langues** avec sélecteur de drapeaux (6 langues)
-- 📋 **Collez l'URL** directement depuis le navigateur
-- ⚙️ **Configuration simple** (pays, langue, dossier)
-- 📊 **Progression en temps réel** avec barre visuelle
-- 📁 **Ouverture automatique** des fichiers générés
-- 📜 **Défilement fluide** pour les petits écrans
-- ℹ️ **Modal "À propos"** avec informations du développeur
-- 🎯 **Icône personnalisée** dans la barre des tâches
-
-### 🌍 **Système Multi-langues**
-- **🇺🇸 English**
-- **🇧🇷 Português**
-- **🇪🇸 Español**
-- **🇫🇷 Français** (Par défaut)
-- **🇩🇪 Deutsch**
-- **🇮🇹 Italiano**
-
-**Sélecteur avec vrais drapeaux** : Cliquez sur le drapeau dans le coin supérieur droit pour changer de langue instantanément !
-
----
-
-## 🛠️ **Interface en Ligne de Commande**
-
-### 🎬 **Démonstration du Terminal**
-![Google Play Reviews Scraper Terminal Demo](../assets/screenshots/google-play-reviews-scraper-terminal.gif)
-
-### 🍎🐧 **Pour les Utilisateurs Mac/Linux (Obligatoire)**
-
-Comme l'interface graphique est exclusive à Windows, les utilisateurs Mac et Linux doivent utiliser la ligne de commande :
+## Ligne de commande
 
 ```bash
-git clone https://github.com/dssiqueira/google-play-reviews-scraper.git
-cd google-play-reviews-scraper
-pip install -r requirements.txt
-python src/app_gui.py
+# une app, par ID ou URL
+python src/review_scraper.py com.whatsapp
+
+# plusieurs apps, store US en anglais, 1 000 max. chacune, depuis le 1er janvier, en CSV + Excel
+python src/review_scraper.py com.whatsapp com.instagram.android \
+    --country us --lang en --max 1000 --since 2026-01-01 --format csv,xlsx
 ```
 
----
+Toutes les options, l'API Python et le format des données sont dans le [README en anglais](../README.md).
 
-## 🎯 Cas d'Usage
+## Bon à savoir
 
-### 💼 **Parfait pour:**
+- **Combien d'avis puis-je récupérer ?** Autant que Google Play en fournit pour ce pays/cette langue — souvent moins que le total affiché, qui compte toutes les langues.
+- **Est-ce autorisé ?** L'outil lit des pages publiques, comme un navigateur. Les avis contiennent des noms d'utilisateurs : traitez les données de façon responsable (RGPD) et respectez les conditions de Google Play.
 
-- **📊 Chercheurs de Marché** - Analyser les applications concurrentes et tendances
-- **🎯 Chefs de Produit** - Collecter les retours utilisateurs pour planification  
-- **🔍 Chercheurs UX** - Comprendre les points de douleur et préférences
-- **📈 Développeurs d'Apps** - Surveiller performance et satisfaction utilisateurs
-- **🏢 Analystes Business** - Générer des insights pour décisions stratégiques
-- **🎓 Étudiants et Académiques** - Collecter données pour projets de recherche
+Graphiques et analyse de sentiment ? Importez le JSON dans **[Review Stats Pro](https://review-stats-pro.lovable.app/)**.
 
+## Licence
+
+[MIT](../LICENSE) © Douglas Siqueira
