@@ -143,3 +143,5 @@ Translations live in `src/translations.py`; a test checks every language has eve
 ## License
 
 [MIT](LICENSE) © Douglas Siqueira
+
+Made by [Douglas Siqueira](https://dsiqueira.com/sobre) · [dsiqueira.com](https://dsiqueira.com)
